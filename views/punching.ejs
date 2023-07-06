@@ -1,0 +1,170 @@
+<%- include('./header.ejs') %>
+
+<style>
+	h1{
+		color: #264673;
+		font-weight: 450;
+		font-size: 40px;
+		margin: 40px 0px 20px;
+	}
+	#clockdiv{
+		font-family: sans-serif;
+		color: #fff;
+		display: inline-block;
+		font-weight: 100;
+		text-align: center;
+		font-size: 30px;
+	}
+
+	#clockdiv > div{
+		padding: 10px;
+		border-radius: 3px;
+		background: #2c58a9;
+		display: inline-block;
+	}
+
+	#clockdiv div > span{
+		padding: 15px;
+		border-radius: 3px;
+		background: #233c60;
+		display: inline-block;
+	}
+
+	.smalltext{
+		padding-top: 5px;
+		font-size: 16px;
+	}
+</style>
+<body onload="get_badge()">
+
+<!--wrapper-->
+<div class="wrapper">
+
+<%- include('./sidebar.ejs') %>
+<%- include('./topbar.ejs') %>
+
+<!--start page wrapper -->
+
+<div class="page-wrapper">
+	<div class="page-content">
+		<!--breadcrumb-->
+		<div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+			<div class="ps-3">
+				<span class="font-30"><i class="bx bx-timer"></i></span>
+				<span class="font-24"><%= __("Punch In/Out") %></span>
+			</div>
+		</div>
+		<!--end breadcrumb-->
+		<!-- <div class="col-12 col-lg-9 mx-auto"> -->
+			<div class="card radius-10">
+				<div class="card-body">
+					<div class="d-flex">
+						<div class="flex-grow-1 ms-12 text-md-center">
+							<h1 class="text-bold-300"><%=__("Current Time") %></h1>
+							<div id="clockdiv" >
+								<div>
+									<span id="hr" class="hour"></span>
+									<div class="smalltext"><%=__("Hour") %></div>
+								</div>
+								<div>
+									<span id="min" class="minute"></span>
+									<div class="smalltext"><%=__("Minute") %></div>
+								</div>
+								<div>
+									<span id="sec" class="second"></span>
+									<div class="smalltext"><%=__("Second") %></div>
+								</div>
+							</div>
+						</div>
+						<div></div>
+					</div>
+					<div class="text-md-center"><br> <p id="local_msg" style="font-size: 15px; font-weight: bold;"></p> <br> </div>
+					<form id="Punching">
+					<div class="flex-grow-1 ms-12 text-md-center">
+						<input type="button" id="btn_punch" class="btn btn-primary px-4" onclick="punchio()"/>
+					</div>
+					</form>
+				</div>
+			</div>
+		<!-- </div> -->
+
+		<%- include('./copyright.ejs') %>
+	</div>
+</div>
+
+<!--end page wrapper -->
+
+<%- include('./footer.ejs') %>
+
+</div>
+<!--wrapper ended-->
+
+<script type="text/javascript">
+	function punchio() {
+		// disable the button
+		$('#btn_punch').removeAttr('onclick');
+		let form = $('#Punching');
+		$.ajax({
+			type: 'get',
+			url: '/user/punchio',
+			success: function(return_sData) {
+				if (return_sData.returnMSG==="Punch In") {
+					$('#p-out').show();
+					$('#p-in').hide();
+					$('#btn_punch').attr("value","<%=__("Punch OUT")%>");
+					$('#local_msg').text("<%=__("Welcome to work") %>");
+					// resume the button
+					$('#btn_punch').attr('onclick', 'punchio()');
+					showTime();
+					$('#ClockDisplay').show();
+				} else {
+					$('#p-out').hide();
+					$('#p-in').show();
+					$('#btn_punch').attr("value","<%=__("Punch IN")%>");
+					$('#local_msg').text("<%=__("Goodbye") %>");
+					// resume the button
+					$('#btn_punch').attr('onclick', 'punchio()');
+					$('#ClockDisplay').hide();
+				}
+			}
+		});
+	}
+</script>
+<script type="text/javascript">
+	function get_servertime() {
+		$.ajax({
+			type : 'GET',
+			url : '/user/getClock',
+			success : function(server_time) {
+				let t = server_time;
+				return t;
+				t = new Date();
+				//alert(t);
+			}
+		});
+	}
+	function initializeClock(id) {
+		//let x = get_servertime();
+		//alert(x);
+		const clock = document.getElementById(id);
+		const hoursSpan = clock.querySelector('.hour');
+		const minutesSpan = clock.querySelector('.minute');
+		const secondsSpan = clock.querySelector('.second');
+
+		function updateClock() {
+			const t = new Date();
+			$('#hr').html(('0' + t.getHours()).slice(-2));
+			$('#min').html(('0' + t.getMinutes()).slice(-2));
+			$('#sec').html(('0' + t.getSeconds()).slice(-2));
+		}
+		updateClock();
+		$(document).ready(function(){
+			setInterval(updateClock, 1000); //refresh per sec
+		});
+	}
+	initializeClock('clockdiv');
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,654 @@
+
+<%- include('./header.ejs') %>
+
+<body onload="get_badge()">
+
+<!--wrapper-->
+<div class="wrapper">
+
+<%- include('./sidebar.ejs') %>
+<%- include('./topbar.ejs') %>
+
+<!--start page wrapper -->
+<div class="page-wrapper">
+	<div class="page-content">
+		<!--breadcrumb-->
+		<div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+			<div class="ps-3">
+				<span class="font-30"><i class="bx bx-server"></i></span>
+				<span class="font-24"><%= __("Master Tables") %></span>
+			</div>
+		</div>
+		<!--end breadcrumb-->
+
+		<div class="col-12 col-lg-9 mx-auto">
+			<div class="card radius-10">
+				<div class="card-body">
+					<div class="table-responsive">
+						<h6 class="text-md-center text-primary"><%=__("Leaves Type")%></h6>
+						<table class="table mb-0 table-striped table-bordered" id="myDataTable2" data-ordering="false" data-info="false">
+							<thead class="table-light">
+							<tr>
+								<th class="text-md-center"><%= __("ID") %></th>
+								<th class="text-md-center"><%= __("EN") %></th>
+								<th class="text-md-center"><%= __("HK") %></th>
+								<th class="text-md-center"><%= __("CN") %></th>
+								<th class="text-md-center"><%= __("ACTION") %></th>
+							</tr>
+							</thead>
+							<tbody>
+							<% for(let i = 0; i < leavetb.length; i++) { %>
+							<tr>
+								<td class="text-md-left"><%= leavetb[i].Id %></td>
+								<td class="text-md-left"><%= leavetb[i].Type %></td>
+								<td class="text-md-left"><%= leavetb[i].HK %></td>
+								<td class="text-md-left"><%= leavetb[i].CN %></td>
+								<td class="text-md-center">
+									<button type="button" class="btn btn-sm btn-outline-primary ms-2"
+											onclick="edit_leave_type('<%= leavetb[i].Id %>','<%= leavetb[i].Type %>','<%= leavetb[i].HK %>','<%= leavetb[i].CN %>')"><i
+												class='bx bx-edit me-0'></i></button>
+									<button type="button" class="btn btn-sm btn-outline-danger ms-2"
+											onclick="delete_leave_type('<%= leavetb[i].Id %>')">
+										<i class='bx bx-trash me-0'></i></button>
+								</td>
+							</tr>
+							<% } %>
+							</tbody>
+						</table>
+						<a class="btn bg-primary btn-sm  text-white" onclick="add_new_leave_type()"
+						   id="btn_add_leave_type"><%= __("Add New Type") %></a>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-12 col-lg-9 mx-auto">
+
+			<div class="card radius-10">
+				<div class="card-body">
+					<div class="table-responsive">
+						<h6 class="text-md-center text-primary"><%=__("Claims Type")%></h6>
+						<table class="table mb-0 table-striped table-bordered" id="myDataTable3" data-ordering="false" data-info="false">
+							<thead class="table-light">
+							<tr>
+								<th class="text-md-center"><%= __("ID") %></th>
+								<th class="text-md-center"><%= __("EN") %></th>
+								<th class="text-md-center"><%= __("HK") %></th>
+								<th class="text-md-center"><%= __("CN") %></th>
+								<th class="text-md-center"><%= __("ACTION") %></th>
+							</tr>
+							</thead>
+							<tbody>
+							<% for(let i = 0; i < claimtb.length; i++) { %>
+								<tr>
+									<td class="text-md-left"><%= claimtb[i].Id %></td>
+									<td class="text-md-left"><%= claimtb[i].Type %></td>
+									<td class="text-md-left"><%= claimtb[i].HK %></td>
+									<td class="text-md-left"><%= claimtb[i].CN %></td>
+									<td class="text-md-center">
+										<button type="button" class="btn btn-sm btn-outline-primary ms-2"
+												onclick="edit_claim_type('<%= claimtb[i].Id %>','<%= claimtb[i].Type %>','<%= claimtb[i].HK %>','<%= claimtb[i].CN %>')"><i
+													class='bx bx-edit me-0'></i></button>
+										<button type="button" class="btn btn-sm btn-outline-danger ms-2"
+												onclick="delete_claim_type('<%= claimtb[i].Id %>')">
+											<i class='bx bx-trash me-0'></i></button>
+									</td>
+								</tr>
+							<% } %>
+							</tbody>
+						</table>
+
+						<a class="btn bg-primary btn-sm  text-white" onclick="add_new_claim_type()"
+						   id="btn_add_leave_type"><%= __("Add New Type") %></a>
+					</div>
+				</div>
+			</div>
+
+		</div>
+
+		<div class="col-12 col-lg-9 mx-auto">
+
+			<div class="card radius-10">
+				<div class="card-body">
+					<div class="table-responsive">
+						<h6 class="text-md-center text-primary"><%=__("Venues")%></h6>
+						<table class="table mb-0 table-striped table-bordered" id="myDataTable4" data-ordering="false" data-info="false">
+							<thead class="table-light">
+							<tr>
+								<th class="text-md-center"><%= __("ID") %></th>
+								<th class="text-md-center"><%= __("CODE") %></th>
+								<th class="text-md-center"><%= __("NAME") %></th>
+								<th class="text-md-center"><%= __("BRANCH CODE") %></th>
+								<th class="text-md-center"><%= __("ACTION") %></th>
+							</tr>
+							</thead>
+							<tbody>
+							<% for(let i = 0; i < venue.length; i++) { %>
+								<tr>
+									<td class="text-md-left"><%= venue[i].Idx %></td>
+									<td class="text-md-left"><%= venue[i].VenueCode %></td>
+									<td class="text-md-left"><%= venue[i].VenueName %></td>
+									<td class="text-md-left"><%= venue[i].BranchCode %></td>
+									<td class="text-md-center">
+										<button type="button" class="btn btn-sm btn-outline-primary ms-2"
+												onclick="edit_venue('<%= venue[i].Idx %>','<%= venue[i].VenueCode %>','<%= venue[i].VenueName %>','<%= venue[i].BranchCode %>')"><i
+													class='bx bx-edit me-0'></i></button>
+										<button type="button" class="btn btn-sm btn-outline-danger ms-2"
+												onclick="delete_venue('<%= venue[i].Idx %>')">
+											<i class='bx bx-trash me-0'></i></button>
+									</td>
+								</tr>
+							<% } %>
+							</tbody>
+						</table>
+
+						<a class="btn bg-primary btn-sm  text-white" onclick="add_new_venue()"
+						   id="btn_add_venue"><%= __("Add New Venue") %></a>
+					</div>
+				</div>
+			</div>
+
+		</div>
+
+
+
+		<%- include('./copyright.ejs') %>
+	</div>
+</div>
+<!--end page wrapper -->
+
+	<!-- venue edit modal -->
+	<div class="modal fade" id="edit_venue_Modal" role="dialog" data-backdrop="static" data-keyboard="false">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-body">
+					<form id="table2">
+						<input type="hidden" id="vr_id">
+						<div class="modal-header">
+							<h5 class="modal-title"><span id="modal_caption"></h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="card-body">
+							<div class="row mb-3">
+								<div class="col-sm-3">
+									<h6 class="mb-0"><%= __("Venue Code") %></h6>
+								</div>
+								<div class="col-sm-9 text-secondary">
+									<input type="text" id="vcode" class="form-control">
+								</div>
+							</div>
+							<div class="row mb-3">
+								<div class="col-sm-3">
+									<h6 class="mb-0"><%= __("Venue Name") %></h6>
+								</div>
+								<div class="col-sm-9 text-secondary">
+									<input type="text" class="form-control" id="vname">
+								</div>
+							</div>
+							<div class="row mb-3">
+								<div class="col-sm-3">
+									<h6 class="mb-0"><%= __("Branch Code") %></h6>
+								</div>
+								<div class="col-sm-9 text-secondary">
+									<input type="text" class="form-control" id="branchcode" onclick="get_branchcode()">
+								</div>
+							</div>
+							<div class="row mb-3">
+								<div class="col-sm-3">
+									<h6 class="mb-0"></h6>
+								</div>
+								<div class="col-sm-9 text-secondary">
+									<a class="btn btn-primary btn-sm radius-30 px-4" id="btn_save_venue"><%= __("Save") %></a>
+								</div>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+
+		</div>
+	</div>
+	<!-- venue edit modal ended -->
+
+	<!-- leave edit modal -->
+	<div class="modal fade" id="edit_Modal" role="dialog" data-backdrop="static" data-keyboard="false">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-body">
+					<form id="table1">
+						<input type="hidden" id="record_id">
+					<div class="modal-header">
+						<h5 class="modal-title"><span id="modal_caption"></h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="card-body">
+						<div class="row mb-3">
+							<div class="col-sm-3">
+								<h6 class="mb-0"><%= __("English") %></h6>
+							</div>
+							<div class="col-sm-9 text-secondary">
+								<input type="text" id="en_name" class="form-control">
+							</div>
+						</div>
+						<div class="row mb-3">
+							<div class="col-sm-3">
+								<h6 class="mb-0"><%= __("Traditional Chinese") %></h6>
+							</div>
+							<div class="col-sm-9 text-secondary">
+								<input type="text" class="form-control" id="hk_name">
+							</div>
+						</div>
+						<div class="row mb-3">
+							<div class="col-sm-3">
+								<h6 class="mb-0"><%= __("Simplified Chinese") %></h6>
+							</div>
+							<div class="col-sm-9 text-secondary">
+								<input type="text" class="form-control" id="cn_name">
+							</div>
+						</div>
+						<div class="row mb-3">
+							<div class="col-sm-3">
+								<h6 class="mb-0"></h6>
+							</div>
+							<div class="col-sm-9 text-secondary">
+								<a class="btn btn-primary btn-sm radius-30 px-4" id="btn_save_change"><%= __("Save") %></a>
+							</div>
+						</div>
+					</div>
+					</form>
+				</div>
+			</div>
+
+		</div>
+	</div>
+	<!-- leave edit modal ended -->
+
+	<!-- Get branch code modal -->
+	<div class="modal fade" id="branchcode_Modal" role="dialog">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-body">
+					<div class="modal-header">
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="card">
+						<div class="table-responsive">
+							<table class="table mb-0 table-striped table-bordered table-sm table-hover" id="invoice_details"
+								   data-paging="false">
+								<thead class="table-light">
+								<tr>
+									<th class="text-md-center" style="width: 80%"><%= __("Branch Code") %></th>
+								</tr>
+								</thead>
+								<tbody>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+	<!-- get branch code modal ended -->
+
+<%- include('./footer.ejs') %>
+
+</div>
+<!--wrapper ended-->
+
+<script type="application/javascript">
+	function edit_leave_type(id,en,hk,cn) {
+		$('#record_id').val(id)
+		$('#en_name').val(en);
+		$('#hk_name').val(hk);
+		$('#cn_name').val(cn);
+		$('#btn_save_change').removeAttr('onclick');
+		$('#btn_save_change').attr('onclick','update_leave()');
+		$('#modal_caption').text('<%= __("Edit") %>')
+		$('#edit_Modal').modal({backdrop: 'static', keyboard: false})
+		$('#edit_Modal').modal('show')
+
+	}
+
+	function edit_claim_type(id,en,hk,cn) {
+		$('#record_id').val(id)
+		$('#en_name').val(en);
+		$('#hk_name').val(hk);
+		$('#cn_name').val(cn);
+		$('#btn_save_change').removeAttr('onclick');
+		$('#btn_save_change').attr('onclick','update_claim()');
+		$('#modal_caption').text('<%= __("Edit") %>')
+		$('#edit_Modal').modal({backdrop: 'static', keyboard: false})
+		$('#edit_Modal').modal('show')
+
+	}
+
+	function edit_venue(id,c,n,b) {
+		$('#vr_id').val(id)
+		$('#vcode').val(c);
+		$('#vname').val(n);
+		$('#branchcode').val(b);
+		$('#btn_save_venue').removeAttr('onclick');
+		$('#btn_save_venue').attr('onclick','update_venue()');
+		$('#modal_caption').text('<%= __("Edit") %>')
+		$('#edit_venue_Modal').modal({backdrop: 'static', keyboard: false})
+		$('#edit_venue_Modal').modal('show')
+
+	}
+
+	function update_leave() {
+		if ($('#en_name').val() === '') {
+			$('#promptMSG').text('<%= __("Please provide English Name") %>');
+			$('#msgModal').modal('show');
+			$('#en_name').addClass("border-danger-input_alert");
+			return;
+		} else {
+			$('#en_name').removeClass("border-danger-input_alert");
+		}
+		if ($('#hk_name').val() === '' && $('#cn_name').val() === '') {
+			$('#promptMSG').text('<%= __("Please provide Chinese Name") %>');
+			$('#msgModal').modal('show');
+			$('#hk_name').addClass("border-danger-input_alert");
+			$('#cn_name').addClass("border-danger-input_alert");
+			return;
+		} else {
+			$('#hk_name').removeClass("border-danger-input_alert");
+			$('#cn_name').removeClass("border-danger-input_alert");
+		}
+		$('#edit_Modal').modal('hide')
+		$.ajax({
+			async: false,
+			type: 'post',
+			url: '/system/mastertb',
+			data: {
+				action: 'update_leave_type',
+				en_name: $('#en_name').val(),
+				hk_name: $('#hk_name').val(),
+				cn_name: $('#cn_name').val(),
+				Id: $('#record_id').val()
+			}
+		})
+		window.location.reload();
+	}
+
+	function update_claim() {
+		if ($('#en_name').val() === '') {
+			$('#promptMSG').text('<%= __("Please provide English Name") %>');
+			$('#msgModal').modal('show');
+			$('#en_name').addClass("border-danger-input_alert");
+			return;
+		} else {
+			$('#en_name').removeClass("border-danger-input_alert");
+		}
+		if ($('#hk_name').val() === '' && $('#cn_name').val() === '') {
+			$('#promptMSG').text('<%= __("Please provide Chinese Name") %>');
+			$('#msgModal').modal('show');
+			$('#hk_name').addClass("border-danger-input_alert");
+			$('#cn_name').addClass("border-danger-input_alert");
+			return;
+		} else {
+			$('#hk_name').removeClass("border-danger-input_alert");
+			$('#cn_name').removeClass("border-danger-input_alert");
+		}
+		$('#edit_Modal').modal('hide')
+		$.ajax({
+			async: false,
+			type: 'post',
+			url: '/system/mastertb',
+			data: {
+				action: 'update_claim_type',
+				en_name: $('#en_name').val(),
+				hk_name: $('#hk_name').val(),
+				cn_name: $('#cn_name').val(),
+				Id: $('#record_id').val()
+			}
+		})
+		window.location.reload();
+	}
+
+	function update_venue() {
+		if ($('#vcode').val() === '') {
+			$('#promptMSG').text('<%= __("Please provide venue code") %>');
+			$('#msgModal').modal('show');
+			$('#vcode').addClass("border-danger-input_alert");
+			return;
+		} else {
+			$('#vcode').removeClass("border-danger-input_alert");
+		}
+		if ($('#vname').val() === '') {
+			$('#promptMSG').text('<%= __("Please provide venue name") %>');
+			$('#msgModal').modal('show');
+			$('#vname').addClass("border-danger-input_alert");
+			return;
+		} else {
+			$('#vname').removeClass("border-danger-input_alert");
+		}
+		if ($('#branchcode').val() === '') {
+			$('#promptMSG').text('<%= __("Please select branch code") %>');
+			$('#msgModal').modal('show');
+			$('#branchcode').addClass("border-danger-input_alert");
+			return;
+		} else {
+			$('#branchcode').removeClass("border-danger-input_alert");
+		}
+		$('#edit_venue_Modal').modal('hide')
+		$.ajax({
+			async: false,
+			type: 'post',
+			url: '/system/mastertb',
+			data: {
+				action: 'update_venue',
+				vcode: $('#vcode').val(),
+				vname: $('#vname').val(),
+				bcode: $('#branchcode').val(),
+				Id: $('#vr_id').val()
+			}
+		})
+		window.location.reload();
+	}
+
+	function add_new_leave_type() {
+		$('#table1').trigger('reset');
+		$('#btn_save_change').removeAttr('onclick');
+		$('#btn_save_change').attr('onclick','add_leave_type()');
+		$('#modal_caption').text('<%= __("Add") %>')
+		$('#edit_Modal').modal({backdrop: 'static', keyboard: false})
+		$('#edit_Modal').modal('show')
+	}
+
+	function add_leave_type() {
+		if ($('#en_name').val() === '') {
+			$('#promptMSG').text('<%= __("Please provide English Name") %>');
+			$('#msgModal').modal('show');
+			$('#en_name').addClass("border-danger-input_alert");
+			return;
+		} else {
+			$('#en_name').removeClass("border-danger-input_alert");
+		}
+		if ($('#hk_name').val() === '' && $('#cn_name').val() === '') {
+			$('#promptMSG').text('<%= __("Please provide Chinese Name") %>');
+			$('#msgModal').modal('show');
+			$('#hk_name').addClass("border-danger-input_alert");
+			$('#cn_name').addClass("border-danger-input_alert");
+			return;
+		} else {
+			$('#hk_name').removeClass("border-danger-input_alert");
+			$('#cn_name').removeClass("border-danger-input_alert");
+		}
+		$('#edit_Modal').modal('hide')
+		$.ajax({
+			async: false,
+			type: 'post',
+			url: '/system/mastertb',
+			data: {
+				action: 'add_leave_type',
+				en_name: $('#en_name').val(),
+				hk_name: $('#hk_name').val(),
+				cn_name: $('#cn_name').val()
+			}
+		})
+		window.location.reload();
+	}
+
+	function add_new_claim_type() {
+		$('#table1').trigger('reset');
+		$('#btn_save_change').removeAttr('onclick');
+		$('#btn_save_change').attr('onclick','add_claim_type()');
+		$('#modal_caption').text('<%= __("Add") %>')
+		$('#edit_Modal').modal({backdrop: 'static', keyboard: false})
+		$('#edit_Modal').modal('show')
+	}
+
+	function add_claim_type() {
+		if ($('#en_name').val() === '') {
+			$('#promptMSG').text('<%= __("Please provide English Name") %>');
+			$('#msgModal').modal('show');
+			$('#en_name').addClass("border-danger-input_alert");
+			return;
+		} else {
+			$('#en_name').removeClass("border-danger-input_alert");
+		}
+		if ($('#hk_name').val() === '' && $('#cn_name').val() === '') {
+			$('#promptMSG').text('<%= __("Please provide Chinese Name") %>');
+			$('#msgModal').modal('show');
+			$('#hk_name').addClass("border-danger-input_alert");
+			$('#cn_name').addClass("border-danger-input_alert");
+			return;
+		} else {
+			$('#hk_name').removeClass("border-danger-input_alert");
+			$('#cn_name').removeClass("border-danger-input_alert");
+		}
+		$('#edit_Modal').modal('hide')
+		$.ajax({
+			async: false,
+			type: 'post',
+			url: '/system/mastertb',
+			data: {
+				action: 'add_claim_type',
+				en_name: $('#en_name').val(),
+				hk_name: $('#hk_name').val(),
+				cn_name: $('#cn_name').val()
+			}
+		})
+		window.location.reload();
+	}
+
+	function add_new_venue() {
+		$('#table2').trigger('reset');
+		$('#btn_save_venue').removeAttr('onclick');
+		$('#btn_save_venue').attr('onclick','add_venue()');
+		$('#modal_caption').text('<%= __("Add") %>')
+		$('#edit_venue_Modal').modal({backdrop: 'static', keyboard: false})
+		$('#edit_venue_Modal').modal('show')
+	}
+
+	function add_venue() {
+		if ($('#vcode').val() === '') {
+			$('#promptMSG').text('<%= __("Please provide venue code") %>');
+			$('#msgModal').modal('show');
+			$('#vcode').addClass("border-danger-input_alert");
+			return;
+		} else {
+			$('#vcode').removeClass("border-danger-input_alert");
+		}
+		if ($('#vname').val() === '') {
+			$('#promptMSG').text('<%= __("Please provide venue name") %>');
+			$('#msgModal').modal('show');
+			$('#vname').addClass("border-danger-input_alert");
+			return;
+		} else {
+			$('#vname').removeClass("border-danger-input_alert");
+		}
+		if ($('#branchcode').val() === '') {
+			$('#promptMSG').text('<%= __("Please select branch code") %>');
+			$('#msgModal').modal('show');
+			$('#branchcode').addClass("border-danger-input_alert");
+			return;
+		} else {
+			$('#branchcode').removeClass("border-danger-input_alert");
+		}
+		$('#edit_venue_Modal').modal('hide')
+		$.ajax({
+			async: false,
+			type: 'post',
+			url: '/system/mastertb',
+			data: {
+				action: 'add_venue',
+				vcode: $('#vcode').val(),
+				vname: $('#vname').val(),
+				bcode: $('#branchcode').val()
+			}
+		})
+		window.location.reload();
+	}
+
+	function delete_claim_type(id) {
+		$.ajax({
+			async: false,
+			type: 'post',
+			url: '/system/mastertb',
+			data: {
+				action: 'del_claim_type',
+				Id: id
+			}
+		})
+		window.location.reload();
+	}
+
+	function delete_leave_type(id) {
+		$.ajax({
+			async: false,
+			type: 'post',
+			url: '/system/mastertb',
+			data: {
+				action: 'del_leave_type',
+				Id: id
+			}
+		})
+		window.location.reload();
+	}
+
+	function delete_venue(id) {
+		$.ajax({
+			async: false,
+			type: 'post',
+			url: '/system/mastertb',
+			data: {
+				action: 'del_venue',
+				Id: id
+			}
+		})
+		window.location.reload();
+	}
+
+	function get_branchcode() {
+		$('#invoice_details').DataTable().data().clear();
+		$.ajax({
+			type: 'post',
+			async: false,
+			url: '/system/users',
+			data: {action: 'get_branchcode'},
+			success: function (return_data) {
+				$.each(return_data, function (i) {
+					this_row = `<tr onclick="use_this_branchcode('`+ return_data[i].BranchCode +`')">`;
+					this_row += `<td class="text-md-center">` + return_data[i].BranchCode + `</td>`;
+					this_row += `</tr>`;
+					$('#invoice_details').DataTable().row.add($(this_row)).draw(false);
+				});
+			}
+		});
+		$('#branchcode_Modal').modal({backdrop: 'static', keyboard: false})
+		$('#branchcode_Modal').modal('show');
+	}
+
+	function use_this_branchcode(e) {
+		$('#branchcode_Modal').modal('hide');
+		$('#branchcode').val(e);
+	}
+
+</script>
+
+</body>
+
+</html>

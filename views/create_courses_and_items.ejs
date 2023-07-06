@@ -1,0 +1,1934 @@
+<%- include('./header.ejs') %>
+
+<body onload="get_badge()">
+
+<!--wrapper-->
+<div class="wrapper">
+
+    <%- include('./sidebar.ejs') %>
+    <%- include('./topbar.ejs') %>
+
+    <!--start page wrapper -->
+    <div class="page-wrapper">
+        <div class="page-content">
+            <!--breadcrumb-->
+            <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+                <div class="ps-3">
+                    <span class="font-30"><i class="bx bx-grid-alt"></i></span>
+                    <span class="font-24"><%= __("Product creation") %></span>
+                </div>
+            </div>
+            <!--end breadcrumb-->
+            <!-- <div class="col-12 col-lg-9 mx-auto">  -->
+            <div class="card radius-10">
+                <div class="card-body">
+                    <div class="border p-3 rounded">
+                        <div class="col-md-3">
+                            <label class="form-label"><%= __("Select product type") %></label>
+                            <select class="single-select" id="prod_type_sel" onChange="DefineStep2()" disabled>
+                                <option><%= __("Please Select") %></option>
+                                <option value="course"><%= __("Course") %></option>
+                                <option value="material"><%= __("Material/Service") %></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>&nbsp;</div>
+                    <div id="step2-container">
+
+                        <div id="producttype-course" style="display: none">
+
+                            <div id="producttype-course-step1" class="row g-3" style="display:none;">
+                                <div class="row">
+                                    <div class="col-md-3 py-3">
+                                        <label for="start_date"
+                                               class="form-label"><%= __("Course Start Date") %></label>
+                                        <input type="text" class="form-control" id="start_date" required
+                                               autocomplete="off">
+                                    </div>
+                                    <div class="col-md-3 py-3">
+                                        <label for="end_date"
+                                               class="form-label"><%= __("Course End Date") %> <%= __(" >>> OR >>>") %> </label>
+                                        <input type="text" class="form-control" id="end_date" autocomplete="off"
+                                               onchange="validate_enddate()"
+                                               style="background-color:rgba(96,143,215,0.28);">
+                                    </div>
+                                    <div class="col-md-1 py-3">
+                                        <label for="no_of_class" class="form-label"><%= __("Class#") %></label>
+                                        <input type="text" class="form-control" id="no_of_class" autocomplete="off"
+                                               onchange="validate_noofclass()" onkeyup="intCheck('no_of_class')"
+                                               style="text-align: right;width: 60px; background-color:rgba(96,143,215,0.28);">
+                                    </div>
+                                </div>
+                                <div id="time_slot_container">
+                                </div>
+                                <div id="invoice_details_container">
+                                </div>
+                                <div class="row" id="confirm_button">
+                                    <div class="col-md-6 py-3">
+                                        <a class="btn btn-primary btn-sm radius-30 px-4" id="btn_confirm_schedule"
+                                           onclick="confirm_schedule()"><%= __("Confirm Schedule") %></a>
+                                    </div>
+                                    <div class="col-md-6 py-3 text-end">
+                                        <a class="btn btn-secondary btn-sm radius-30 px-4" id="btn_add_time_slot"
+                                           onclick="add_time_slot()"><%= __("Add Class Schedule") %></a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="class_calculated" style="display: none">
+                                <div class="row">
+                                    <div class="col-md-3 py-3">
+                                        <label for="first_class"
+                                               class="form-label"><%= __("First Day of Class Schedule") %></label>
+                                        <input type="text" class="form-control bg-light-success" id="first_class">
+                                    </div>
+                                    <div class="col-md-3 py-3">
+                                        <label for="last_class"
+                                               class="form-label"><%= __("Last Day of Class Schedule") %></label>
+                                        <input type="text" class="form-control bg-light-success" id="last_class">
+                                    </div>
+                                    <div class="col-md-2 py-3">
+                                        <label for="total_class"
+                                               class="form-label"><%= __("Number of Classes ") %></label>
+                                        <input type="text" class="form-control bg-light-success" id="total_class">
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div id="producttype-course-step2" style="display: none">
+
+                                <form id="course_save">
+                                    <div class="card">
+                                        <div class="card-body p-4 border-rounded">
+                                            <div class="row">
+                                                <div class="col-md-3 py-3">
+                                                    <label for="f_cmcode"
+                                                           class="form-label"><%= __("Course Master Code") %></label>
+                                                    <div class="d-none d-md-flex">
+                                                        <input type="text" class="form-control border-primary"
+                                                               id="f_cmcode"
+                                                               name="f_cmcode" onchange="check_mcode()" required
+                                                               autocomplete="off"
+                                                               onkeydown="if(['Space'].includes(arguments[0].code)){return false;}">
+                                                        <button type="button" class="btn btn-outline-primary ms-2"
+                                                                onclick="get_exist_mastercode()"><i
+                                                                    class='bx bx-search me-0'></i></button>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3 py-3">
+                                                    <label for="f_ccode"
+                                                           class="form-label"><%= __("Course Code") %></label>
+                                                    <div class="d-none d-md-flex">
+                                                        <input type="text" class="form-control"
+                                                               autocomplete="off"
+                                                               value="System-Gen"
+                                                               disabled>
+                                                    </div>
+                                                    <input type="hidden" id="f_ccode" name="f_ccode" value="System Gen">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-3 py-3">
+                                                    <label for="f_ctype"
+                                                           class="form-label"><%= __("Course Type") %></label>
+                                                    <div class="d-none d-md-flex">
+                                                        <input type="text" class="form-control" id="f_ctype" name="f_ctype"
+                                                               required autocomplete="off">
+                                                        <button type="button" class="btn btn-outline-secondary ms-2"
+                                                                onclick="get_exist_coursecode()"><i
+                                                                    class='bx bx-search me-0'></i></button>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 py-3">
+                                                    <label for="f_ctitle"
+                                                           class="form-label"><%= __("Course Title") %></label>
+                                                    <input type="text" class="form-control" id="f_ctitle"
+                                                           name="f_ctitle" required autocomplete="off">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6 py-3">
+                                                    <label for="f_cdesc"
+                                                           class="form-label"><%= __("Course Description") %></label>
+                                                    <textarea type="text" class="form-control" id="f_cdesc"
+                                                              name="f_cdesc" rows="4" required
+                                                              autocomplete="off"></textarea>
+                                                </div>
+                                                <div class="col-md-6 py-3">
+                                                    <label for="f_cremark"
+                                                           class="form-label"><%= __("Course Remark") %></label>
+                                                    <textarea type="text" class="form-control" id="f_cremark" rows="4"
+                                                              name="f_cremark" required autocomplete="off"></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-3 py-3">
+                                                    <label for="teachercode"
+                                                           class="form-label"><%= __("Teacher") %></label>
+                                                    <div class="d-none d-md-flex" ondblclick="get_teacherlist()">
+                                                        <input type="hidden" class="form-control" id="teachercode"
+                                                               name="teachercode"
+                                                               required autocomplete="off">
+                                                        <input type="text" class="form-control border-primary"
+                                                               id="teacher_select"
+                                                               disabled required autocomplete="off">
+                                                        <button type="button" class="btn btn-outline-primary ms-2"
+                                                                onclick="get_teacherlist()"><i
+                                                                    class='bx bx-search me-0'></i></button>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3 py-3">
+                                                    <label for="venuecode" class="form-label"><%= __("Venue") %></label>
+                                                    <div class="d-none d-md-flex" ondblclick="get_venues()">
+                                                        <input type="hidden" class="form-control" id="venuecode"
+                                                               name="venuecode"
+                                                               required autocomplete="off">
+                                                        <input type="text" class="form-control border-success"
+                                                               id="venue_select"
+                                                               onchange="check_venue()" disabled required
+                                                               autocomplete="off">
+                                                        <button type="button" class="btn btn-outline-success ms-2"
+                                                                onclick="get_venues()"><i class='bx bx-search me-0'></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2 py-3" ondblclick="get_venues()">
+                                                    <label for="branchcode"
+                                                           class="form-label"><%= __("Branch") %></label>
+                                                    <input type="hidden" class="form-control" id="branchcode"
+                                                           name="branchcode"
+                                                           required>
+                                                    <input type="text" class="form-control border-success"
+                                                           id="branch"
+                                                           name="branch" disabled autocomplete="off">
+                                                </div>
+                                                <div class="col-md-2 py-3">
+                                                    <label for="f_subject"
+                                                           class="form-label"><%= __("Subject") %></label>
+                                                    <input type="text" class="form-control" id="f_subject"
+                                                           name="f_subject" required autocomplete="off">
+                                                </div>
+                                                <div class="col-md-2 py-3">
+                                                    <label for="f_form"
+                                                           class="form-label"><%= __("Prerequisite") %></label>
+                                                    <input type="text" class="form-control" id="f_form" name="f_form"
+                                                           required autocomplete="off">
+                                                </div>
+                                            </div>
+
+                                            <div id="ta_container">
+                                                <a class="btn btn-secondary btn-sm radius-30 px-4" id="btn_add_ta"
+                                                   onclick="add_ta()"
+                                                   type="submit"><%= __("Assistant(s)") %></a>
+                                            </div>
+
+
+                                            <div class="row">
+                                                <div class="col-md-6 py-3">
+                                                    <label for="f_ciremark"
+                                                           class="form-label"><%= __("Private Remark") %></label>
+                                                    <textarea type="text" class="form-control" id="f_ciremark"
+                                                              name="f_ciremark" rows="4" required
+                                                              autocomplete="off"></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-3 py-3">
+                                                    <label for="en_start_date"
+                                                           class="form-label"><%= __("Enrollment Start") %></label>
+                                                    <input type="text" class="form-control" id="en_start_date"
+                                                           name="en_start_date" required autocomplete="off">
+                                                </div>
+                                                <div class="col-md-3 py-3">
+                                                    <label for="en_end_date"
+                                                           class="form-label"><%= __("Enrollment End") %></label>
+                                                    <input type="text" class="form-control" id="en_end_date"
+                                                           name="en_end_date" required autocomplete="off">
+                                                </div>
+                                                <div class="col-md-2 py-3">
+                                                    <label for="min_student"
+                                                           class="form-label"><%= __("Min. students") %></label>
+                                                    <input type="text" onkeyup="intCheck('min_student')"
+                                                           style="text-align: right"
+                                                           class="form-control" id="min_student" name="min_student"
+                                                           required autocomplete="off">
+                                                </div>
+                                                <div class="col-md-2 py-3">
+                                                    <label for="max_student"
+                                                           class="form-label"><%= __("Max. students") %></label>
+                                                    <input type="text" onkeyup="intCheck('max_student')"
+                                                           style="text-align: right"
+                                                           class="form-control" id="max_student" name="max_student"
+                                                           required autocomplete="off">
+                                                </div>
+                                                <div class="col-md-1 py-3">
+                                                    <label for="year" class="form-label"><%= __("Year") %></label>
+                                                    <input type="text" class="form-control" id="year" name="year"
+                                                           onkeyup="intCheck('year')"
+                                                           style="text-align: right" required autocomplete="off">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-3 py-3">
+                                                    <label for="f_price" class="form-label"><%= __("Price") %></label>
+                                                    <input type="text" onkeyup="decimalCheck('f_price')"
+                                                           style="text-align: right"
+                                                           class="form-control" id="f_price" name="f_price" required
+                                                           autocomplete="off">
+                                                </div>
+                                                <div class="col-md-6 py-3">
+                                                    <label for="f_cpaymethod"
+                                                           class="form-label"><%= __("Charge Method") %></label><br>
+                                                    <!--
+                                                    <input type="radio" id="f_cpaymethod02" name="f_cpaymethod" class="form-check-input"
+                                                           value="02"> <%= __("By Month") %> -->
+                                                    <input type="radio" id="f_cpaymethod01" name="f_cpaymethod"
+                                                           class="form-check-input" onclick="confirm_charge_method()"
+                                                           value="01"> <%= __("By Class") %>
+                                                    <!--
+                                                    <input type="radio" id="f_cpaymethod03" name="f_cpaymethod" class="form-check-input"
+                                                           value="03"> <%= __("By Attendance") %>
+                                                           -->
+                                                    <input type="radio" id="f_cpaymethod04" name="f_cpaymethod"
+                                                           class="form-check-input" onclick="confirm_charge_method()"
+                                                           value="04"> <%= __("Full Course") %>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-1 py-3">
+                                                    <label for="recurring"
+                                                           class="form-label"><%= __("Recurring") %></label><br>
+                                                    <input type="radio" id="recurring01" name="recurring"
+                                                           class="form-check-input"
+                                                           value="1"> <%= __("Yes") %>
+                                                    <input type="radio" id="recurring02" name="recurring"
+                                                           class="form-check-input" checked
+                                                           value="0"> <%= __("No") %>
+                                                </div>
+                                                <div class="col-md-1 py-3">
+                                                    <label for="daysbefore"
+                                                           class="form-label"><%= __("Days before") %></label>
+                                                    <input type="text" id="daysbefore" name="daysbefore"
+                                                           class="form-control" onkeyup="intCheck('daysbefore')"
+                                                           value="0" style="text-align: right">
+                                                </div>
+                                                <div class="col-md-2 py-3">
+                                                    <label for="last_class"
+                                                           class="form-label"><%= __("Last Day of Class Schedule") %></label>
+                                                    <input type="text" class="form-control bg-light-success"
+                                                           id="last_class_br" disabled>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-sm-12 text-secondary">
+                                                    <div class="p-4 float-end">
+                                                        <a class="btn btn-primary" id="btn_course_save"
+                                                           onclick="save_course()" type="submit"><%= __("Save") %></a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+
+                            </div>
+
+                        </div>
+
+                        <div id="producttype-material" style="display: none">
+                            <form id="service_form">
+
+                                <div class="row g-3">
+                                    <div class="col-md-3 py3">
+                                        <label for="productCode"
+                                               class="form-label"><%= __("Material/Service Code") %></label>
+                                        <div class="d-none d-md-flex">
+                                            <input type="text" class="form-control border-primary" id="productCode"
+                                                   name="productCode"
+                                                   onchange="check_productcode()" required
+                                                   autocomplete="off">
+                                            <button type="button" class="btn btn-outline-primary ms-2"
+                                                    onclick="get_exist_productcode()"><i
+                                                        class='bx bx-search me-0'></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 py3">
+                                        <label for="productName"
+                                               class="form-label"><%= __("Material/Service Name") %></label>
+                                        <input type="text" class="form-control" id="productName" name="productName"
+                                               required
+                                               autocomplete="off">
+                                    </div>
+                                    <div class="col-md-3 py3">
+                                        <label for="productPrice"
+                                               class="form-label"><%= __("Selling Price") %></label>
+                                        <div class="d-none d-md-flex">
+                                            <input type="text" class="form-control" id="productPrice"
+                                                   name="productPrice" required
+                                                   style="text-align: right;"
+                                                   onkeyup="decimalCheck('productPrice')">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 py3">
+                                        <label for="productCost" class="form-label"><%= __("Cost") %></label>
+                                        <input type="text" class="form-control" id="productCost" name="productCost"
+                                               required
+                                               style="text-align: right;" onkeyup="decimalCheck('serviceCost')">
+                                    </div>
+                                </div>
+                                <div class="row"><br></div>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="productDesc"
+                                               class="form-label"><%= __("Description") %></label>
+                                        <input type="text" class="form-control" id="productDesc" name="productDesc"
+                                               required
+                                               autocomplete="off">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="productCat"
+                                               class="form-label"><%= __("Type") %></label><br>
+                                        <input type="radio" id="productCat1" name="productCat" class="form-check-input"
+                                               value="Charge"> <%= __("Service") %>
+                                        <input type="radio" id="productCat2" name="productCat" class="form-check-input"
+                                               value="Product"> <%= __("Material") %>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="use_voucher"
+                                               class="form-label"><%= __("Can Use Voucher") %></label><br>
+                                        <input type="radio" id="use_voucher_yes" name="use_voucher"
+                                               class="form-check-input"
+                                               value=true> <%= __("Yes") %>
+                                        <input type="radio" id="use_voucher_no" name="use_voucher"
+                                               class="form-check-input"
+                                               value=false> <%= __("No") %>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="stock_item"
+                                               class="form-label"><%= __("Stock Item") %></label><br>
+                                        <input type="radio" id="stock_item_yes" name="stock_item"
+                                               class="form-check-input" onclick="confirm_stock()"
+                                               value=true> <%= __("Yes") %>
+                                        <input type="radio" id="stock_item_no" name="stock_item"
+                                               class="form-check-input" onclick="confirm_stock()"
+                                               value=false> <%= __("No") %>
+                                    </div> 
+                                    <div class="col-md-6" id="testing" hidden="true">
+                                        <label for="productQty" 
+                                               class="form-label"><%= __("Qty") %></label>
+                                        <input type="text" class="form-control" id="productQty" name="productQty"
+                                               required
+                                               autocomplete="off">
+                                    </div>    
+                                           
+                                </div>
+                                <div class="col-sm-12 text-secondary">
+                                    <div class="p-4 float-end">
+                                        <a class="btn btn-primary" id="btn_product_save"
+                                           onclick="save_product()"
+                                           type="submit"><%= __("Save") %></a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+
+                    </div>
+                </div>
+
+            </div>
+            <!-- </div>  -->
+
+            <form id="add_t">
+                <input type="hidden" name="action" value="add_task">
+                <input type="hidden" id="new_task_input" name="new_task_input">
+                <input type="hidden" name="tdate"
+                       value="<%= new Date().toLocaleDateString('en-CA', {timeZone: 'GMT'}) %>">
+            </form>
+
+            <%- include('./copyright.ejs') %>
+        </div>
+    </div>
+    <!--end page wrapper -->
+
+    <!-- Schedule conflict modal -->
+    <div class="modal fade" id="teacherresult_Modal" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><%= __("Overlapping Schedules") %></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table class="table mb-0 table-striped table-bordered table-hover" id="conflict_sm">
+                                <thead class="table-light">
+                                <tr>
+                                    <th class="text-md-center" style="width: 50%;"><%= __("Date") %></th>
+                                    <th class="text-md-center" style="width: 50%;"><%= __("Time") %></th>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                                <tfoot>
+                                <tr>
+                                    <td colspan="2" class="text-md-center">
+                                        <a class="btn btn-secondary btn-sm radius-30 px-4" id="btn_add_todo"
+                                           onclick="add_task('teacher')"
+                                           type="submit"><%= __("Add reminder to your ToDo list") %></a>
+                                        <a class="btn btn-secondary btn-sm radius-30 px-4"
+                                           data-bs-dismiss="modal"><%= __("Close") %></a>
+                                    </td>
+                                </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- Schedule conflict modal ended -->
+
+    <!-- Venue conflict modal -->
+    <div class="modal fade" id="venuueresult_Modal" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><%= __("Venue conflicts") %></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table class="table mb-0 table-striped table-bordered table-hover" id="conflict_sm2">
+                                <thead class="table-light">
+                                <tr>
+                                    <th class="text-md-center" style="width: 50%;"><%= __("Date") %></th>
+                                    <th class="text-md-center" style="width: 50%;"><%= __("Time") %></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                                <tfoot>
+                                <tr>
+                                    <td colspan="2" class="text-md-center">
+                                        <a class="btn btn-secondary btn-sm radius-30 px-4" id="btn_add_todo"
+                                           onclick="add_task('venue')"
+                                           type="submit"><%= __("Add reminder to your ToDo list") %></a>
+                                        <a class="btn btn-secondary btn-sm radius-30 px-4"
+                                           data-bs-dismiss="modal"><%= __("Close") %></a>
+                                    </td>
+                                </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- Venue conflict modal ended -->
+
+    <!-- Confirm course creation modal -->
+    <div class="modal fade" id="confirm_new_course_Modal" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><%= __("Message") %></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-bold-700 text-lg-center font-20" id="confirm_MSG">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><%= __("Close") %></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Confirm course creation ended -->
+
+    <!-- Check master code modal -->
+    <div class="modal fade" id="mastercode_Modal" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table class="table mb-0 table-striped table-bordered table-hover"
+                                   id="selection_table_search"
+                                   data-ordering="false" data-searching="false" data-paging="false" data-info="false">
+                                <thead class="table-light">
+                                <tr>
+                                    <th class="text-md-center" style="width: 20%"><%= __("Code") %></th>
+                                    <th class="text-md-center" style="width: 80%"><%= __("Course Title") %></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- Check master code modal ended -->
+
+    <!-- Check course code modal -->
+    <div class="modal fade" id="coursecode_Modal" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table class="table mb-0 table-striped table-bordered table-hover"
+                                   id="selection_table_search2">
+                                <thead class="table-light">
+                                <tr>
+                                    <th class="text-md-center" style="width: 30%"><%= __("Code") %></th>
+                                    <th class="text-md-center" style="width: 70%"><%= __("Course Title") %></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- Check course code modal ended -->
+
+    <!-- Get teacher modal -->
+    <div class="modal fade" id="teacher_Modal" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table class="table mb-0 table-striped table-bordered table-hover"
+                                   id="selection_table_search3">
+                                <thead class="table-light">
+                                <tr>
+                                    <th class="text-md-center" style="width: 15%"></th>
+                                    <th class="text-md-center" style="width: 85%"><%= __("Name") %></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- Get teacher modal ended -->
+
+    <!-- Get venues modal -->
+    <div class="modal fade" id="venues_Modal" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table class="table mb-0 table-striped table-bordered table-hover"
+                                   id="selection_table_search4">
+                                <thead class="table-light">
+                                <tr>
+                                    <th class="text-md-center" style="width: 35%"><%= __("Branch Code") %></th>
+                                    <th class="text-md-center" style="width: 65%"><%= __("Venue") %></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Get venues modal ended -->
+
+    <!-- Get existing product modal -->
+    <div class="modal fade" id="product_Modal" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table class="table mb-0 table-striped table-bordered table-hover"
+                                   id="selection_table_search5">
+                                <thead class="table-light">
+                                <tr>
+                                    <th class="text-md-center" style="width: 15%"><%= __("Code") %></th>
+                                    <th class="text-md-center" style="width: 85%"><%= __("Description") %></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Get existing product modal ended -->
+
+    <%- include('./footer.ejs') %>
+
+</div>
+<!--wrapper ended-->
+
+<script type="text/javascript">
+    var ta_count = 0;
+    var time_slot_count = 0;
+    var time_slot_last_saved;
+    var sTempid = get_tempid();
+    var org_start_date;
+    var org_end_date;
+
+    function decimalCheck(e) {
+        let dec = $('#' + e).val();
+        // console.log(dec);
+        $('#' + e).val(dec.replace(/[^0-9.,-]/g, ''));
+        if (dec.includes(".")) {
+            let res = dec.substring(dec.indexOf(".") + 1);
+            let kl = res.split("");
+            if (kl.length > 1) {
+                $('#' + e).val((parseInt(dec * 100) / 100).toFixed(2));
+            }
+        }
+    }
+
+    function intCheck(e) {
+        let dec = $('#' + e).val();
+        $('#' + e).val(dec.replace(/[^0-9]/g, ''));
+    }
+
+    function validate_noofclass() {
+        endd = $('#end_date').val();
+        nooc = $('#no_of_class').val();
+        if (endd !== '') {
+            // check no. of class, and it should be blank
+            // if not clean it up
+            $('#end_date').val('');
+        }
+    }
+
+    function validate_enddate() {
+        endd = $('#end_date').val();
+        nooc = $('#no_of_class').val();
+        if (nooc !== '') {
+            // check end day, and it should be blank
+            // if not clean it up
+            $('#no_of_class').val('');
+        }
+    }
+
+    function get_tempid() {
+        var e = '';
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/prod/prod_create',
+            data: {action: 'get_tempid'},
+            success: function (return_data) {
+                e = return_data[0].UID;
+            }
+        });
+        return e;
+    }
+
+    function DefineStep2() {
+        let t = $('#prod_type_sel option:selected').val();
+        switch (t) {
+            case 'course':
+                $('#producttype-course').show();
+                $('#producttype-course-step1').show();
+                $('#producttype-material').hide();
+                break;
+            case 'material':
+                $('#producttype-course').hide();
+                $('#producttype-material').show();
+                break;
+            case 'service':
+                $('#producttype-course').hide();
+                $('#producttype-material').hide();
+                break;
+            default:
+                break;
+        }
+    }
+
+    function confirm_schedule() {
+        // check course schedule first
+        let start_date = $('#start_date').val();
+        let end_date = $('#end_date').val();
+        let no_of_class = $('#no_of_class').val();
+
+        org_start_date = start_date;
+        org_end_date = end_date;
+
+        if (!start_date) {
+            $('#promptMSG').text('<%= __("Missing start date") %>');
+            $('#msgModal').modal('show');
+            $('#start_date').addClass("border-danger-input_alert");
+            return;
+        } else {
+            $('#start_date').removeClass("border-danger-input_alert");
+        }
+        if (!no_of_class) {
+            // use start and end date method
+            // them end end must be entered
+            if (!$('#end_date').val()) {
+                $('#promptMSG').text('<%= __("Missing end date or number of classes") %>');
+                $('#msgModal').modal('show');
+                $('#end_date').addClass("border-danger-input_alert");
+                $('#no_of_class').addClass("border-danger-input_alert");
+                return;
+            } else {
+                $('#end_date').removeClass("border-danger-input_alert");
+                $('#no_of_class').removeClass("border-danger-input_alert");
+            }
+            if (Date.parse(start_date) > Date.parse(end_date)) {
+                // same day is accepted
+                $('#promptMSG').text('<%= __("Incorrect date range") %>');
+                $('#msgModal').modal('show');
+                $('#start_date').addClass("border-danger-input_alert");
+                $('#end_date').addClass("border-danger-input_alert");
+                return;
+            } else {
+                $('#start_date').removeClass("border-danger-input_alert");
+                $('#end_date').removeClass("border-danger-input_alert");
+            }
+        }
+        if (time_slot_count === 0) {
+            // no schedule yet
+            $('#promptMSG').text('<%= __("Please define class schedule") %>');
+            $('#msgModal').modal('show');
+            $('#btn_add_time_slot').addClass("border-danger-input_alert");
+            return;
+        } else {
+            $('#btn_add_time_slot').removeClass("border-danger-input_alert");
+        }
+        // if pass, let's do it.
+        // add last time slot to temp table first
+        if (time_slot_last_saved !== time_slot_count) {
+            // there should have one more record left
+            let wdays = '';
+            if ($('#start_time' + time_slot_count).val() === '') {
+                $('#promptMSG').text('<%= __("Missing start time") %>');
+                $('#msgModal').modal('show');
+                $('#start_time' + time_slot_count).addClass("border-danger-input_alert");
+                return;
+            } else {
+                $('#start_time' + time_slot_count).removeClass("border-danger-input_alert");
+            }
+
+            if ($('#end_time' + time_slot_count).val() === '') {
+                $('#promptMSG').text('<%= __("Missing end time") %>');
+                $('#msgModal').modal('show');
+                $('#end_time' + time_slot_count).addClass("border-danger-input_alert");
+                return;
+            } else {
+                $('#end_time' + time_slot_count).removeClass("border-danger-input_alert");
+            }
+
+            if (Date.parse('1/1/1999 ' + $('#start_time' + time_slot_count).val()) >= Date.parse('1/1/1999 ' + $('#end_time' + time_slot_count).val())) {
+                $('#promptMSG').text('<%= __("Incorrect time range") %>');
+                $('#msgModal').modal('show');
+                $('#start_time' + time_slot_count).addClass("border-danger-input_alert");
+                $('#end_time' + time_slot_count).addClass("border-danger-input_alert");
+                return;
+            } else {
+                $('#start_time' + time_slot_count).removeClass("border-danger-input_alert");
+                $('#end_time' + time_slot_count).removeClass("border-danger-input_alert");
+            }
+
+            if ($('input:checkbox[name="time_slot_weekday' + time_slot_count + '"]:checked').length === 0) {
+                $('#promptMSG').text('<%= __("Please pick week day(s)") %>');
+                $('#msgModal').modal('show');
+                $('#time_slot_weekday1_' + time_slot_count).addClass("border-danger-input_alert");
+                $('#time_slot_weekday2_' + time_slot_count).addClass("border-danger-input_alert");
+                $('#time_slot_weekday3_' + time_slot_count).addClass("border-danger-input_alert");
+                $('#time_slot_weekday4_' + time_slot_count).addClass("border-danger-input_alert");
+                $('#time_slot_weekday5_' + time_slot_count).addClass("border-danger-input_alert");
+                $('#time_slot_weekday6_' + time_slot_count).addClass("border-danger-input_alert");
+                $('#time_slot_weekday7_' + time_slot_count).addClass("border-danger-input_alert");
+                $('#time_slot_weekday8_' + time_slot_count).addClass("border-danger-input_alert");
+                return;
+            } else {
+                $('#time_slot_weekday1_' + time_slot_count).removeClass("border-danger-input_alert");
+                $('#time_slot_weekday2_' + time_slot_count).removeClass("border-danger-input_alert");
+                $('#time_slot_weekday3_' + time_slot_count).removeClass("border-danger-input_alert");
+                $('#time_slot_weekday4_' + time_slot_count).removeClass("border-danger-input_alert");
+                $('#time_slot_weekday5_' + time_slot_count).removeClass("border-danger-input_alert");
+                $('#time_slot_weekday6_' + time_slot_count).removeClass("border-danger-input_alert");
+                $('#time_slot_weekday7_' + time_slot_count).removeClass("border-danger-input_alert");
+                $('#time_slot_weekday8_' + time_slot_count).removeClass("border-danger-input_alert");
+                $('input:checkbox[name="time_slot_weekday' + time_slot_count + '"]:checked').each(function (i) {
+                    // add $(this).val() to your array
+                    if ($('input:checkbox[name="time_slot_weekday' + time_slot_count + '"]:checked').length === 1 || i === 0) {
+                        wdays = $(this).val();
+                    } else {
+                        wdays += ',' + $(this).val();
+                    }
+                });
+                // should be OK let's add a record
+                // let's lock up something before saving to DB
+                $('#prod_type_sel').attr('disabled', 'disabled');
+                $('#time_slot_weekday1_' + time_slot_count).attr('disabled', 'disabled');
+                $('#time_slot_weekday2_' + time_slot_count).attr('disabled', 'disabled');
+                $('#time_slot_weekday3_' + time_slot_count).attr('disabled', 'disabled');
+                $('#time_slot_weekday4_' + time_slot_count).attr('disabled', 'disabled');
+                $('#time_slot_weekday5_' + time_slot_count).attr('disabled', 'disabled');
+                $('#time_slot_weekday6_' + time_slot_count).attr('disabled', 'disabled');
+                $('#time_slot_weekday7_' + time_slot_count).attr('disabled', 'disabled');
+                $('#time_slot_weekday8_' + time_slot_count).attr('disabled', 'disabled');
+                $('#removebutton_' + time_slot_count).attr('disabled', 'disabled').removeAttr('onclick');
+                // $('#removebutton_' + time_slot_count).removeAttr('onclick');
+                $('#start_time' + time_slot_count).attr('disabled', 'disabled').css("display", "block");
+                // $('#start_time' + time_slot_count).css("display", "block");
+                $('#end_time' + time_slot_count).attr('disabled', 'disabled').css("background-color", "#e8ebee");
+                //$('#end_time' + time_slot_count).css("background-color", "#e8ebee");
+                $('#start_date').attr('disabled', 'disabled');
+                $('#end_date').attr('disabled', 'disabled');
+                $('#no_of_class').attr('disabled', 'disabled');
+                $.ajax({
+                    type: 'post',
+                    url: '/prod/prod_create',
+                    data: {
+                        action: 'add_temp_row',
+                        tempid: sTempid,
+                        temprowid: $('#temp_rowid_' + time_slot_count).val(),
+                        wdays: wdays,
+                        stime: $('#start_time' + time_slot_count).val(),
+                        etime: $('#end_time' + time_slot_count).val()
+                    },
+                    success: function (return_data) {
+
+                    }
+                });
+            }
+        }
+        // let's go confirm the schedule
+
+        $('#btn_confirm_schedule').removeAttr('onclick');
+        $.ajax({
+            type: 'post',
+            url: '/prod/prod_create',
+            data: {
+                action: 'confirm_schedule',
+                tempid: sTempid,
+                no_of_class: no_of_class,
+                start_date: start_date,
+                end_date: end_date
+            },
+            beforeSend: function () {
+                $("#spinner").show();
+            },
+            success: function (return_data) {
+                $("#spinner").hide();
+                let total_class = return_data.length;
+                let swDay = return_data[0].WeekDay;
+                let swDay2 = return_data[total_class - 1].WeekDay
+                slng = '<%= req.session.lang %>';
+                if (slng) {
+                    if (slng !== "en") {
+                        switch (swDay) {
+                            case "MON":
+                                swDay = "星期一";
+                                break;
+                            case "TUE":
+                                swDay = "星期二";
+                                break;
+                            case "WED":
+                                swDay = "星期三";
+                                break;
+                            case "THU":
+                                swDay = "星期四";
+                                break;
+                            case "FRI":
+                                swDay = "星期五";
+                                break;
+                            case "SAT":
+                                swDay = "星期六";
+                                break;
+                            case "SUN":
+                                swDay = "星期日";
+                                break;
+                            case "HOL":
+                                swDay = "假期";
+                                break;
+                        }
+                        switch (swDay2) {
+                            case "MON":
+                                swDay2 = "星期一";
+                                break;
+                            case "TUE":
+                                swDay2 = "星期二";
+                                break;
+                            case "WED":
+                                swDay2 = "星期三";
+                                break;
+                            case "THU":
+                                swDay2 = "星期四";
+                                break;
+                            case "FRI":
+                                swDay2 = "星期五";
+                                break;
+                            case "SAT":
+                                swDay2 = "星期六";
+                                break;
+                            case "SUN":
+                                swDay2 = "星期日";
+                                break;
+                            case "HOL":
+                                swDay2 = "假期";
+                                break;
+                        }
+                    }
+                }
+
+                $('#first_class').val(new Date(return_data[0].ClassDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) + ' ( ' + swDay + ' ) ');
+                $('#last_class').val(new Date(return_data[total_class - 1].ClassDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) + ' ( ' + swDay2 + ' ) ');
+                $('#last_class_br').val(new Date(return_data[total_class - 1].ClassDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) + ' ( ' + swDay2 + ' ) ');
+                $('#total_class').val(total_class);
+                $('#first_class').attr('disabled', 'disabled');
+                $('#last_class').attr('disabled', 'disabled');
+                $('#total_class').attr('disabled', 'disabled');
+                newHTML = ``;
+                newHTML += `<input type="hidden" name="f_cstart_date" id="f_cstart_date" value="` + new Date(return_data[0].ClassDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) + `">`;
+                newHTML += `<input type="hidden" name="f_cend_date" id="f_cend_date" value="` + new Date(return_data[total_class - 1].ClassDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) + `">`;
+                let dummy = document.createElement("div");
+                dummy.innerHTML = newHTML;
+                let timeslot = $.parseHTML(newHTML);
+                $('#time_slot_container').append(timeslot);
+                //add actually first/last day the form
+
+                $('#class_calculated').show();
+            }
+        });
+        $('#confirm_button').remove();
+
+        $('#producttype-course-step2').show();
+    }
+
+    function save_course() {
+        let start_date = $('#first_class').val();
+        let end_date = $('#last_class').val();
+
+        org_start_date = start_date.split(' ')[0];
+        org_end_date = end_date.split(' ')[0];
+        console.log('----------------------------------CHECK CHECK----------------------------------')
+        console.log(org_start_date);
+        console.log(org_end_date);
+        // alert('save course');
+        if ($('#f_cmcode').val() === '') {
+            $('#promptMSG').text('<%= __("Master code is required") %>');
+            $('#msgModal').modal('show');
+            $('#f_cmcode').addClass("border-danger-input_alert");
+            return;
+        } else {
+            $('#f_cmcode').removeClass("border-danger-input_alert");
+        }
+        if ($('#f_ccode').val() === '') {
+            $('#promptMSG').text('<%= __("Course code is required") %>');
+            $('#msgModal').modal('show');
+            $('#f_ccode').addClass("border-danger-input_alert");
+            return;
+        } else {
+            $('#f_ccode').removeClass("border-danger-input_alert");
+        }
+
+        //if (!check_ccode()) {
+        //    return;
+        //}
+
+        if ($('#f_ctype').val() === '') {
+            $('#promptMSG').text('<%= __("Course type is required") %>');
+            $('#msgModal').modal('show');
+            $('#f_ctype').addClass("border-danger-input_alert");
+            return;
+        } else {
+            $('#f_ctype').removeClass("border-danger-input_alert");
+        }
+        if ($('#f_ctitle').val() === '') {
+            $('#promptMSG').text('<%= __("Course title is required") %>');
+            $('#msgModal').modal('show');
+            $('#f_ctitle').addClass("border-danger-input_alert");
+            return;
+        } else {
+            $('#f_ctitle').removeClass("border-danger-input_alert");
+        }
+        if ($('#f_cdesc').val() === '') {
+            $('#promptMSG').text('<%= __("Course Description is required") %>');
+            $('#msgModal').modal('show');
+            $('#f_cdesc').addClass("border-danger-input_alert");
+            return;
+        } else {
+            $('#f_cdesc').removeClass("border-danger-input_alert");
+        }
+        if ($('#teacher_select').val() === '') {
+            $('#promptMSG').text('<%= __("Select a Teacher") %>');
+            $('#msgModal').modal('show');
+            $('#teacher_select').addClass("border-danger-input_alert");
+            return;
+        } else {
+            $('#teacher_select').removeClass("border-danger-input_alert");
+        }
+        if ($('#venue_select').val() === '') {
+            $('#promptMSG').text('<%= __("Select a Venue") %>');
+            $('#msgModal').modal('show');
+            $('#venue_select').addClass("border-danger-input_alert");
+            return;
+        } else {
+            $('#venue_select').removeClass("border-danger-input_alert");
+        }
+        if ($('#branch_select').val() === '') {
+            $('#promptMSG').text('<%= __("Select a Branch") %>');
+            $('#msgModal').modal('show');
+            $('#branch_select').addClass("border-danger-input_alert");
+            return;
+        } else {
+            $('#branch_select').removeClass("border-danger-input_alert");
+        }
+        if ($('#en_start_date').val() === '') {
+            $('#promptMSG').text('<%= __("Please choose enrollment start date") %>');
+            $('#msgModal').modal('show');
+            $('#en_start_date').addClass("border-danger-input_alert");
+            return;
+        } else {
+            $('#en_start_date').removeClass("border-danger-input_alert");
+        }
+        if ($('#en_end_date').val() === '') {
+            $('#promptMSG').text('<%= __("Please choose enrollment end date") %>');
+            $('#msgModal').modal('show');
+            $('#en_end_date').addClass("border-danger-input_alert");
+            return;
+        } else {
+            $('#en_end_date').removeClass("border-danger-input_alert");
+        }
+        if ($('#f_price').val() === '') {
+            $('#promptMSG').text('<%= __("Please enter price") %>');
+            $('#msgModal').modal('show');
+            $('#f_price').addClass("border-danger-input_alert");
+            return;
+        } else {
+            $('#f_price').removeClass("border-danger-input_alert");
+        }
+        let payment_method = $('input[name="f_cpaymethod"]:checked').val();
+        if (payment_method === '' || payment_method === undefined) {
+            $('#promptMSG').text('<%= __("Please choose charge method") %>');
+            $('#msgModal').modal('show');
+            $('input[name="f_cpaymethod"]').addClass("border-danger-input_alert");
+            return;
+        } else {
+            $('input[name="f_cpaymethod"]').removeClass("border-danger-input_alert");
+        }
+        if ($('#min_student').val() === '') {
+            $('#promptMSG').text('<%= __("Please enter min. student") %>');
+            $('#msgModal').modal('show');
+            $('#min_student').addClass("border-danger-input_alert");
+            return;
+        } else {
+            $('#min_student').removeClass("border-danger-input_alert");
+        }
+        if ($('#max_student').val() === '') {
+            $('#promptMSG').text('<%= __("Please enter max. student") %>');
+            $('#msgModal').modal('show');
+            $('#max_student').addClass("border-danger-input_alert");
+            return;
+        } else {
+            $('#max_student').removeClass("border-danger-input_alert");
+        }
+        form = $('#course_save');
+        // alert('disable the button and then save form');
+        $('#btn_course_save').removeAttr('onclick');
+        $('#btn_course_save').attr('disabled', 'disabled');
+
+
+        // add ta first
+        for (i = 0; i < 11; i++) {
+            if ($('#tacode' + i).val() !== undefined) {
+                console.log($('#tacode' + i).val());
+                $.ajax({
+                    async: false,
+                    type: 'post',
+                    url: '/prod/prod_create',
+                    data: {
+                        action: 'add_ta',
+                        ccode: $('#f_ccode').val(),
+                        ta: $('#tacode' + i).val()
+                    }
+                });
+            }
+        }
+
+        $.ajax({
+            type: 'post',
+            url: '/prod/prod_create',
+            data: {
+                action: 'save_course',
+                tempid: sTempid,
+                // fix recurrent
+                //c_startd: $('#f_cstart_date').val(),
+                //c_endd: $('#f_cend_date').val(),
+                c_startd: org_start_date,
+                c_endd: org_end_date,
+                form: form.serialize()
+            },
+            success: function (return_data) {
+                // resume lang select
+                $('#sel_lang').show();
+                $('#sel_lang_dummy').hide();
+                // assume everything ok. alert user and refresh the page
+                $('#confirm_MSG').text('<%= __("New Course Created") %>');
+                $('#confirm_new_course_Modal').on('hidden.bs.modal', function () {
+                    document.location.reload();
+                })
+
+                $('#confirm_new_course_Modal').modal('show');
+            }
+        });
+    }
+
+    function add_time_slot() {
+        // clear button alert
+        $('#btn_add_time_slot').removeClass("border-danger-input_alert");
+        // save current one to db first
+        if (time_slot_count > 0) {
+            // lang change disabled from now on
+            $('#sel_lang').hide();
+            $('#sel_lang_dummy').show();
+            // add previous record first
+            let wdays = '';
+            if ($('#start_time' + time_slot_count).val() === '') {
+                $('#promptMSG').text('<%= __("Missing start time") %>');
+                $('#msgModal').modal('show');
+                $('#start_time' + time_slot_count).addClass("border-danger-input_alert");
+                return;
+            } else {
+                $('#start_time' + time_slot_count).removeClass("border-danger-input_alert");
+            }
+
+            if ($('#end_time' + time_slot_count).val() === '') {
+                $('#promptMSG').text('<%= __("Missing end time") %>');
+                $('#msgModal').modal('show');
+                $('#end_time' + time_slot_count).addClass("border-danger-input_alert");
+                return;
+            } else {
+                $('#end_time' + time_slot_count).removeClass("border-danger-input_alert");
+            }
+
+            if (Date.parse('1/1/1999 ' + $('#start_time' + time_slot_count).val()) >= Date.parse('1/1/1999 ' + $('#end_time' + time_slot_count).val())) {
+                $('#promptMSG').text('<%= __("Incorrect time range") %>');
+                $('#msgModal').modal('show');
+                $('#start_time' + time_slot_count).addClass("border-danger-input_alert");
+                $('#end_time' + time_slot_count).addClass("border-danger-input_alert");
+                return;
+            } else {
+                $('#start_time' + time_slot_count).removeClass("border-danger-input_alert");
+                $('#end_time' + time_slot_count).removeClass("border-danger-input_alert");
+            }
+
+            if ($('input:checkbox[name="time_slot_weekday' + time_slot_count + '"]:checked').length === 0) {
+                $('#promptMSG').text('<%= __("Please pick week day(s)") %>');
+                $('#msgModal').modal('show');
+                $('#time_slot_weekday1_' + time_slot_count).addClass("border-danger-input_alert");
+                $('#time_slot_weekday2_' + time_slot_count).addClass("border-danger-input_alert");
+                $('#time_slot_weekday3_' + time_slot_count).addClass("border-danger-input_alert");
+                $('#time_slot_weekday4_' + time_slot_count).addClass("border-danger-input_alert");
+                $('#time_slot_weekday5_' + time_slot_count).addClass("border-danger-input_alert");
+                $('#time_slot_weekday6_' + time_slot_count).addClass("border-danger-input_alert");
+                $('#time_slot_weekday7_' + time_slot_count).addClass("border-danger-input_alert");
+                $('#time_slot_weekday8_' + time_slot_count).addClass("border-danger-input_alert");
+                return;
+            } else {
+                $('#time_slot_weekday1_' + time_slot_count).removeClass("border-danger-input_alert");
+                $('#time_slot_weekday2_' + time_slot_count).removeClass("border-danger-input_alert");
+                $('#time_slot_weekday3_' + time_slot_count).removeClass("border-danger-input_alert");
+                $('#time_slot_weekday4_' + time_slot_count).removeClass("border-danger-input_alert");
+                $('#time_slot_weekday5_' + time_slot_count).removeClass("border-danger-input_alert");
+                $('#time_slot_weekday6_' + time_slot_count).removeClass("border-danger-input_alert");
+                $('#time_slot_weekday7_' + time_slot_count).removeClass("border-danger-input_alert");
+                $('#time_slot_weekday8_' + time_slot_count).removeClass("border-danger-input_alert");
+                $('input:checkbox[name="time_slot_weekday' + time_slot_count + '"]:checked').each(function (i) {
+                    // add $(this).val() to your array
+                    if ($('input:checkbox[name="time_slot_weekday' + time_slot_count + '"]:checked').length === 1 || i === 0) {
+                        wdays = $(this).val();
+                    } else {
+                        wdays += ',' + $(this).val();
+                    }
+                });
+                // should be OK let's add a record
+                // let's lock up something before saving to DB
+                $('#prod_type_sel').attr('disabled', 'disabled');
+                $('#time_slot_weekday1_' + time_slot_count).attr('disabled', 'disabled');
+                $('#time_slot_weekday2_' + time_slot_count).attr('disabled', 'disabled');
+                $('#time_slot_weekday3_' + time_slot_count).attr('disabled', 'disabled');
+                $('#time_slot_weekday4_' + time_slot_count).attr('disabled', 'disabled');
+                $('#time_slot_weekday5_' + time_slot_count).attr('disabled', 'disabled');
+                $('#time_slot_weekday6_' + time_slot_count).attr('disabled', 'disabled');
+                $('#time_slot_weekday7_' + time_slot_count).attr('disabled', 'disabled');
+                $('#time_slot_weekday8_' + time_slot_count).attr('disabled', 'disabled');
+                $('#removebutton_' + time_slot_count).attr('disabled', 'disabled').removeAttr('onclick');
+                // $('#removebutton_' + time_slot_count).removeAttr('onclick');
+                $('#start_time' + time_slot_count).attr('disabled', 'disabled').css("display", "block");
+                // $('#start_time' + time_slot_count).css("display", "block");
+                $('#end_time' + time_slot_count).attr('disabled', 'disabled').css("background-color", "#e8ebee");
+                // $('#end_time' + time_slot_count).css("background-color", "#e8ebee");
+                $.ajax({
+                    type: 'post',
+                    url: '/prod/prod_create',
+                    data: {
+                        action: 'add_temp_row',
+                        tempid: sTempid,
+                        temprowid: $('#temp_rowid_' + time_slot_count).val(),
+                        wdays: wdays,
+                        stime: $('#start_time' + time_slot_count).val(),
+                        etime: $('#end_time' + time_slot_count).val()
+                    },
+                    success: function (return_data) {
+
+                    }
+                });
+            }
+        }
+        // if everything goes right
+        time_slot_last_saved = time_slot_count;
+        time_slot_count += 1;
+        // get a temp key for processing
+        let rowid = get_tempid();
+        newHTML = ``;
+        newHTML += `	<div class="row" id="timeslot` + time_slot_count + `">`;
+        newHTML += `		<div class="col-md-3 py-3">`;
+        newHTML += `			<label for="cls_cend" class="form-label"><%= __("Class Start Time") %></label>`;
+        newHTML += `			<input type="text" class="form-control timepicker" id="start_time` + time_slot_count + `" required autocomplete="off">`;
+        newHTML += `		</div>`;
+        newHTML += `		<div class="col-md-3 py-3">`;
+        newHTML += `			<label for="cls_cend" class="form-label"><%= __("Class End Time") %></label>`;
+        newHTML += `			<input type="text" class="form-control timepicker" id="end_time` + time_slot_count + `" required autocomplete="off">`;
+        newHTML += `         	<input type="hidden" id="temp_rowid_` + time_slot_count + `" value="` + rowid + `"></input>`;
+        newHTML += `		</div>`;
+        newHTML += `		<div class="col-md-6 py-3">`;
+        newHTML += `           <label for="time_slot" class="form-label"><%= __("Weekday") %></label><br>`;
+        newHTML += `         	<input type="checkbox" class="form-check-input"  id="time_slot_weekday1_` + time_slot_count + `" name="time_slot_weekday` + time_slot_count + `" value="SUN"></input>`;
+        newHTML += `         	<label for="chk_mon" class="form-label"><%= __("SUN") %> &nbsp;</label>`;
+        newHTML += `         	<input type="checkbox" class="form-check-input"  id="time_slot_weekday2_` + time_slot_count + `" name="time_slot_weekday` + time_slot_count + `" value="MON"></input>`;
+        newHTML += `         	<label for="chk_mon" class="form-label"><%= __("MON") %> &nbsp;</label>`;
+        newHTML += `         	<input type="checkbox" class="form-check-input"  id="time_slot_weekday3_` + time_slot_count + `" name="time_slot_weekday` + time_slot_count + `" value="TUE"></input>`;
+        newHTML += `         	<label for="chk_mon" class="form-label"><%= __("TUE") %> &nbsp;</label>`;
+        newHTML += `         	<input type="checkbox" class="form-check-input"  id="time_slot_weekday4_` + time_slot_count + `" name="time_slot_weekday` + time_slot_count + `" value="WED"></input>`;
+        newHTML += `         	<label for="chk_mon" class="form-label"><%= __("WED") %> &nbsp;</label>`;
+        newHTML += `         	<input type="checkbox" class="form-check-input"  id="time_slot_weekday5_` + time_slot_count + `" name="time_slot_weekday` + time_slot_count + `" value="THU"></input>`;
+        newHTML += `         	<label for="chk_mon" class="form-label"><%= __("THU") %> &nbsp;</label>`;
+        newHTML += `         	<input type="checkbox" class="form-check-input"  id="time_slot_weekday6_` + time_slot_count + `" name="time_slot_weekday` + time_slot_count + `" value="FRI"></input>`;
+        newHTML += `         	<label for="chk_mon" class="form-label"><%= __("FRI") %> &nbsp;</label>`;
+        newHTML += `         	<input type="checkbox" class="form-check-input"  id="time_slot_weekday7_` + time_slot_count + `" name="time_slot_weekday` + time_slot_count + `" value="SAT"></input>`;
+        newHTML += `         	<label for="chk_mon" class="form-label"><%= __("SAT") %> &nbsp;</label>`;
+        newHTML += `         	<input type="checkbox" class="form-check-input"  id="time_slot_weekday8_` + time_slot_count + `" name="time_slot_weekday` + time_slot_count + `" value="HOL"></input>`;
+        newHTML += `         	<label for="chk_mon" class="form-label"><%= __("HOL") %> &nbsp;</label> &nbsp;&nbsp;<button type="button" class="btn-close btn-danger" onclick="remove_time_slot(` + time_slot_count + `)" id="removebutton_` + time_slot_count + `"></button>`;
+        newHTML += `		</div>`;
+        newHTML += `	</div>`;
+        let dummy = document.createElement("div");
+        dummy.innerHTML = newHTML;
+        let timeslot = $.parseHTML(newHTML);
+        $('#time_slot_container').append(timeslot);
+        $('.timepicker').pickatime({
+            interval: 15,
+            min: [7, 0],
+            max: [23, 0]
+        });
+    }
+
+    function add_ta() {
+        ta_count += 1;
+        newHTML = ``;
+        newHTML += `<div class="row" id="ta_` + ta_count + `">`;
+        newHTML += `    <div class="col-md-3 py-3">`;
+        newHTML += `        <div class="d-none d-md-flex" ondblclick="get_talist(` + ta_count + `)">`;
+        newHTML += `           <input type="hidden" class="form-control" id="tacode` + ta_count + `"`;
+        newHTML += `                   name="tacode` + ta_count + `"`;
+        newHTML += `                   required autocomplete="off">`;
+        newHTML += `                <input type="text" class="form-control border-primary"`;
+        newHTML += `                       id="ta_select` + ta_count + `"`;
+        newHTML += `                       disabled required autocomplete="off">`;
+        newHTML += `                    <button type="button" class="btn btn-outline-primary ms-2"`;
+        newHTML += `                            onclick="get_talist(` + ta_count + `)"><i`;
+        newHTML += `                        class='bx bx-search me-0'></i></button>`;
+        newHTML += ` &nbsp;&nbsp; <button type="button" class="btn-close btn-danger" onclick="remove_ta(` + ta_count + `)" id="removetabutton_` + ta_count + `"></button>`;
+        newHTML += `        </div>`;
+        newHTML += `    </div>`;
+        let dummy = document.createElement("div");
+        dummy.innerHTML = newHTML;
+        let ta = $.parseHTML(newHTML);
+        $('#ta_container').append(ta);
+    }
+
+    function remove_ta(e) {
+        if (e === ta_count) {
+            // probably this is the last record
+            // remove the count as well
+            ta_count -= 1;
+        }
+        $('#ta_' + e).remove();
+    }
+
+    function remove_time_slot(e) {
+        if (e === time_slot_count) {
+            // probably this is the last record
+            // remove the count as well
+            time_slot_count -= 1;
+        }
+        $.ajax({
+            type: 'post',
+            url: '/prod/prod_create',
+            data: {
+                action: 'remove_temp_row',
+                temprowid: $('#temp_rowid_' + e).val()
+            },
+            success: function (return_data) {
+                $('#timeslot' + e).remove();
+                return true;
+            }
+        });
+    }
+
+    function get_exist_coursecode() {
+        $('#selection_table_search2').DataTable().data().clear();
+        $.ajax({
+            type: 'post',
+            async: false,
+            url: '/prod/prod_create',
+            data: {action: 'get_coursecode'},
+            success: function (return_data) {
+                $.each(return_data, function (i) {
+                    this_row = `<tr onclick="use_this_ccode('` + return_data[i].CourseCode + `')">`;
+                    this_row += `<td class="text-md-left" style="width: 30%">` + return_data[i].CourseCode.replace(/(.{20})..+/, "$1…") + `</td>`;
+                    this_row += `<td class="text-md-left" style="width: 70%">` + return_data[i].CourseTitle.replace(/(.{70})..+/, "$1…") + `</td>`;
+                    this_row += `</tr>`;
+                    $('#selection_table_search2').DataTable().row.add($(this_row)).draw();
+                });
+            }
+        });
+        $('#coursecode_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#coursecode_Modal').modal('show');
+    }
+
+    function use_this_ccode(ccode) {
+        $.ajax({
+            type: 'post',
+            async: false,
+            url: '/prod/prod_create',
+            data: {action: 'get_course_details_bycode', ccode: ccode},
+            success: function (return_data) {
+                $("input[name=f_cpaymethod][value=" + return_data[0].MethodCode + "]").prop('checked', true);
+                if ($('#f_cmcode').val() === '') {
+                    $('#f_cmcode').val(return_data[0].CourseMasterCode);
+                }
+                $('#f_ccode').val(return_data[0].CourseCode);
+                $('#f_ctype').val(return_data[0].CourseType);
+                $('#f_ctitle').val(return_data[0].CourseTitle);
+                $('#f_cdesc').val(return_data[0].CourseDesc);
+                $('#f_cremark').val(return_data[0].CourseRemark);
+                $('#f_subject').val(return_data[0].Subject);
+                $('#f_form').val(return_data[0].Form);
+                $('#f_ciremark').val(return_data[0].CourseInternalRemark);
+                $('#min_student').val(return_data[0].CourseMinLimit);
+                $('#max_student').val(return_data[0].CourseQuota);
+                $('#year').val(new Date().getFullYear());
+                $('#f_price').val(return_data[0].CoursePrice);
+            }
+        });
+        $('#coursecode_Modal').modal('hide');
+    }
+
+    function get_exist_mastercode() {
+        $('#selection_table_search').DataTable().data().clear();
+        $.ajax({
+            type: 'post',
+            async: false,
+            url: '/prod/prod_create',
+            data: {action: 'get_mastercode'},
+            success: function (return_data) {
+                $.each(return_data, function (i) {
+                    this_row = `<tr onclick="use_this_mcode('` + return_data[i].MasterCode + `')">`;
+                    this_row += `<td class="text-md-left" style="width: 20%">` + return_data[i].MasterCode.replace(/(.{15})..+/, "$1…") + `</td>`;
+                    this_row += `<td class="text-md-left" style="width: 80%">` + return_data[i].CourseTitle.replace(/(.{70})..+/, "$1…") + `</td>`;
+                    this_row += `</tr>`;
+                    $('#selection_table_search').DataTable().row.add($(this_row)).draw(false);
+                });
+            }
+        });
+        $('#mastercode_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#mastercode_Modal').modal('show');
+    }
+
+    function use_this_mcode(e) {
+        $('#mastercode_Modal').modal('hide');
+        $('#f_cmcode').val(e);
+    }
+
+    function get_exist_productcode() {
+        $('#selection_table_search5').DataTable().data().clear();
+        $.ajax({
+            type: 'post',
+            async: false,
+            url: '/prod/prod_create',
+            data: {action: 'get_productcode'},
+            success: function (return_data) {
+                $.each(return_data, function (i) {
+                    this_row = `<tr onclick="use_this_productcode('` +
+                        return_data[i].ProductCode + `','` +
+                        return_data[i].ProductName + `','` +
+                        return_data[i].ProductDescription + `','` +
+                        return_data[i].ProductCat + `','` +
+                        return_data[i].ProductCost + `','` +
+                        return_data[i].ProductPrice + `','` +
+                        return_data[i].Stockable + `','` +
+                        return_data[i].Voucher + `')">`;
+                    this_row += `<td class="text-md-left" style="width: 15%">` + return_data[i].ProductCode + `</td>`;
+                    this_row += `<td class="text-md-left" style="width: 85%">` + return_data[i].ProductName.replace(/(.{70})..+/, "$1…") + `</td>`;
+                    this_row += `</tr>`;
+                    $('#selection_table_search5').DataTable().row.add($(this_row)).draw(false);
+                });
+            }
+        });
+        $('#product_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#product_Modal').modal('show');
+    }
+
+    function use_this_productcode(code, name, desc, cat, cost, price, stock, voucher) {
+        $('#product_Modal').modal('hide');
+        $('#productCode').val(code);
+        $('#productName').val(name);
+        $('#productDesc').val(desc);
+        $('#productCost').val(cost);
+        $('#productPrice').val(price);
+        $('#productCat').val(cat);
+        $("input[name=productCat][value=" + cat + "]").prop('checked', true);
+        $("input[name=use_voucher][value=" + voucher + "]").prop('checked', true);
+        $("input[name=stock_item][value=" + stock + "]").prop('checked', true);
+        confirm_stock();
+    }
+
+    function check_productcode() {
+        let count;
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/prod/prod_create',
+            data: {action: 'check_productcode', code: $('#productCode').val()},
+            success: function (return_data) {
+                count = return_data.length;
+            }
+        });
+        if (count < 1) {
+            $('#productCode').removeClass("border-danger-input_alert")
+            //alert('return true '+count);
+            return true;
+        } else {
+            $('#promptMSG').text('<%= __("Material/Service code duplicated!") %>');
+            $('#msgModal').modal('show');
+            $('#productCode').addClass("border-danger-input_alert")
+            // alert('return false '+count);
+            return false;
+        }
+    }
+
+    function get_teacherlist() {
+        $('#selection_table_search3').DataTable().data().clear();
+        $.ajax({
+            type: 'post',
+            async: false,
+            url: '/prod/prod_create',
+            data: {action: 'get_teacherlist'},
+            success: function (return_data) {
+                $.each(return_data, function (i) {
+                    chk_img = '/assets/images/avatars/' + return_data[i].UserCode + '.jpg'
+                    let img = new Image();
+                    img.src = 'http://' + window.location.hostname + chk_img;
+                    if (img.complete) {
+                        img_use = chk_img;
+                    } else {
+                        img_use = '/assets/images/avatars/default.png';
+                    }
+                    this_row = `<tr onclick="use_this_teacher('` + return_data[i].UserCode + `','` + return_data[i].Name + `')">`;
+                    this_row += `<td class="text-md-center" style="width: 15%"><img src="` + img_use + `" class="rounded-circle" width="30" height="30"></td>`;
+                    this_row += `<td class="text-md-left" style="width: 85%">` + return_data[i].Name + `</td>`;
+                    this_row += `</tr>`;
+                    $('#selection_table_search3').DataTable().row.add($(this_row)).draw();
+                });
+            }
+        });
+        $('#teacher_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#teacher_Modal').modal('show');
+    }
+
+    function use_this_teacher(c, n) {
+        $('#teacher_Modal').modal('hide');
+        $('#teachercode').val(c);
+        $('#teacher_select').val(n);
+        check_teacher();
+    }
+
+    function get_talist(x) {
+        let x_ta = x;
+        $('#selection_table_search3').DataTable().data().clear().draw();
+        $.ajax({
+            type: 'post',
+            async: false,
+            url: '/prod/prod_create',
+            data: {action: 'get_teacherlist'},
+            success: function (return_data) {
+                $.each(return_data, function (i) {
+                    chk_img = '/assets/images/avatars/' + return_data[i].UserCode + '.jpg'
+                    let img = new Image();
+                    img.src = 'http://' + window.location.hostname + chk_img;
+                    if (img.complete) {
+                        img_use = chk_img;
+                    } else {
+                        img_use = '/assets/images/avatars/default.png';
+                    }
+                    this_row = `<tr onclick="use_this_ta('` + return_data[i].UserCode + `','` + return_data[i].Name + `','` + x_ta + `')">`;
+                    this_row += `<td class="text-md-center" style="width: 15%"><img src="` + img_use + `" class="rounded-circle" width="30" height="30"></td>`;
+                    this_row += `<td class="text-md-left" style="width: 85%">` + return_data[i].Name + `</td>`;
+                    this_row += `</tr>`;
+                    $('#selection_table_search3').DataTable().row.add($(this_row)).draw();
+                });
+            }
+        });
+        $('#teacher_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#teacher_Modal').modal('show');
+    }
+
+    function use_this_ta(c, n, x) {
+        let x_ta = x;
+        $('#teacher_Modal').modal('hide');
+        $('#tacode' + x_ta).val(c);
+        $('#ta_select' + x_ta).val(n);
+        check_teacher(c);
+    }
+
+    function get_venues() {
+        $('#selection_table_search4').DataTable().data().clear();
+        $.ajax({
+            type: 'post',
+            async: false,
+            url: '/prod/prod_create',
+            data: {action: 'get_venues'},
+            success: function (return_data) {
+                $.each(return_data, function (i) {
+                    this_row = `<tr onclick="use_this_venue('` + return_data[i].BranchCode + `','` + return_data[i].VenueCode + `','` + return_data[i].VenueName + `')">`;
+                    this_row += `<td class="text-md-center" style="width: 35%">` + return_data[i].BranchCode + `</td>`;
+                    this_row += `<td class="text-md-left" style="width: 65%">` + return_data[i].VenueName + `</td>`;
+                    this_row += `</tr>`;
+                    // console.log(this_row);
+                    $('#selection_table_search4').DataTable().row.add($(this_row)).draw(false);
+                });
+            }
+        });
+        $('#venues_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#venues_Modal').modal('show');
+    }
+
+    function use_this_venue(b, v, n) {
+        $('#venues_Modal').modal('hide');
+        $('#branch').val(b);
+        $('#branchcode').val(b);
+        $('#venuecode').val(v);
+        $('#venue_select').val(n);
+        check_venue();
+    }
+
+    function check_teacher(c) {
+        let teacher_code;
+        $('#conflict_sm').DataTable().data().clear().draw();
+        if (c !== undefined && c !== '' && c !== null) {
+            teacher_code = c;
+        } else {
+            teacher_code = $('#teachercode').val();
+        }
+
+        $.ajax({
+            type: 'post',
+            url: '/prod/prod_create',
+            data: {action: 'check_teacher', tempid: sTempid, teacher_code: teacher_code},
+            success: function (return_data) {
+                if (return_data.length === 0) {
+                    $('#promptMSG').text('<%= __("Schedule OK") %>');
+                    $('#msgModal').modal('show');
+                } else {
+                    // there must be some conflicts
+                    $.each(return_data, function (i) {
+                        this_row = `<tr>`;
+                        this_row += `<td class="text-md-center">` + new Date(return_data[i].ClassDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) + `</td>`;
+                        this_row += `<td class="text-md-center">` + new Date(return_data[i].StartTime).toLocaleTimeString('en-CA', {timeZone: 'GMT'}) + `</td>`;
+                        this_row += `</tr>`;
+                        $('#conflict_sm').DataTable().row.add($(this_row)).draw(false);
+                        $('#teacherresult_Modal').modal({backdrop: 'static', keyboard: false})
+                        $('#teacherresult_Modal').modal('show');
+                    });
+                }
+            }
+        });
+    }
+
+    function check_mcode() {
+        if ($('#f_cmcode').val() !== '') {
+            $.ajax({
+                type: 'post',
+                url: '/prod/prod_create',
+                data: {action: 'check_mcode', code: $('#f_cmcode').val()},
+                success: function (return_data) {
+                    if (return_data.length === 0) {
+                        $('#promptMSG').text('<%= __("Master code is a new one") %>');
+                        $('#msgModal').modal('show');
+                    }
+                }
+            });
+        }
+    }
+
+    function check_ccode() {
+        let count;
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/prod/prod_create',
+            data: {action: 'check_ccode', code: $('#f_ccode').val()},
+            success: function (return_data) {
+                count = return_data.length;
+            }
+        });
+        if (count < 1) {
+            // $('#promptMSG').text('<%= __("Course code is a new one") %>');
+            // $('#msgModal').modal('show');
+            $('#f_ccode').removeClass("border-danger-input_alert")
+            //alert('return true '+count);
+            return true;
+        } else {
+            $('#promptMSG').text('<%= __("Course code duplicated!") %>');
+            $('#msgModal').modal('show');
+            $('#f_ccode').addClass("border-danger-input_alert")
+            //alert('return false '+count);
+            return false;
+        }
+    }
+
+    function check_venue() {
+        $('#conflict_sm2').DataTable().data().clear();
+        let venue_code = $('#venuecode').val();
+        $.ajax({
+            type: 'post',
+            url: '/prod/prod_create',
+            data: {action: 'check_venue', tempid: sTempid, venue_code: venue_code},
+            success: function (return_data) {
+                if (return_data.length === 0) {
+                    $('#promptMSG').text('<%= __("Venue OK") %>');
+                    $('#msgModal').modal('show');
+                } else {
+                    // there must be some conflicts
+                    $.each(return_data, function (i) {
+                        this_row = `<tr>`;
+                        this_row += `<td class="text-md-center">` + new Date(return_data[i].ClassDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) + `</td>`;
+                        this_row += `<td class="text-md-center">` + new Date(return_data[i].StartTime).toLocaleTimeString('en-CA', {timeZone: 'GMT'}) + `</td>`;
+                        this_row += `</tr>`;
+                        $('#conflict_sm2').DataTable().row.add($(this_row)).draw(false);
+                        $('#venuueresult_Modal').modal({backdrop: 'static', keyboard: false})
+                        $('#venuueresult_Modal').modal('show');
+                    });
+                }
+            }
+        });
+    }
+
+    function add_task(e) {
+        let task_msg;
+        if (e === "teacher") {
+            task_msg = `<%= __("Check schedule of teacher : ") %> ` + $('#teacher_select').val();
+        } else {
+            // then it should be venue
+            task_msg = `<%= __("Check availability of venue : ") %> ` + $('#venue_select').val();
+        }
+        $('#new_task_input').val(task_msg);
+        let form = $('#add_t');
+        $.ajax({
+            type: 'post',
+            data: form.serialize(),
+            url: '/user/task',
+            success: function (result) {
+                $('#promptMSG').text('<%= __("Task added") %>');
+                $('#msgModal').modal('show');
+            }
+        });
+    }
+
+    function save_product() {
+        if ($('#productCode').val() === '') {
+            $('#promptMSG').text('<%= __("Please enter Material/Service code") %>');
+            $('#msgModal').modal('show');
+            return;
+        }
+        if ($('#productName').val() === '') {
+            $('#promptMSG').text('<%= __("Please enter Material/Service name") %>');
+            $('#msgModal').modal('show');
+            return;
+        }
+        if ($('#productDesc').val() === '') {
+            $('#promptMSG').text('<%= __("Please enter Material/Service description") %>');
+            $('#msgModal').modal('show');
+            return;
+        }
+        if (!check_productcode()) {
+            return;
+        }
+        $('#btn_product_save').removeAttr('onclick');
+        $('#btn_product_save').attr('disabled', 'disabled');
+        $.ajax({
+            type: 'post',
+            url: '/prod/prod_create',
+            data: {
+                action: 'save_product',
+                code: $('#productCode').val(),
+                name: $('#productName').val(),
+                desc: $('#productDesc').val(),
+                qty: $('#productQty').val(),
+                cat: $('input[name="productCat"]:checked').val(),
+                cost: $('#productCost').val(),
+                price: $('#productPrice').val(),
+                stock: $('input[name="stock_item"]:checked').val(),
+                voucher: $('input[name="use_voucher"]:checked').val()
+            },
+            success: function (return_data) {
+                // resume lang select
+                $('#sel_lang').show();
+                $('#sel_lang_dummy').hide();
+                // assume everything ok. alert user and refresh the page
+                $('#confirm_MSG').text('<%= __("New Material/Service Created") %>');
+                $('#confirm_new_course_Modal').on('hidden.bs.modal', function () {
+                    document.location.reload();
+                })
+                $('#confirm_new_course_Modal').modal({backdrop: 'static', keyboard: false})
+                $('#confirm_new_course_Modal').modal('show');
+            }
+        });
+    }
+    
+    function confirm_stock(){
+        if($('input[name="stock_item"]:checked').val()=== 'true'){
+            //remove hidden from id='productQty'
+            $('#testing').removeAttr('hidden')
+        } else if ($('input[name="stock_item"]:checked').val()=== 'false') {
+            $('#testing').attr('hidden','hidden')
+        }
+        
+    }
+
+    //Charge method 
+    function confirm_charge_method(){
+        // console.log($('input[name="f_cpaymethod"]:checked').val())
+        if($('input[name="f_cpaymethod"]:checked').val()=== '01'){
+            //Select No automatically
+            $('#recurring02').prop('checked',true)
+            //disable Yes
+            $('#recurring01').attr('disabled', 'disabled')
+        } else if ($('input[name="f_cpaymethod"]:checked').val()=== '04') {
+            $('#recurring01').removeAttr('disabled')
+        }
+    }
+
+    $(document).ready(function () {
+        $('#prod_type_sel').removeAttr('disabled');
+        //console.log(x);
+        $('#start_date').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            format: "yyyy-mm-dd",
+            <% if(req.session.lang === 'zh-HK') { %>
+            language: "zh-TW",
+            <% } else if(req.session.lang === 'zh-CN') { %>
+            language: "zh-CN",
+            <% } else { %>
+            language: "en-CA",
+            <% } %>
+        });
+        $('#end_date').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            format: "yyyy-mm-dd",
+            <% if(req.session.lang === 'zh-HK') { %>
+            language: "zh-TW",
+            <% } else if(req.session.lang === 'zh-CN') { %>
+            language: "zh-CN",
+            <% } else { %>
+            language: "en-CA",
+            <% } %>
+        });
+        $('#en_start_date').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            format: "yyyy-mm-dd",
+            <% if(req.session.lang === 'zh-HK') { %>
+            language: "zh-TW",
+            <% } else if(req.session.lang === 'zh-CN') { %>
+            language: "zh-CN",
+            <% } else { %>
+            language: "en-CA",
+            <% } %>
+        });
+        $('#en_end_date').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            format: "yyyy-mm-dd",
+            <% if(req.session.lang === 'zh-HK') { %>
+            language: "zh-TW",
+            <% } else if(req.session.lang === 'zh-CN') { %>
+            language: "zh-CN",
+            <% } else { %>
+            language: "en-CA",
+            <% } %>
+        });
+        $('#testtimepicker').pickatime({
+            interval: 15,
+            min: [7, 0],
+            max: [23, 0]
+        });
+    });
+
+</script>
+
+</body>
+
+</html>

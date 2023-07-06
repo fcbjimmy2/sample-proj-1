@@ -1,0 +1,239 @@
+<%- include('./header.ejs') %>
+
+<body onload="get_badge()">
+
+<!--wrapper-->
+<div class="wrapper">
+
+    <%- include('./sidebar.ejs') %>
+    <%- include('./topbar.ejs') %>
+
+    <!--start page wrapper -->
+    <div class="page-wrapper">
+        <div class="page-content">
+            <!--breadcrumb-->
+            <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+                <div class="ps-3">
+                    <span class="font-30"><i class="bx bx-calendar"></i></span>
+                    <span class="font-24"><%= __("Holidays Tables") %></span>
+                </div>
+            </div>
+            <!--end breadcrumb-->
+
+            <div class="col-12 col-lg-9 mx-auto">
+                <div class="card radius-10">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <h6 class="text-md-center text-primary"></h6>
+                            <div class="col-md-1 py-3">
+                                <input type="text" class="form-control text-white font-20 bg-secondary"
+                                       onchange="change_date()" id="show_date" value="<%= date %>">
+                            </div>
+                            <table class="table mb-0 table-striped table-bordered" id="myDataTable2"
+                                   data-ordering="false" data-searching="false">
+                                <thead class="table-light">
+                                <tr>
+                                    <th class="text-md-center"><%= __("Date") %></th>
+                                    <th class="text-md-center"><%= __("Description EN") %></th>
+                                    <th class="text-md-center"><%= __("Description CH") %></th>
+                                    <th class="text-md-center"><%= __("ACTION") %></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <% for(let i = 0; i < return_data.length; i++) { %>
+                                    <tr>
+                                        <td class="text-md-left"><%= new Date(return_data[i].HolidayDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) %></td>
+                                        <td class="text-md-left"><%= return_data[i].HolidayEng %></td>
+                                        <td class="text-md-left"><%= return_data[i].HolidayChi %></td>
+                                        <td class="text-md-center">
+                                            <button type="button" class="btn btn-sm btn-outline-danger ms-2"
+                                                    onclick="delete_hol('<%= new Date(return_data[i].HolidayDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) %>')">
+                                                <i class='bx bx-trash me-0'></i></button>
+                                        </td>
+                                    </tr>
+                                <% } %>
+                                </tbody>
+                            </table>
+                            <a class="btn bg-primary btn-sm  text-white" onclick="add_new_hol()"
+                               id="btn_add_hol"><%= __("Add New") %></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- edit modal -->
+            <div class="modal fade" id="edit_Modal" role="dialog" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <form id="table1">
+                                <input type="hidden" id="record_id">
+                                <div class="modal-header">
+                                    <h5 class="modal-title"><%= __("Add") %></h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row mb-3">
+                                        <div class="col-sm-3">
+                                            <h6 class="mb-0"><%= __("Date") %></h6>
+                                        </div>
+                                        <div class="col-sm-9 text-secondary">
+                                            <input type="text" class="form-control" id="hol">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-sm-3">
+                                            <h6 class="mb-0"><%= __("English") %></h6>
+                                        </div>
+                                        <div class="col-sm-9 text-secondary">
+                                            <input type="text" id="en_name" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-sm-3">
+                                            <h6 class="mb-0"><%= __("Traditional Chinese") %></h6>
+                                        </div>
+                                        <div class="col-sm-9 text-secondary">
+                                            <input type="text" class="form-control" id="hk_name">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-sm-3">
+                                            <h6 class="mb-0"></h6>
+                                        </div>
+                                        <div class="col-sm-9 text-secondary">
+                                            <a class="btn btn-primary btn-sm radius-30 px-4" id="btn_save_change"><%= __("Save") %></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <!-- edit modal ended -->
+
+            <%- include('./copyright.ejs') %>
+        </div>
+    </div>
+    <!--end page wrapper -->
+
+    <%- include('./footer.ejs') %>
+
+</div>
+<!--wrapper ended-->
+
+<script type="application/javascript">
+    function change_date() {
+        let new_date = $('#show_date').val();
+        let url = new URL(window.location.href);
+        url.searchParams.set("date", new_date)
+        window.location.href = url;
+    }
+
+    function edit_hol(d, en, hk) {
+        $('#hol').val(d);
+        $('#en_name').val(en);
+        $('#hk_name').val(hk);
+        $('#btn_save_change').removeAttr('onclick');
+        $('#btn_save_change').attr('onclick', 'update_hol()');
+        $('#edit_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#edit_Modal').modal('show')
+
+    }
+
+    function add_new_hol() {
+        $('#table1').trigger('reset');
+        $('#btn_save_change').removeAttr('onclick');
+        $('#btn_save_change').attr('onclick', 'add_hol()');
+        $('#edit_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#edit_Modal').modal('show')
+    }
+
+    function add_hol() {
+        if ($('#hol').val() === '') {
+            $('#promptMSG').text('<%= __("Please provide date") %>');
+            $('#msgModal').modal('show');
+            $('#hol').addClass("border-danger-input_alert");
+            return;
+        } else {
+            $('#hol').removeClass("border-danger-input_alert");
+        }
+        if ($('#en_name').val() === '') {
+            $('#promptMSG').text('<%= __("Please provide English Name") %>');
+            $('#msgModal').modal('show');
+            $('#en_name').addClass("border-danger-input_alert");
+            return;
+        } else {
+            $('#en_name').removeClass("border-danger-input_alert");
+        }
+        if ($('#hk_name').val() === '') {
+            $('#promptMSG').text('<%= __("Please provide Chinese Name") %>');
+            $('#msgModal').modal('show');
+            $('#hk_name').addClass("border-danger-input_alert");
+            return;
+        } else {
+            $('#hk_name').removeClass("border-danger-input_alert");
+        }
+        $('#edit_Modal').modal('hide')
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/system/holidays',
+            data: {
+                action: 'add_hol',
+                hol: $('#hol').val(),
+                en_name: $('#en_name').val(),
+                hk_name: $('#hk_name').val()
+            }
+        })
+        window.location.reload();
+    }
+
+    function delete_hol(hol) {
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/system/holidays',
+            data: {
+                action: 'del_hol',
+                hol: hol
+            }
+        })
+        window.location.reload();
+    }
+
+    $(document).ready(function () {
+        $('#show_date').datepicker({
+            autoclose: true,
+            format: "yyyy",
+            viewMode: "years",
+            minViewMode: "years",
+            <% if(req.session.lang === 'zh-HK') { %>
+            language: "zh-TW",
+            <% } else if(req.session.lang === 'zh-CN') { %>
+            language: "zh-CN",
+            <% } else { %>
+            language: "en-CA",
+            <% } %>
+        });
+        $('#hol').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            format: "yyyy-mm-dd",
+            <% if(req.session.lang === 'zh-HK') { %>
+            language: "zh-TW",
+            <% } else if(req.session.lang === 'zh-CN') { %>
+            language: "zh-CN",
+            <% } else { %>
+            language: "en-CA",
+            <% } %>
+        });
+    });
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,1110 @@
+<%- include('./header.ejs') %>
+
+<body onload="get_badge()">
+
+<!--wrapper-->
+<div class="wrapper">
+
+    <%- include('./sidebar.ejs') %>
+    <%- include('./topbar.ejs') %>
+
+    <!--start page wrapper -->
+    <div class="page-wrapper">
+        <div class="page-content">
+
+            <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+                <div class="ps-3">
+                    <span class="font-30"><i class="bx bx-happy-alt"></i></span>
+                    <span class="font-24"><%= __("Students") %></span>
+                </div>
+            </div>
+
+            <!-- <div class="col-12 col-lg-9 mx-auto"> -->
+
+            <div class="card radius-10">
+                <div class="card-body">
+                    <div class="table-responsive lead-table">
+                        <table class="table mb-0 align-middle table-hover" id="myDataTable">
+                            <thead class="table-light">
+                            <tr>
+                                <th style="width: 16%"><span class="font-16"><%= __("Student") %></span></th>
+                                <th style="width: 20%"><span class="font-16"><%= __("Name") %></span></th>
+                                <th style="width: 8%"><span class="font-16"><%= __("Phone") %></span></th>
+                                <th style="width: 25%"><span class="font-16"><%= __("Email") %></span></th>
+                                <th style="width: 15%"><span class="font-16"><%= __("Level") %></span></th>
+                                <th style="width: 17%"><span class="font-16"><%= __("Registration Date") %></span>
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <% for(let i = 0; i < student_list.length; i++) { %>
+                                <tr onclick="show_student('<%= student_list[i].StudentCode %>')">
+                                    <td><span class="font-15"><%= student_list[i].StudentCode %></span>
+                                    </td>
+                                    <td>
+                                        <span class="font-15"><%= student_list[i].FirstName %> <%= student_list[i].LastName %></span>
+                                    </td>
+                                    <td><span class="font-15"><%= student_list[i].Mobile %></span>
+                                    </td>
+                                    <td><span class="font-15"><a
+                                                    href="mailto: <%= student_list[i].Email %>"><%= student_list[i].Email %></a></span>
+                                    </td>
+                                    <td><span class="font-15"><%= student_list[i].Form %></span></td>
+                                    <td class="text-center"><span
+                                                class="font-15"><%= new Date(student_list[i].CreateDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) %></span>
+                                    </td>
+                                </tr>
+                            <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- </div> -->
+
+            <%- include('./copyright.ejs') %>
+        </div>
+    </div>
+    <!--end page wrapper -->
+
+    <!-- student details -->
+    <div class="modal fade" id="student_Modal" role="dialog">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="card">
+
+                        <div class="card-body p-4 border-rounded">
+
+                            <form id="StudentProfileData">
+
+                                <div id="student_profile_container">
+
+                                    <div class="col-12 col-lg-9 mx-auto">
+                                        <!--    <div class="card radius-10"> -->
+                                        <div class="card-body">
+                                            <div class="row mb-3">
+                                                <div class="col-sm-3">
+                                                    <h6 class="my-1"><%= __("Student Code") %></h6>
+                                                </div>
+                                                <div class="col-sm-9 text-secondary">
+                                                    <input type="hidden" id="student_code" name="student_code">
+                                                    <input type='text' class="form-control" id="student_code_v"
+                                                           disable>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col-sm-3">
+                                                    <h6 class="mb-0"><%= __("Gender") %></h6>
+                                                </div>
+                                                <div class="col-sm-9 text-secondary">
+                                                    <input type='radio' class="form-check-input" id="gender_M"
+                                                           name="gender" value="M"> <%= __("Male") %> </input>
+                                                    <input type='radio' class="form-check-input" id="gender_F"
+                                                           name='gender' value="F"> <%= __("Female") %> </input>
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-sm-3">
+                                                    <h6 class="my-1"><%= __("Name (Eng)") %></h6>
+                                                </div>
+                                                <div class="col-sm-9 text-secondary">
+                                                    <input type="text" class="form-control" id="name_eng"
+                                                           name="name_eng" autocomplete="off">
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-sm-3">
+                                                    <h6 class="my-1"><%= __("Name (Chi)") %></h6>
+                                                </div>
+                                                <div class="col-sm-9 text-secondary">
+                                                    <input type="text" class="form-control" id="name_chi"
+                                                           name="name_chi" autocomplete="off">
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-sm-3">
+                                                    <h6 class="my-1"><%= __("Date of Birth") %></h6>
+                                                </div>
+                                                <div class="col-sm-9 text-secondary">
+                                                    <input type="text" class="form-control" id="dob" name="dob"
+                                                           autocomplete="off">
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-sm-3">
+                                                    <h6 class="my-1"><%= __("Email") %></h6>
+                                                </div>
+                                                <div class="col-sm-9 text-secondary">
+                                                    <input type="text" class="form-control" id="email" name="email"
+                                                           autocomplete="off">
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-sm-3">
+                                                    <h6 class="my-1"><%= __("Mobile") %></h6>
+                                                </div>
+                                                <div class="col-sm-9 text-secondary">
+                                                    <input type="text" class="form-control" id="stu_mobile"
+                                                           name="stu_mobile" onkeyup="intCheck('stu_mobile')"
+                                                           autocomplete="off">
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-sm-3">
+                                                    <h6 class="my-1"><%= __("BranchCode") %></h6>
+                                                </div>
+                                                <div class="col-sm-9 text-secondary" id="branchcodepanel" onclick="get_branchcode()">
+                                                    <input type="text" class="form-control" id="branchcode" 
+                                                           name="branchcode"
+                                                           autocomplete="off">
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-sm-3">
+                                                    <h6 class="my-1"><%= __("Address") %></h6>
+                                                </div>
+                                                <div class="col-sm-9 text-secondary">
+                                                    <textarea type="text" class="form-control" id="address"
+                                                              name="address" rows="4" autocomplete="off"></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-sm-3">
+                                                    <h6 class="my-1"><%= __("Emergency Contact") %></h6>
+                                                </div>
+                                                <div class="col-sm-9 text-secondary">
+                                                    <input type="text" class="form-control" id="em_contact"
+                                                           name="em_contact" autocomplete="off">
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-sm-3">
+                                                    <h6 class="my-1"><%= __("Emergency Contact Mobile") %></h6>
+                                                </div>
+                                                <div class="col-sm-9 text-secondary">
+                                                    <input type="text" class="form-control" id="em_mobile"
+                                                           name="em_mobile" onkeyup="intCheck('em_mobile')"
+                                                           autocomplete="off">
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-sm-3">
+                                                    <h6 class="my-1"><%= __("School") %></h6>
+                                                </div>
+                                                <div class="col-sm-9 text-secondary">
+                                                    <input type="text" class="form-control" id="school"
+                                                           name="school"
+                                                           autocomplete="off">
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-sm-3">
+                                                    <h6 class="my-1"><%= __("Current level") %></h6>
+                                                </div>
+                                                <div class="col-sm-9 text-secondary">
+                                                    <input type="text" class="form-control" id="level" name="level"
+                                                           autocomplete="off">
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-sm-3">
+                                                    <h6 class="my-1"><%= __("Remarks") %></h6>
+                                                </div>
+                                                <div class="col-sm-9 text-secondary">
+                                                    <textarea type="text" class="form-control" id="remarks"
+                                                              name="remarks" rows="2" required
+                                                              autocomplete="off"></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-sm-3"></div>
+                                                <div class="col-sm-9 text-secondary">
+                                                    <span id="confirmation"
+                                                          class="text-center text-primary font-18"></span>
+                                                    <div id="edit_button_container">
+                                                        <input type="button" id="edit_student"
+                                                               class="btn btn-danger px-4 float-end"
+                                                               onclick="open_edit_student()"
+                                                               value="<%= __("Edit") %>"/>
+                                                        <input type="button" id="search_student_billing"
+                                                               class="btn btn-primary px-4"
+                                                               onclick="s_student_billing()"
+                                                               value="<%= __("Billing Info") %>"/>
+                                                        <input type="button" id="search_student_class"
+                                                               class="btn btn-primary px-4"
+                                                               onclick="s_student_class()"
+                                                               value="<%= __("Class Info") %>"/>
+                                                        <input type="button" id="btn_student_card"
+                                                               class="btn btn-primary px-4"
+                                                               onclick="student_card()"
+                                                               value="<%= __("Card") %>"/>
+                                                        <input type="button" id="search_voucher"
+                                                               class="btn btn-primary px-4"
+                                                               onclick="show_vouchers()"
+                                                               value="<%= __("Vouchers") %>"/>
+                                                       
+                                                    </div>
+                                                    <div id="save_button_container" style="display: none">
+                                                        <input type="button" id="saveChange"
+                                                               class="btn btn-primary px-4" onclick="save_student()"
+                                                               value="<%= __("Save") %>"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- </div> -->
+                                </div>
+                            </form>
+                        </div>
+
+                        <div id="student_bill_info_container" style="display: none">
+                            <div>
+                                <table class="table mb-0 table-striped table-bordered" id="myDataTable2">
+                                    <thead class="table-light">
+                                    <tr>
+                                        <th class="text-md-center"><%= __("Invoice No.") %></th>
+                                        <th class="text-md-center"><%= __("Date") %></th>
+                                        <th class="text-md-center"><%= __("Discount") %></th>
+                                        <th class="text-md-center"><%= __("Amount") %></th>
+                                        <th class="text-md-center"><%= __("Remarks") %></th>
+                                        <th class="text-md-center"><%= __("Status") %></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div>
+                                <input type="button" id="search_student_class"
+                                       class="btn btn-primary px-4"
+                                       onclick="s_student_class()"
+                                       value="<%= __("Class Info") %>"/>
+                                <input type="button" id="s_profile1"
+                                       class="btn btn-primary px-4"
+                                       onclick="s_student_profile()"
+                                       value="<%= __("Profile") %>"/>
+                                <input type="button" id="search_voucher"
+                                       class="btn btn-primary px-4"
+                                       onclick="show_vouchers()"
+                                       value="<%= __("Vouchers") %>"/>
+                            </div>
+                        </div>
+
+                        <div id="student_course_info_container" style="display: none">
+                            <div>
+                                <table class="table mb-0 table-striped table-bordered" id="myDataTable3">
+                                    <thead class="table-light">
+                                    <tr>
+                                        <th class="text-md-center" style="width: 8%"><%= __("Course") %></th>
+                                        <th class="text-md-center" style="width: 16%"><%= __("Title") %></th>
+                                        <th class="text-md-center" style="width: 12%"><%= __("Start") %></th>
+                                        <th class="text-md-center" style="width: 12%"><%= __("End") %></th>
+                                        <th class="text-md-center" style="width: 20%"><%= __("Course time") %></th>
+                                        <th class="text-md-center" style="width: 10%"><%= __("Class Status") %></th>
+                                        <th class="text-md-center"
+                                            style="width: 10%"><%= __("Attend Status") %></th>
+                                        <th class="text-md-center" style="width: 10%"><%= __("Absents") %></th>
+                                        <th class="text-md-center" style="width: 10%"><%= __("Absent Date") %></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div>
+                                <input type="button" id="search_student_billing2"
+                                       class="btn btn-primary px-4"
+                                       onclick="s_student_billing()"
+                                       value="<%= __("Billing Info") %>"/>
+                                <input type="button" id="s_profile2"
+                                       class="btn btn-primary px-4"
+                                       onclick="s_student_profile()"
+                                       value="<%= __("Profile") %>"/>
+                                <input type="button" id="search_voucher"
+                                       class="btn btn-primary px-4"
+                                       onclick="show_vouchers()"
+                                       value="<%= __("Vouchers") %>"/>
+                            </div>
+                        </div>
+
+                        <div id="search_voucher_container" style="display: none">
+                           
+                            <div class="modal-body">
+                                <div class="m-2"><span class="font-24">
+                                        <%= __("Voucher Code") %>
+                                </span></div>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="d-none d-md-flex" >
+                                    <button type="button" class="btn btn-outline-primary"
+                                            onclick="get_voucher_list()"><i
+                                                class='bx bx-search me-0'></i></button>
+                                    <input type="text" class="form-control border-primary"
+                                           id="voucher_type_sel"
+                                           disabled required autocomplete="off">
+                                    <input type="hidden" class="form-control" id="leave_type"
+                                           name="leave_type"
+                                           required autocomplete="off">
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="save_voucher_button_container" style="display: none; margin-top: 20px;">
+                                <input type="button" id="saveVoucher"
+                                       class="btn btn-primary px-4" onclick="save_voucher()"
+                                       value="<%= __("Save") %>"/>
+                            </div>
+                            <hr/>
+                            <div class="table-responsive lead-table">
+                                <table class="table mb-0 table-striped table-bordered" id="myDataTable4">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="text-md-center"><%= __("Code") %></th>
+                                            <th class="text-md-center"><%= __("Name") %></th>
+                                            <th class="text-md-center"><%= __("Qty") %></th>
+                                            <th class="text-md-center"><%= __("Amount") %></th>
+                                            <th class="text-md-center"><%= __("Used") %></th>
+                                            <th class="text-md-center"><%= __("Used Date") %></th>
+                                            <th class="text-md-center"><%= __("Expiry Date") %></th>
+                                            <th class="text-md-center"><%= __("Invoice No.") %></th>
+                                            <th class="text-md-center" style="width: 10%" sorting_asc_disabled
+                                            sorting_desc_disabled><%= __("Action") %></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div>
+                                <input type="button" id="search_student_billing2"
+                                       class="btn btn-primary px-4"
+                                       onclick="s_student_billing()"
+                                       value="<%= __("Billing Info") %>"/>
+                                <input type="button" id="s_profile2"
+                                       class="btn btn-primary px-4"
+                                       onclick="s_student_profile()"
+                                       value="<%= __("Profile") %>"/>
+                                <input type="button" id="search_student_class"
+                                       class="btn btn-primary px-4"
+                                       onclick="s_student_class()"
+                                       value="<%= __("Class Info") %>"/>
+                            </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- student details ended -->
+    
+</div>
+
+<!-- Get branch code modal -->
+<div class="modal fade" id="branchcode_Modal" role="dialog">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-body">
+				<div class="modal-header">
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="card">
+					<div class="table-responsive">
+						<table class="table mb-0 table-striped table-bordered table-sm" id="product_list_sm"
+							   data-paging="false">
+							<thead class="table-light">
+							<tr>
+								<th class="text-md-center" style="width: 20%"></th>
+								<th class="text-md-center" style="width: 80%"><%= __("Branch Code") %></th>
+							</tr>
+							</thead>
+							<tbody>
+							</tbody>
+							<tfoot>
+							<tr>
+								<td class="text-left">
+									<a class="btn btn-primary btn-sm radius-30 px-4" data-bs-dismiss="modal"
+									   onclick="use_this_branchcode()"><%= __("Apply") %></a>
+								</td>
+								<td class="text-end">
+									<a class="btn btn-secondary btn-sm radius-30 px-4"
+									   data-bs-dismiss="modal"><%= __("Cancel") %></a>
+								</td>
+							</tr>
+							</tfoot>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>
+<!-- get branch code modal ended -->
+
+<!-- Get existing vouchers modal -->
+    <div class="modal fade" id="voucher_Modal" role="dialog">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table class="table mb-0 table-striped table-bordered table-hover"
+                                   id="selection_table_search5">
+                                <thead class="table-light">
+                                <tr>
+                                    <th class="text-md-center" style="width: 10%"><%= __("Code") %></th>
+                                    <th class="text-md-center" style="width: 75%"><%= __("Description") %></th>
+                                    <th class="text-md-center" style="width: 15%"><%= __("Type") %></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Get existing vouchers modal ended -->
+
+        <!-- delete confirmation modal -->
+        <div class="modal fade" id="delete_Modal" role="dialog">
+            <div class="modal-dialog modal-dialog-centered">
+    
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="modal-header">
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form id="delete_voucher_form">
+                            <div class="text-md-center">
+                                <input type="hidden" id="del_vcode">
+                                <span class="text-secondary font-16"><%= __("Delete Voucher") %>  </span>
+                                <span class="text-primary font-16" id="del_vcode_v"></span>
+                                <span class="text-primary font-16" id="del_idx" style="display: none"></span>
+                            </div>
+                            <hr>
+                            <div class="text-md-center">
+                                <a class="btn btn-sm bg-secondary text-white" data-bs-dismiss="modal"
+                                   id="btn_del_cancel"><%= __("Cancel") %></a> &nbsp;&nbsp;
+                                <a class="btn btn-sm bg-danger text-white"
+                                   id="btn_del_confirm"
+                                   onclick="del_confirm()"><%= __("Confirm") %></a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+    
+            </div>
+        </div>
+        <!-- delete confirmation modal ended -->
+
+    <!-- Hold voucher values -->
+
+    <form id="voucherdesc_form" style="display: none">
+
+        <div id="voucherdesc_container">
+
+            <div class="col-12 col-lg-9 mx-auto">
+                <!--    <div class="card radius-10"> -->
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            <h6 class="my-1"><%= __("Voucher Code") %></h6>
+                        </div>
+                        <div class="col-sm-9 text-secondary">
+                            <div class="col-md-3 py-3 input-group">
+                                <input type="text" class="form-control border-primary"
+                                       id="voucher_code"
+                                       name="voucher_code" onchange="checkdup()">
+                                <button type="button" class="btn btn-outline-primary ms-2"
+                                        id="btn_get_vlist"><i
+                                            class='bx bx-search me-0'></i></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            <h6 class="my-1"><%= __("Voucher Name") %></h6>
+                        </div>
+                        <div class="col-sm-9 text-secondary">
+                            <input type="text" class="form-control" id="voucher_name"
+                                   name="voucher_name" autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            <h6 class="my-1"><%= __("Voucher Type") %></h6>
+                        </div>
+                        <div class="col-sm-9 text-secondary">
+                            <input type="radio" class="form-check-input" id="voucher_type01"
+                                   name="voucher_type" value="Voucher" onclick="set_field()"
+                                   autocomplete="off"> <%= __("Voucher") %> &nbsp;</input>
+                            <input type="radio" class="form-check-input" id="voucher_type02"
+                                   name="voucher_type" value="Discount" onclick="set_field()"
+                                   autocomplete="off"> <%= __("Discount") %> &nbsp;</input>
+                            <input type="radio" class="form-check-input" id="voucher_type03"
+                                   name="voucher_type" value="Credit" onclick="set_field()"
+                                   autocomplete="off"> <%= __("Credit") %> &nbsp;</input>
+                            <input type="radio" class="form-check-input" id="voucher_type04"
+                                   name="voucher_type" value="Old Price" onclick="set_field()"
+                                   autocomplete="off"> <%= __("Old Price") %> &nbsp;</input>
+                            <input type="radio" class="form-check-input" id="voucher_type05"
+                                   name="voucher_type" value="Special Price"
+                                   onclick="set_field()"
+                                   autocomplete="off"> <%= __("Special Price") %> &nbsp;</input>
+                            <input type="radio" class="form-check-input" id="voucher_type06"
+                                   name="voucher_type" value="Coupon" onclick="set_field()"
+                                   autocomplete="off"> <%= __("Coupon") %> &nbsp;</input>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            <h6 class="my-1"><%= __("QTY") %></h6>
+                        </div>
+                        <div class="col-sm-9 text-secondary">
+                            <input type="text" class="form-control" id="qty" name="qty"
+                                   onkeyup="intCheck('qty')" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            <h6 class="my-1"><%= __("Amount") %></h6>
+                        </div>
+                        <div class="col-sm-9 text-secondary">
+                            <input type="text" class="form-control" id="amount" name="amount"
+                                   onkeyup="decimalCheck('amount')" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            <h6 class="my-1"><%= __("Discount") %></h6>
+                        </div>
+                        <div class="col-sm-9 text-secondary">
+                            <input type="text" class="form-control" id="discount"
+                                   name="discount" onkeyup="intCheck('discount')"
+                                   autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            <h6 class="my-1"><%= __("Validity") %></h6>
+                        </div>
+                        <div class="col-sm-9 text-secondary">
+                            <input type="text" class="form-control" id="validity"
+                                   name="validity" onkeyup="intCheck('validity')"
+                                   autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            <h6 class="my-1"><%= __("Quota") %></h6>
+                        </div>
+                        <div class="col-sm-9 text-secondary">
+                            <input type="text" class="form-control" id="quota" name="quota"
+                                   value="999"
+                                   onkeyup="intCheck('quota')" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            <h6 class="my-1"><%= __("Start Date") %></h6>
+                        </div>
+                        <div class="col-sm-9 text-secondary">
+                            <input type="text" class="form-control" id="start_date"
+                                   name="start_date" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            <h6 class="my-1"><%= __("Expiry Date") %></h6>
+                        </div>
+                        <div class="col-sm-9 text-secondary">
+                            <input type="text" class="form-control" id="end_date"
+                                   value="2999-12-31"
+                                   name="end_date" autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- </div> -->
+        </div>
+    </form>
+
+     <!-- Hold voucher values end-->
+
+<%- include('./footer.ejs') %>
+
+</div>
+<!--wrapper ended-->
+
+<script type="text/javascript">
+    function open_edit_student() {
+        $("#StudentProfileData").find(':input:disabled').prop('disabled', false)
+        $('#student_code_v').prop('disabled', true)
+        $('#edit_button_container').hide();
+        $('#save_button_container').show();
+        $('#student_bill_info_container').hide();
+        $('#search_voucher_container').hide();
+        $('#student_course_info_container').hide();
+        $('#branchcodepanel').attr('onclick','get_branchcode()')
+    }
+
+    function s_student_billing() {
+        $('#voucher_type_sel').val("")
+        $('#voucherdesc_form').trigger('reset');
+        $('#student_profile_container').hide();
+        $('#student_bill_info_container').show();
+        $('#student_course_info_container').hide();
+        $('#search_voucher_container').hide();
+        $('#myDataTable2').DataTable().data().clear().draw();
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/students/info',
+            data: {action: 'get_invoice_info', code: $('#student_code').val()},
+            success: function (return_data) {
+                $.each(return_data, function (i) {
+                    this_row = `<tr>`;
+                    this_row += `<td class="text-md-center"><span class="font-15"><a  onclick="show_inv('` + return_data[i].InvoiceNo + `')">` + return_data[i].InvoiceNo + `</a></span></td>`;
+                    this_row += `<td class="text-md-center"><span class="font-15">` + new Date(return_data[i].InvoiceDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) + `</span></td>`;
+                    this_row += `<td class="text-md-end"><span class="font-15">` + return_data[i].TotalDiscount + `</span></td>`;
+                    this_row += `<td class="text-md-end"><span class="font-15">` + return_data[i].TotalAmount + `</span></td>`;
+                    this_row += `<td><span class="font-15">` + return_data[i].Remarks + `</span></td>`;
+                    this_row += `<td class="text-center"><span class="font-15">` + return_data[i].Status + `</span></td>`;
+                    this_row += `</tr>`;
+                    $('#myDataTable2').DataTable().row.add($(this_row)).draw(false);
+                });
+            }
+        });
+    }
+
+    function s_student_profile() {
+        $('#student_bill_info_container').hide()
+        $('#student_course_info_container').hide()
+        $('#search_voucher_container').hide()
+        $('#voucher_type_sel').val("")
+        $('#voucherdesc_form').trigger('reset');
+        $('#student_profile_container').show()
+    }
+
+    function s_student_class() {
+        $('#student_profile_container').hide();
+        $('#student_bill_info_container').hide();
+        $('#search_voucher_container').hide();
+        $('#student_course_info_container').show();
+        $('#voucher_type_sel').val("")
+        $('#voucherdesc_form').trigger('reset');
+        $('#myDataTable3').DataTable().data().clear().draw();
+        
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/students/info',
+            data: {action: 'get_class_info', code: $('#student_code').val()},
+            success: function (return_data) {
+
+                $.each(return_data, function (i) {
+                    this_row = `<tr>`;
+                    this_row += `<td class="text-md-center" style="width: 8%"><span class="font-11">` + return_data[i].CourseCode + `</span></td>`;
+                    this_row += `<td class="text-md-left" style="width: 18%"><span class="font-11">` + return_data[i].CourseTitle + `</span></td>`;
+                    this_row += `<td class="text-md-center" style="width: 12%"><span class="font-11">` + new Date(return_data[i].CourseStart).toLocaleDateString('en-CA', {timeZone: 'GMT'}) + `</span></td>`;
+                    this_row += `<td class="text-md-center" style="width: 12%"><span class="font-11">` + new Date(return_data[i].CourseEnd).toLocaleDateString('en-CA', {timeZone: 'GMT'}) + `</span></td>`;
+                    ct = '';
+                    if (return_data[i].CourseTime) {
+                        for (x of return_data[i].CourseTime.split(",")) {
+                            ct += x + '<br>';
+                        }
+                    }
+                    this_row += `<td style="width: 20%"><span class="font-11">` + ct + `</span></td>`;
+                    this_row += `<td class="text-md-center" style="width: 10%"><span class="font-11">` + return_data[i].TotalPassedClass + ' / ' + return_data[i].TotalCourseClass + `</span></td>`;
+                    this_row += `<td class="text-md-center" style="width: 10%"><span class="font-11">` + return_data[i].Attended + ' / ' + return_data[i].TotalPassedClass + `</span></td>`;
+                    this_row += `<td class="text-md-center" style="width: 10%"><span class="font-11">` + return_data[i].Absent + `</span></td>`;
+                    adays = '';
+                    if (return_data[i].AbsentDays) {
+                        for (y of return_data[i].AbsentDays.split(",")) {
+                            adays += y + '<br>';
+                        }
+                    }
+                    this_row += `<td class="text-md-center" style="width: 10%"><span class="font-11">` + adays + `</span></td>`;
+                    this_row += `</tr>`;
+                    $('#myDataTable3').DataTable().row.add($(this_row)).draw(false);
+                });
+            }
+        });
+    }
+
+    function show_student(c) {
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/students/info',
+            data: {action: 'get_student_info', code: c},
+            success: function (return_data) {
+                if (return_data[0].StudentCode) {
+                    $('#student_code').val(return_data[0].StudentCode)
+                    $('#student_code_v').val(return_data[0].StudentCode)
+                    $("input[name=gender][value=" + return_data[0].Gender + "]").prop('checked', true);
+                    $('#name_eng').val(return_data[0].FirstName);
+                    $('#name_chi').val(return_data[0].LastName);
+                    $('#dob').val(new Date(return_data[0].DOB).toLocaleDateString('en-CA', {timeZone: 'GMT'}));
+                    $('#email').val(return_data[0].Email);
+                    $('#stu_mobile').val(return_data[0].Mobile);
+                    $('#branchcode').val(return_data[0].BranchCode);
+                    $('#address').val(return_data[0].Address);
+                    $('#em_contact').val(return_data[0].EmergencyContactNo1);
+                    $('#em_mobile').val(return_data[0].EmergencyContactPerson1);
+                    $('#school').val(return_data[0].SchoolName);
+                    $('#level').val(return_data[0].Form);
+                    $('#remarks').val(return_data[0].Remarks);
+                }
+            }
+        });
+        $("#StudentProfileData").find(':input:not(:disabled)').prop('disabled', true);
+        $('#edit_button_container').show();
+        $('#edit_student').removeAttr('disabled');
+        $('#search_student_billing').removeAttr('disabled');
+        $('#search_student_class').removeAttr('disabled');
+        $('#btn_student_card').removeAttr('disabled');
+        $('#search_voucher').removeAttr('disabled');
+        $('#student_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#student_Modal').modal('show')
+         $('#branchcodepanel').removeAttr('onclick');
+    }
+
+    function save_student() {
+
+        let e = $('input[name="gender"]:checked').val();
+        if (e === undefined) {
+            $('#promptMSG').text('<%= __("Please select gender") %>');
+            $('#msgModal').modal('show');
+            $('#gender_M').addClass("border-danger-input_alert");
+            $('#gender_F').addClass("border-danger-input_alert");
+            return;
+        } else {
+            $('#gender_M').removeClass("border-danger-input_alert");
+            $('#gender_F').removeClass("border-danger-input_alert");
+        }
+        if ($('#name_chi').val() === '' && $('#name_eng').val() === '') {
+            $('#promptMSG').text('<%= __("Please enter name") %>');
+            $('#msgModal').modal('show');
+            $('#name_chi').addClass("border-danger-input_alert");
+            $('#name_eng').addClass("border-danger-input_alert");
+            return;
+        } else {
+            $('#name_chi').removeClass("border-danger-input_alert");
+            $('#name_eng').removeClass("border-danger-input_alert");
+        }
+        if ($('#email').val() === '' && $('#mobile').val() === '') {
+            $('#promptMSG').text('<%= __("Please provide at least one contact method") %>');
+            $('#msgModal').modal('show');
+            $('#email').addClass("border-danger-input_alert");
+            $('#mobile').addClass("border-danger-input_alert");
+            return;
+        } else {
+            $('#email').removeClass("border-danger-input_alert");
+            $('#mobile').removeClass("border-danger-input_alert");
+        }
+
+        $('#saveChange').removeAttr('onclick');
+        $('#save_button_container').hide();
+
+        let form = $('#StudentProfileData');
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/students/info',
+            data: {action: 'update_student', form: form.serialize()},
+            success: function (student_list) {
+                $("#StudentProfileData").find(':input:not(:disabled)').prop('disabled', true)
+                $('#confirmation').text('Student Updated');
+                $('#myDataTable').DataTable().data().clear();
+                $.each(student_list, function (i) {
+                    this_row = `<tr onclick="show_student('` + student_list[i].StudentCode + `')"> `;
+                    this_row += `<td><span class="font-15">` + student_list[i].StudentCode + ` </span></td>`;
+                    this_row += `<td><span class="font-15">` + student_list[i].FirstName + ` ` + student_list[i].LastName + `</span></td>`;
+                    this_row += `<td><span class="font-15">` + student_list[i].Mobile + ` </span></td>`;
+                    this_row += `<td><span class="font-15"><a href="mailto:` + student_list[i].Email + `">` + student_list[i].Email + `</a></span></td>`;
+                    this_row += `<td><span class="font-15">` + student_list[i].Form + `</span></td>`;
+                    this_row += `<td class="text-center"><span class="font-15">` + new Date(student_list[i].CreateDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) + `</span></td>`;
+                    this_row += `</tr>`;
+                    $('#myDataTable').DataTable().row.add($(this_row)).draw(false);
+                });
+            }
+        });
+        setTimeout(resume_normal, 3000)
+    }
+
+    function show_vouchers(){
+        $('#student_profile_container').hide();
+        $('#search_voucher_container').show();
+        $('#save_voucher_button_container').show();
+        $('#student_bill_info_container').hide();
+        $('#student_course_info_container').hide();
+        $('#myDataTable4').DataTable().data().clear().draw();
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/students/uservouchers',
+            data: {action: 'get_vouchers', code: $('#student_code').val()},
+            success: function (return_data) {
+                $.each(return_data, function (i) {
+                    let usedVoucher= return_data[i].Used ? 'Yes' : 'No';
+                    let usedDate= return_data[i].UsedDate ? new Date(return_data[i].UsedDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) : '/';
+                    this_row = `<tr>`;
+                    this_row += `<td class="text-md-center"><span class="font-15">` + return_data[i].VoucherCode + `</span></td>`;
+                    this_row += `<td class="text-md-center"><span class="font-15">` + return_data[i].VoucherName + `</span></td>`;
+                    this_row += `<td class="text-md-center"><span class="font-15">` + return_data[i].Qty + `</span></td>`;
+                    this_row += `<td class="text-md-center"><span class="font-15">` + return_data[i].Price + `</span></td>`;
+                    this_row += `<td class="text-md-center"><span class="font-15">` + usedVoucher + `</span></td>`;
+                    this_row += `<td class="text-md-center"><span class="font-15">` + usedDate + `</span></td>`;
+                    this_row += `<td class="text-md-center"><span class="font-15">` + new Date(return_data[i].ExpDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) + `</span></td>`;
+                    this_row += `<td class="text-md-center"><span class="font-15">` + return_data[i].InvoiceNo + `</span></td>`;
+                    this_row += `<td class="text-md-center" style="width: 10%"><button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="delete_voucher('` +
+                        return_data[i].Idx + `','` +
+                        return_data[i].VoucherCode + `','` + usedVoucher +`')"><i class='bx bx-trash me-0'></i></button></td>`
+                    this_row += `</tr>`;
+                    $('#myDataTable4').DataTable().row.add($(this_row)).draw(false);
+                });
+            }
+        });
+    }
+
+    function save_voucher() {
+        console.log($('#student_code').val());
+        if (checkrequired()) {
+            console.log('--------------------------------------OK--------------------------------------')
+            let form = $('#voucherdesc_form')
+            $.ajax({
+                async: false,
+                type: 'post',
+                url: '/students/adduservouchers',
+                data: {form: form.serialize(), code: $('#student_code').val()},
+                success: function (return_data) {
+                    console.log(return_data);
+                }
+            });
+        } else {
+            return;
+        }
+        // $('#voucherdesc_Modal').modal('hide')
+        // get_voucher_listfull()
+        setTimeout(resume_normal, 2000)
+    }
+
+    function checkrequired() {
+        if ($('#voucher_type_sel').val() === '') {
+            // no schedule yet
+            $('#promptMSG').text('<%= __("Please provide Voucher code") %>');
+            $('#msgModal').modal('show');
+            $('#voucher_type_sel').addClass("border-danger-input_alert");
+            return false;
+        } else {
+            $('#voucher_type_sel').removeClass("border-danger-input_alert");
+            return true;
+        }
+    }
+
+    function student_card() {
+        let f_url = '<embed src="/fup/studentcard-view?id=' + $('#student_code').val() + ' " frameborder="0" width="100%" height="600px">';
+        $('#file_url').html(f_url);
+        $('#showFile_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#showFile_Modal').modal('show');
+    }
+
+    function show_inv(e) {
+        let f_url = '<embed src="/fup/inv-view?id=' + e + ' " frameborder="0" width="100%" height="600px">';
+        $('#file_url').html(f_url);
+        $('#showFile_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#showFile_Modal').modal('show');
+    }
+
+    function set_field() {
+        if ($('input[name="voucher_type"]:checked').val() === 'Discount') {
+            $('#amount').val('')
+            $('#amount').attr('disabled', 'disabled')
+            $('#discount').removeAttr('disabled')
+        } else {
+            $('#discount').val('')
+            $('#discount').attr('disabled', 'disabled')
+            $('#amount').removeAttr('disabled')
+        }
+        $('#voucher_type01').removeClass("border-danger-input_alert");
+        $('#voucher_type02').removeClass("border-danger-input_alert");
+        $('#voucher_type03').removeClass("border-danger-input_alert");
+        $('#voucher_type04').removeClass("border-danger-input_alert");
+        $('#voucher_type05').removeClass("border-danger-input_alert");
+        $('#voucher_type06').removeClass("border-danger-input_alert");
+    }
+
+    function delete_voucher(idx, vcode, used) {
+        console.log('----------------------------------------Used----------------------------------------')
+        console.log(used)
+        if(used === 'Yes'){
+            return;
+        }
+        $('#del_vcode_v').text(vcode)
+        $('#del_idx').text(idx)
+        $('#delete_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#delete_Modal').modal('show')
+    }
+
+    function del_confirm(){
+        console.log('testing');
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/students/uservouchers',
+            data: {action: 'delete_voucher', idx: $('#del_idx').text()},
+            success: function (return_data) {
+                    console.log(return_data);
+                }
+        });
+        // $('#delete_voucher_form').trigger('reset');
+        // $('#voucherdesc_form').trigger('reset');
+        // $('#voucherdesc_Modal').modal('hide');
+        $('#del_vcode_v').text('')
+        $('#del_idx').text('')
+        $('#delete_Modal').modal('hide')
+        setTimeout(resume_normal, 1000)
+        // get_voucher_listfull()
+    }
+
+    function resume_normal() {
+        $('#voucherdesc_form').trigger('reset');
+        $('#student_bill_info_container').hide();
+        $('#student_course_info_container').hide();
+        $('#search_voucher_container').hide();
+        $('#student_profile_container').show();
+        $('#student_Modal').modal('hide');
+        $('#save_button_container').hide();
+        $('#edit_button_container').show();
+        $('#saveChange').attr('onclick', 'save_student()');
+        $('#confirmation').text('');
+        $("#StudentProfileData").find(':input:disabled').prop('disabled', false)
+        $("#StudentProfileData").trigger('reset');
+        $('#voucher_type_sel').val("")
+    }
+
+    	// testing branch code modal
+
+	function get_branchcode() {
+        $('#product_list_sm').DataTable().data().clear();
+        $.ajax({
+            type: 'post',
+            async: false,
+            url: '/system/users',
+            data: {action: 'get_branchcode'},
+            success: function (return_data) {
+                $.each(return_data, function (i) {
+                    this_row = `<tr>`;
+                    this_row += `<td class="text-md-center" style="width: 20%"><input class="checkoption" onclick="confirm_branchcode()" type="checkbox" value="` + return_data[i].BranchCode + `"></td>`;
+                    this_row += `<td class="text-md-center" style="width: 80%">` + return_data[i].BranchCode + `</td>`;
+                    this_row += `</tr>`;
+
+                    $('#product_list_sm').DataTable().row.add($(this_row)).draw(false);
+                });
+            }
+        });
+		$('#branchcode_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#branchcode_Modal').modal('show');
+    }
+
+	function use_this_branchcode() {
+        $('#branchcode_Modal').modal('hide');
+        let x = $('#product_list_sm').DataTable().$('input[type=checkbox]:checked');
+        console.log('------use_this_branchcode------');
+        console.log(x.length)
+        console.log(x)
+        $.each(x, function (i) {
+            if (i > 0) {
+                console.log('------if i>0 ------');
+                $('#branchcode').val($('#branchcode').val() + ',' + x[i].value);
+            } else {
+                console.log('------if i<0 ------');
+                console.log(x[i].value)
+                $('#branchcode').val(x[i].value);
+            }
+        });
+    }
+
+    function get_voucher_list() {
+        $('#selection_table_search5').DataTable().data().clear();
+        $.ajax({
+            type: 'post',
+            async: false,
+            url: '/system/vouchers',
+            data: {action: 'get_voucher_list'},
+            success: function (return_data) {
+                $.each(return_data, function (i) {
+                    this_row = `<tr onclick="use_this_vouchercode('` +
+                        return_data[i].VoucherCode + `','` +
+                        return_data[i].VoucherName + `','` +
+                        return_data[i].VoucherType + `','` +
+                        return_data[i].Amount + `','` +
+                        return_data[i].Discount + `','` +
+                        return_data[i].Validity + `','` +
+                        return_data[i].Qty + `','` +
+                        new Date(return_data[i].VoucherStart).toLocaleDateString('en-CA', {timeZone: 'GMT'}) + `','` +
+                        new Date(return_data[i].VoucherEnd).toLocaleDateString('en-CA', {timeZone: 'GMT'}) + `','` +
+                        return_data[i].Quota + `')">`;
+                    this_row += `<td class="text-md-left" style="width: 10%">` + return_data[i].VoucherCode + `</td>`;
+                    this_row += `<td class="text-md-left" style="width: 75%">` + return_data[i].VoucherName + `</td>`;
+                    this_row += `<td class="text-md-left" style="width: 15%">` + return_data[i].VoucherType + `</td>`;
+                    this_row += `</tr>`;
+                    $('#selection_table_search5').DataTable().row.add($(this_row)).draw(false);
+                });
+            }
+        });
+        $('#voucher_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#voucher_Modal').modal('show');
+    }
+
+    function use_this_vouchercode(co, na, t, amt, dis, v, qty, str, end, qu) {
+        const val = co + ' - ' + na;
+        $('#voucher_Modal').modal('hide');
+        $('#voucher_code').val(co)
+        $('#voucher_name').val(na)
+        $("input[name=voucher_type][value='" + t + "']").prop('checked', true);
+        $('#qty').val(qty)
+        $('#amount').val(amt)
+        $('#discount').val(dis)
+        $('#validity').val(v)
+        $('#quota').val(qu)
+        $('#start_date').val(str)
+        $('#end_date').val(end)
+        $('#voucher_type_sel').val(val)
+        set_field()
+        $('#voucher_type_sel').removeClass("border-danger-input_alert");
+    }
+	
+
+    $(document).ready(function () {
+        $('#student_Modal').on('hidden.bs.modal', function () {
+            resume_normal();
+        })
+    });
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,180 @@
+<%- include('./header.ejs') %>
+<style>
+
+    #calendar {
+        max-width: 3000px;
+        margin: 40px auto;
+        padding: 0 10px;
+    }
+    .popover {
+        border: 2px ridge #fe0015;
+    }
+
+    .popover-title {
+        background-color: #73AD21;
+        color: #FFFFFF;
+        font-size: 28px;
+        text-align:center;
+    }
+    .popover-content {
+        background-color: #e3d51d;
+        color: #006efe;
+        padding: 25px;
+    }
+</style>
+
+<body onload="get_badge()">
+
+<!--wrapper-->
+<div class="wrapper">
+
+    <%- include('./sidebar.ejs') %>
+    <%- include('./topbar.ejs') %>
+
+    <!--start page wrapper -->
+    <div class="page-wrapper">
+        <div class="page-content">
+
+            <!--breadcrumb-->
+            <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+                <div class="ps-3">
+                    <span class="font-30"><i class="bx bx-calendar-edit"></i></span>
+                    <span class="font-24"><%= __("My Schedule") %></span>
+                </div>
+            </div>
+            <!--end breadcrumb-->
+
+            <!-- <div class="col-12 col-lg-9 mx-auto"> -->
+                <div class="card radius-10">
+                    <div class="card-body">
+
+                        <div id='calendar'></div>
+
+                    </div>
+                </div>
+            <!-- </div> -->
+
+
+            <%- include('./copyright.ejs') %>
+        </div>
+    </div>
+    <!--end page wrapper -->
+
+    <%- include('./footer.ejs') %>
+
+</div>
+<!--wrapper ended-->
+
+<script src="/assets/plugins/fullcalendar/js/main.min.js"></script>
+<script src="/assets/plugins/fullcalendar/js/locales-all.min.js"></script>
+<script src="/assets/plugins/fullcalendar/js/moment.min.js"></script>
+
+<script type="application/javascript">
+
+    $(document).ready(function () {
+        <% if(req.session.lang === 'zh-HK') { %>
+        let initialLocaleCode = "zh-tw";
+        <% } else if(req.session.lang === 'zh-CN') { %>
+        let initialLocaleCode = "zh-cn";
+        <% } else { %>
+        let initialLocaleCode = "en";
+        <% } %>
+
+        let roster = get_roster();
+        let events = [];
+        let desc
+        let t;
+        let c;
+        $.each(roster, (i) => {
+            if (roster[i].ClassCode !== '') {
+                t = '';
+                c = '#33ab90';
+                dt = 'block';
+                desc = roster[i].ClassCode;
+            } else {
+                t = '';
+                c = '#f5ae51';
+                dt = 'item-list';
+                desc = '';
+            }
+            events.push({
+                id: roster[i].ClassCode,
+                title: t,
+                start: roster[i].TimeFrom,
+                end: roster[i].TimeTo,
+                description: desc,
+                display: dt,
+                color: c,
+                extendedProps: {
+                    ClassCode: roster[i].ClassCode,
+                    VenueCode: roster[i].VenueCode,
+                    Subject: roster[i].Subject
+                },
+            });
+        });
+        let calendarEl = document.getElementById('calendar');
+        let calendar = new FullCalendar.Calendar(calendarEl, {
+            schedulerLicenseKey: '0136077518-fcs-1656054867',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,listMonth'
+            },
+            eventTimeFormat: {
+                hour: 'numeric',
+                minute: '2-digit'
+            },
+            initialView: 'timeGridWeek',
+            initialDate: new Date(),
+            timeZone: 'UTC',
+            locale: initialLocaleCode,
+
+            displayEventEnd: true,
+            slotMinTime: '08:00',
+            slotMaxTime: '23:00',
+            dateClick: (info) =>  {
+                //alert('clicked ' + info.dateStr);
+            },
+            select: (info) =>  {
+                //alert('selected ' + info.startStr + ' to ' + info.endStr);
+            },
+            eventClick: (info) =>  {
+                //alert('event clicked ' + info.event.start );
+            },
+            eventMouseEnter: (info) =>  {
+                //alert('hover' + info.event.extendedProps.description );
+            },
+            eventDidMount: (info) =>  {
+                $(info.el).popover({
+                    placement: 'top',
+                    html: true,
+                    animation: true,
+                    delay: 100,
+                    content: info.event.extendedProps.ClassCode + '<br>' + info.event.extendedProps.Subject,
+                    trigger: 'hover',
+                });
+            },
+            events: events
+        });
+        calendar.render();
+    });
+
+    function get_roster(u) {
+        let roster;
+        let ucode = u;
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/user/schedule',
+            data: {action: 'get_roster', ucode: ucode},
+            success: function (return_data) {
+                roster = return_data
+            }
+        })
+        return roster;
+    }
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,177 @@
+<%- include('./header.ejs') %>
+<link href="/assets/plugins/fullcalendar/css/main.min.css" rel="stylesheet"/>
+
+<body onload="get_badge();get_course_list();">
+
+<!--wrapper-->
+<div class="wrapper">
+
+<%- include('./sidebar.ejs') %>
+<%- include('./topbar.ejs') %>
+
+<!--start page wrapper -->
+<div class="page-wrapper">
+    <div class="page-content">
+        <!--breadcrumb-->
+        <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+            <div class="ps-3">
+                <span class="font-30"><i class="bx bx-calendar"></i></span>
+                <span class="font-24"><%= __("Class Reschedule") %></span>
+            </div>
+        </div>
+        <!--end breadcrumb-->
+
+        <!-- <div class="col-12 col-lg-9 mx-auto"> -->
+            <div class="card radius-10">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table mb-0 table-striped table-bordered" id="myDataTable">
+                            <thead class="table-light">
+                            <tr>
+                                <th class="text-md-center sorting_asc_disabled sorting_desc_disabled"><%= __("Action") %></th>
+                                <th class="text-md-center"><%= __("Course Code") %></th>
+                                <th class="text-md-center"><%= __("Subject") %></th>
+                                <th class="text-md-center"><%= __("Title") %></th>
+                                <th class="text-md-center"><%= __("Branch Code") %></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        <!-- </div> -->
+
+        <%- include('./copyright.ejs') %>
+    </div>
+</div>
+
+<!--end page wrapper -->
+
+<%- include('./footer.ejs') %>
+
+</div>
+<!--wrapper ended-->
+
+<script type="text/javascript">
+    function show_class(course) {
+		$('#class_schedule_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#class_schedule_Modal').modal('show');
+    }
+
+    function refresh_course_list() {
+        $('#myDataTable').DataTable().data().clear();
+        get_course_list();
+    }
+
+    function get_course_list() {
+        let this_row = '';
+        let this_aval_td = '';
+        //$('#myDataTable').DataTable({
+        //	stateSave: true
+        //});
+        let ccode = 'a';
+        $.ajax({
+            type: 'GET',
+            url: '/course/list2',
+            success: function (course_info) {
+                $.each(course_info, function (i) {
+                    //alert(JSON.stringify(course_info));
+                    // let's prepare the row string
+                    let s_date = new Date(course_info[i].CourseStart);
+                    s_date = s_date.toLocaleDateString('en-CA', {timeZone: 'GMT'});
+                    // handle avaliability effect
+                    this_row = `<tr>`;
+                    this_row += `<td><center><button type="button" onclick="show_class('` + course_info[i].CourseCode + `')" class="btn btn-primary btn-sm radius-30 px-4"><%= __("Show Class") %></button></center></td>`;
+                    this_row += `<td>` + course_info[i].CourseCode + `</td>`;
+                    this_row += `<td>` + course_info[i].Subject + `</td>`;
+                    this_row += `<td>` + course_info[i].CourseTitle + `</td>`;
+                    this_row += `<td>` + course_info[i].BranchCode + `</td>`
+                    this_row += `</tr>`;
+                    // alert(this_row);
+                    $('#myDataTable').DataTable().row.add($(this_row)).draw(false);
+                });
+            }
+        });
+    }
+
+    let _clean = false;
+    $(document).ready(function () {
+        setInterval(refresh_course_list, <%= config.db_refresh_tbl %>);
+        $('#invoice_Modal').on('hidden.bs.modal', function () {
+            document.location.reload();
+        })
+    });
+</script>
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+            },
+            initialView: 'dayGridMonth',
+            initialDate: '2020-09-12',
+            navLinks: true, // can click day/week names to navigate views
+            selectable: true,
+            nowIndicator: true,
+            dayMaxEvents: true, // allow "more" link when too many events
+            editable: true,
+            selectable: true,
+            businessHours: true,
+            dayMaxEvents: true, // allow "more" link when too many events
+            events: [{
+                title: 'All Day Event',
+                start: '2020-09-01',
+            }, {
+                title: 'Long Event',
+                start: '2020-09-07',
+                end: '2020-09-10'
+            }, {
+                groupId: 999,
+                title: 'Repeating Event',
+                start: '2020-09-09T16:00:00'
+            }, {
+                groupId: 999,
+                title: 'Repeating Event',
+                start: '2020-09-16T16:00:00'
+            }, {
+                title: 'Conference',
+                start: '2020-09-11',
+                end: '2020-09-13'
+            }, {
+                title: 'Meeting',
+                start: '2020-09-12T10:30:00',
+                end: '2020-09-12T12:30:00'
+            }, {
+                title: 'Lunch',
+                start: '2020-09-12T12:00:00'
+            }, {
+                title: 'Meeting',
+                start: '2020-09-12T14:30:00'
+            }, {
+                title: 'Happy Hour',
+                start: '2020-09-12T17:30:00'
+            }, {
+                title: 'Dinner',
+                start: '2020-09-12T20:00:00'
+            }, {
+                title: 'Birthday Party',
+                start: '2020-09-13T07:00:00'
+            }, {
+                title: 'Click for Google',
+                url: 'http://google.com/',
+                start: '2020-09-28'
+            }]
+        });
+        calendar.render();
+    });
+</script>
+
+
+</body>
+
+</html>

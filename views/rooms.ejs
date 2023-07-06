@@ -1,0 +1,43 @@
+
+<%- include('./header.ejs') %>
+
+<body onload="get_badge()">
+
+<!--wrapper-->
+<div class="wrapper">
+
+<%- include('./sidebar.ejs') %>
+<%- include('./topbar.ejs') %>
+
+		<!--start page wrapper -->
+
+<div class="page-wrapper">
+	<div class="page-content">
+		<!--breadcrumb-->
+		<div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+			<div class="ps-3">
+				<span class="font-30"><i class="bx bx-door-open"></i></span>
+				<span class="font-24"><%= __("Rooms") %></span>
+			</div>
+		</div>
+		<!--end breadcrumb-->
+		<div class="container">
+			<div class="main-body">
+
+			</div>
+		</div>
+
+		<%- include('./copyright.ejs') %>
+	</div>
+</div>
+
+<!--end page wrapper -->
+
+<%- include('./footer.ejs') %>
+
+</div>
+<!--wrapper ended-->
+
+</body>
+
+</html>

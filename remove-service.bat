@@ -1,0 +1,1 @@
+qckwin\qckwinsvc uninstall name="doStart" description="DoClever"  

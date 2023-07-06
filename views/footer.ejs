@@ -1,0 +1,1094 @@
+<!-- Modals -->
+<!-- Message modal -->
+<div class="modal fade" id="msgModal" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><%= __("Message") %></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-bold-700 text-lg-center font-20" id="promptMSG">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><%= __("Close") %></button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Message modal ended -->
+<!-- PW reset modal -->
+<div class="modal fade" id="resetPW_Modal" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><%= __("Password Reset") %></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="resetPW">
+                    <div><%= __("New Password") %></div>
+                    <div>
+                        <input type="password" name="passwd" id="pswd1" onBlur="checkpw1()" /><br />
+                    </div>
+                    <div><%= __("Retype New Password") %></div>
+                    <div>
+                        <input type="password" id="pswd2" /><br /><br />
+                        <span id="pw_message" style="color:red"> </span>
+                    </div>
+                    <!-- Click to reset fields -->
+                    <br /><br />
+                    <button type="reset" value="Reset" onClick="checkpw2()"><%= __("Reset") %></button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><%= __("Cancel") %></button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- PW reset modal ended -->
+<!-- show file modal -->
+<div class="modal fade" id="showFile_Modal" role="document" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="card">
+                    <div class="card-body p-4 border-rounded" id="file_url">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><%= __("Close") %></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- show file modal ended -->
+<!-- Modals ended -->
+<!--start switcher-->
+<div class="switcher-wrapper">
+    <div class="switcher-btn"><i class='bx bx-cog'></i>
+    </div>
+    <div class="switcher-body">
+        <div class="d-flex align-items-center">
+            <h5 class="mb-0 text-uppercase">Theme Customizer</h5>
+            <button type="button" class="btn-close ms-auto close-switcher" aria-label="Close"></button>
+        </div>
+        <hr/>
+        <h6 class="mb-0">Theme Styles</h6>
+        <hr/>
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="flexRadioDefault" id="lightmode" checked />
+                <label class="form-check-label" for="lightmode">Light</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="flexRadioDefault" id="darkmode" />
+                <label class="form-check-label" for="darkmode">Dark</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="flexRadioDefault" id="semidark" />
+                <label class="form-check-label" for="semidark">Semi Dark</label>
+            </div>
+        </div>
+        <hr/>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" id="minimaltheme" name="flexRadioDefault" />
+            <label class="form-check-label" for="minimaltheme">Minimal Theme</label>
+        </div>
+        <hr/>
+        <h6 class="mb-0">Sidebar Backgrounds</h6>
+        <hr/>
+        <div class="header-colors-indigators">
+            <div class="row row-cols-auto g-3">
+                <div class="col">
+                    <div class="indigator sidebarcolor1" id="sidebarcolor1"></div>
+                </div>
+                <div class="col">
+                    <div class="indigator sidebarcolor2" id="sidebarcolor2"></div>
+                </div>
+                <div class="col">
+                    <div class="indigator sidebarcolor3" id="sidebarcolor3"></div>
+                </div>
+                <div class="col">
+                    <div class="indigator sidebarcolor4" id="sidebarcolor4"></div>
+                </div>
+                <div class="col">
+                    <div class="indigator sidebarcolor5" id="sidebarcolor5"></div>
+                </div>
+                <div class="col">
+                    <div class="indigator sidebarcolor6" id="sidebarcolor6"></div>
+                </div>
+                <div class="col">
+                    <div class="indigator sidebarcolor7" id="sidebarcolor7"></div>
+                </div>
+                <div class="col">
+                    <div class="indigator sidebarcolor8" id="sidebarcolor8"></div>
+                </div>
+            </div>
+
+            <hr/>
+            <h6 class="mb-0">Header Colors</h6>
+            <hr/>
+            <div class="header-colors-indigators">
+                <div class="row row-cols-auto g-3">
+                    <div class="col">
+                        <div class="indigator headercolor1" id="headercolor1"></div>
+                    </div>
+                    <div class="col">
+                        <div class="indigator headercolor2" id="headercolor2"></div>
+                    </div>
+                    <div class="col">
+                        <div class="indigator headercolor3" id="headercolor3"></div>
+                    </div>
+                    <div class="col">
+                        <div class="indigator headercolor4" id="headercolor4"></div>
+                    </div>
+                    <div class="col">
+                        <div class="indigator headercolor5" id="headercolor5"></div>
+                    </div>
+                    <div class="col">
+                        <div class="indigator headercolor6" id="headercolor6"></div>
+                    </div>
+                    <div class="col">
+                        <div class="indigator headercolor7" id="headercolor7"></div>
+                    </div>
+                    <div class="col">
+                        <div class="indigator headercolor8" id="headercolor8"></div>
+                    </div>
+                </div>
+            </div>
+            <hr/>
+            <div>
+                <form id="saveThemeForm">
+                    <input type="hidden" name="action" value="save_theme" />
+                    <input type="button" id="saveTheme" class="btn btn-primary px-4" value="Save as default"/>
+                </form>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+<!--end switcher-->
+
+<script src="/assets/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/jquery.min.js"></script>
+
+<script src="/assets/plugins/simplebar/js/simplebar.min.js"></script>
+
+<script src="/assets/plugins/metismenu/js/metisMenu.min.js"></script>
+<script src="/assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js"></script>
+
+<script src="/assets/plugins/datatable/js/jquery.dataTables.min.js"></script>
+<script src="/assets/plugins/datatable/js/dataTables.bootstrap5.min.js"></script>
+<script src="/assets/plugins/select2/js/select2.min.js"></script>
+<script src="/assets/js/form-select2.js"></script>
+
+<script src="/assets/plugins/datetimepicker/js/legacy.js"></script>
+<script src="/assets/plugins/datetimepicker/js/picker.js"></script>
+<script src="/assets/plugins/datetimepicker/js/picker.time.js"></script>
+<!--
+    <script src="/assets/plugins/datetimepicker/js/picker.date.js"></script>
+
+    <script src="/assets/plugins/bootstrap-material-datetimepicker/js/moment.min.js"></script>
+    <script src="/assets/plugins/bootstrap-material-datetimepicker/js/bootstrap-material-datetimepicker.min.js"></script>
+    <script src="/assets/js/form-date-time-pickes.js"></script>
+-->
+<!-- date picker needed implemented 06-03-->
+<script src="/assets/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+<script src="/assets/plugins/bootstrap-datepicker/locales/bootstrap-datepicker.zh-TW.min.js"></script>
+<script src="/assets/plugins/bootstrap-datepicker/locales/bootstrap-datepicker.zh-CN.min.js"></script>
+<script src="/assets/plugins/bootstrap-datepicker/locales/bootstrap-datepicker.en-CA.min.js"></script>
+
+<script src="/assets/js/table-datatable.js"></script>
+<script src="/assets/js/app.js"></script>
+<script src="/assets/js/papaparse.min.js"></script>
+
+<script type="text/javascript">
+
+    function checkpw1() {
+        $('#pw_message').text("");
+        newpwd = $('#pswd1').val();
+        if (newpwd === "") {
+            $('#pw_message').text("<%= __("**Fill the password please!") %>");
+            return false;
+        } else if (newpwd.length < 4) {
+            $('#pw_message').text("<%= __("**Password length must be at least 4 characters") %>");
+            return false;
+        }
+    }
+
+    function checkpw2() {
+        document.getElementById("pw_message").innerHTML = "";
+        newpwd = $('#pswd1').val();
+        newpwd2 = $('#pswd2').val();
+        // recheck password 1 first
+        // checkpw1();
+        if (newpwd && newpwd2) {
+            if (newpwd === newpwd2) {
+                update_new_pass();
+            } else {
+                $('#pw_message').text("<%= __("Passwords did not match") %>");
+                return false;
+            }
+        } else {
+            $('#pw_message').text("<%= __("**Fill the password please!") %>");
+        }
+    }
+
+    function password_reset() {
+        $('#resetPW_Modal').modal('show');
+    }
+
+    function update_new_pass() {
+        let form = $('#resetPW');
+        $.ajax({
+            type: 'post',
+            url: '/user/reset_password',
+            data: form.serialize(),
+            success: function (response) {
+                // $('#promptMSG').text(response);
+                // close the dialog
+                $('#resetPW_Modal').modal('hide');
+                let t = "<%= __("Password Set") %>";
+                $('#promptMSG').text(t);
+                $('#msgModal').modal('show');
+            }
+        });
+    }
+
+    function showTime() {
+        var date = new Date();
+        var h = date.getHours(); // 0 - 23
+        var m = date.getMinutes(); // 0 - 59
+        var s = date.getSeconds(); // 0 - 59
+
+        h = (h < 10) ? "0" + h : h;
+        m = (m < 10) ? "0" + m : m;
+        s = (s < 10) ? "0" + s : s;
+
+        var time = h + ":" + m + ":" + s + " ";
+        document.getElementById("ClockDisplay").innerText = time;
+        document.getElementById("ClockDisplay").textContent = time;
+
+        setTimeout(showTime, 1000);
+    }
+
+    // check badge
+    function get_badge() {
+        showTime();
+        $.ajax({
+            type: 'GET',
+            url: '/user/check_badge',
+            success: function (return_Data) {
+                total_badges = return_Data[0].Todo + return_Data[0].Inbox;
+                if (total_badges > 0) {
+                    $('#total_badge').text(total_badges);
+                    $('#total_badge').addClass('alert-count-alt');
+                } else {
+                    $('#total_badge').text('');
+                    $('#total_badge').removeClass('alert-count-alt');
+                }
+
+                if (return_Data[0].Todo > 0) {
+                    $('#total_task').text(return_Data[0].Todo);
+                    $('#total_task').addClass('alert-count');
+                } else {
+                    $('#total_task').text('');
+                    $('#total_task').removeClass('alert-count');
+                }
+
+                if (return_Data[0].Inbox > 0) {
+                    $('#total_inbox').text(return_Data[0].Inbox);
+                    $('#total_inbox').addClass('alert-count');
+                } else {
+                    $('#total_inbox').text('');
+                    $('#total_inbox').removeClass('alert-count');
+                }
+
+                if (return_Data[0].Status === "Punch In") {
+                    showTime();
+                    $('#p-out').show();
+                    $('#p-in').hide();
+                    $('#btn_punch').attr("value", "<%= __("Punch OUT") %>");
+                    $('#ClockDisplay').show();
+                } else {
+                    $('#p-out').hide();
+                    $('#p-in').show();
+                    $('#btn_punch').attr("value", "<%= __("Punch IN") %>");
+                    $('#ClockDisplay').hide();
+                }
+            },
+        });
+    }
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        //set theme
+        $('#saveTheme').click(function () {
+            // perform only there is defined class
+            if ($('html').attr('class')) {
+                let form = $('#saveThemeForm');
+                $('#saveThemeForm').append('<input type="hidden" name="theme" value="' + $('html').attr('class') + '" />');
+                $.ajax({
+                    type: 'post',
+                    url: '/user/profile',
+                    // data: {action: 'save_theme', theme: $('html').attr('class')},
+                    data: form.serialize(),
+                    success: function (response) {
+                        $('#promptMSG').text(response.returnMSG);
+                        $('#msgModal').modal('show');
+                    }
+                });
+            } else {
+                t = "<%= __("Nothing are Set") %>";
+                $('#promptMSG').text(t);
+                $('#msgModal').modal('show');
+            }
+            $(".switcher-wrapper").removeClass("switcher-toggled")
+        });
+        // handle missing avator
+        $('img').on('error', function () {
+            $(this).attr('src', '/assets/images/avatars/default.png');
+        });
+        // show badges
+        setInterval(get_badge, <%= config.db_refresh_sts %> );
+    });
+    function checklang(lng) {
+        let url = window.location.href;
+        url = window.location.href.split('#')[0]
+        url = window.location.href.split('lang=')[0]
+        url = window.location.href.split('?')[0]
+        window.location.href = url + '?lang=' + lng;
+    }
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("#clist").DataTable({
+            dom: '<"float-start"f><"#tableId"t>i<"#paginatorId"lp>',
+        });
+
+        $("#myDataTable5").DataTable({
+            dom: '<"float-start"f><"#tableId"t>i<"#paginatorId"lp>',
+            lengthChange: false
+        });
+
+        <% if(req.session.lang === 'zh-HK') { %>
+        $('#teacherTable').DataTable({
+            "language": {
+                "search": "搜尋:",
+                "paginate": {
+                    "first": "第一頁",
+                    "previous": "上一頁",
+                    "next": "下一頁",
+                    "last": "最後一頁"
+                },
+                "emptyTable": "目前沒有資料",
+                "info": "顯示第 _START_ 至 _END_ 項結果，共 _TOTAL_ 項",
+                "lengthMenu": "顯示 _MENU_ 項結果",
+                "infoFiltered": "從 _MAX_ 項結果中過濾"
+            },
+            pageLength: 20,
+            info: false,
+            "lengthMenu": [ [20, 40, 100, -1], [20, 40, 100, "All"] ]
+        });
+        $('#myDataTable').DataTable({
+            "language": {
+                "search": "搜尋:",
+                "paginate": {
+                    "first": "第一頁",
+                    "previous": "上一頁",
+                    "next": "下一頁",
+                    "last": "最後一頁"
+                },
+                "emptyTable": "目前沒有資料",
+                "info": "顯示第 _START_ 至 _END_ 項結果，共 _TOTAL_ 項",
+                "lengthMenu": "顯示 _MENU_ 項結果",
+                "infoFiltered": "從 _MAX_ 項結果中過濾"
+            },
+        });
+        $('#myDataTable2').DataTable({
+            "language": {
+                "search": "搜尋:",
+                "paginate": {
+                    "first": "第一頁",
+                    "previous": "上一頁",
+                    "next": "下一頁",
+                    "last": "最後一頁"
+                },
+                "emptyTable": "目前沒有資料",
+                "info": "顯示第 _START_ 至 _END_ 項結果，共 _TOTAL_ 項",
+                "lengthMenu": "顯示 _MENU_ 項結果",
+                "infoFiltered": "從 _MAX_ 項結果中過濾"
+            },
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            order: [[0, 'asc']]
+        });
+        $('#myDataTable3').DataTable({
+            "language": {
+                "search": "搜尋:",
+                "paginate": {
+                    "first": "第一頁",
+                    "previous": "上一頁",
+                    "next": "下一頁",
+                    "last": "最後一頁"
+                },
+                "emptyTable": "目前沒有資料",
+                "info": "顯示第 _START_ 至 _END_ 項結果，共 _TOTAL_ 項",
+                "lengthMenu": "顯示 _MENU_ 項結果",
+                "infoFiltered": "從 _MAX_ 項結果中過濾"
+            },
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            order: [[0, 'asc']]
+        });
+        $('#myDataTable4').DataTable({
+            "language": {
+                "search": "搜尋:",
+                "paginate": {
+                    "first": "第一頁",
+                    "previous": "上一頁",
+                    "next": "下一頁",
+                    "last": "最後一頁"
+                },
+                "emptyTable": "目前沒有資料",
+                "info": "顯示第 _START_ 至 _END_ 項結果，共 _TOTAL_ 項",
+                "lengthMenu": "顯示 _MENU_ 項結果",
+                "infoFiltered": "從 _MAX_ 項結果中過濾"
+            },
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            order: [[0, 'asc']]
+        });
+        $('#invoice_details').DataTable({
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            paginate: false,
+            ordering: false,
+            searching: false
+        });
+        $('#invoice_details2').DataTable({
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            paginate: false,
+            ordering: false,
+            searching: false
+        });
+        $('#product_list_sm').DataTable({
+            "language": {
+                "search": "搜尋:",
+                "paginate": {
+                    "first": "第一頁",
+                    "previous": "上一頁",
+                    "next": "下一頁",
+                    "last": "最後一頁"
+                },
+                "emptyTable": "目前沒有資料",
+                "info": "顯示第 _START_ 至 _END_ 項結果，共 _TOTAL_ 項",
+                "lengthMenu": "顯示 _MENU_ 項結果",
+                "infoFiltered": "從 _MAX_ 項結果中過濾"
+            },
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            // paginate: false,
+            ordering: false,
+            searching: false
+        });
+        $('#conflict_sm').DataTable({
+            "language": {
+                "search": "搜尋:",
+                "paginate": {
+                    "first": "第一頁",
+                    "previous": "上一頁",
+                    "next": "下一頁",
+                    "last": "最後一頁"
+                },
+                "emptyTable": "目前沒有資料",
+                "info": "顯示第 _START_ 至 _END_ 項結果，共 _TOTAL_ 項",
+                "lengthMenu": "顯示 _MENU_ 項結果",
+                "infoFiltered": "從 _MAX_ 項結果中過濾"
+            },
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            // paginate: false,
+            ordering: false,
+            searching: false
+        });
+        $('#conflict_sm2').DataTable({
+            "language": {
+                "search": "搜尋:",
+                "paginate": {
+                    "first": "第一頁",
+                    "previous": "上一頁",
+                    "next": "下一頁",
+                    "last": "最後一頁"
+                },
+                "emptyTable": "目前沒有資料",
+                "info": "顯示第 _START_ 至 _END_ 項結果，共 _TOTAL_ 項",
+                "lengthMenu": "顯示 _MENU_ 項結果",
+                "infoFiltered": "從 _MAX_ 項結果中過濾"
+            },
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            // paginate: false,
+            ordering: false,
+            searching: false
+        });
+        $('#selection_table_search').DataTable({
+            "language": {
+                "search": "搜尋:",
+                "paginate": {
+                    "first": "第一頁",
+                    "previous": "上一頁",
+                    "next": "下一頁",
+                    "last": "最後一頁"
+                },
+                "emptyTable": "目前沒有資料",
+                "info": "顯示第 _START_ 至 _END_ 項結果，共 _TOTAL_ 項",
+                "lengthMenu": "顯示 _MENU_ 項結果",
+                "infoFiltered": "從 _MAX_ 項結果中過濾"
+            },
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            // paginate: false,
+            ordering: false,
+            searching: true
+        });
+        $('#selection_table_search2').DataTable({
+            "language": {
+                "search": "搜尋:",
+                "paginate": {
+                    "first": "第一頁",
+                    "previous": "上一頁",
+                    "next": "下一頁",
+                    "last": "最後一頁"
+                },
+                "emptyTable": "目前沒有資料",
+                "info": "顯示第 _START_ 至 _END_ 項結果，共 _TOTAL_ 項",
+                "lengthMenu": "顯示 _MENU_ 項結果",
+                "infoFiltered": "從 _MAX_ 項結果中過濾"
+            },
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            // paginate: false,
+            ordering: false,
+            searching: true
+        });
+        $('#selection_table_search3').DataTable({
+            "language": {
+                "search": "搜尋:",
+                "paginate": {
+                    "first": "第一頁",
+                    "previous": "上一頁",
+                    "next": "下一頁",
+                    "last": "最後一頁"
+                },
+                "emptyTable": "目前沒有資料",
+                "info": "顯示第 _START_ 至 _END_ 項結果，共 _TOTAL_ 項",
+                "lengthMenu": "顯示 _MENU_ 項結果",
+                "infoFiltered": "從 _MAX_ 項結果中過濾"
+            },
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            // paginate: false,
+            ordering: false,
+            searching: true
+        });
+        $('#selection_table_search4').DataTable({
+            "language": {
+                "search": "搜尋:",
+                "paginate": {
+                    "first": "第一頁",
+                    "previous": "上一頁",
+                    "next": "下一頁",
+                    "last": "最後一頁"
+                },
+                "emptyTable": "目前沒有資料",
+                "info": "顯示第 _START_ 至 _END_ 項結果，共 _TOTAL_ 項",
+                "lengthMenu": "顯示 _MENU_ 項結果",
+                "infoFiltered": "從 _MAX_ 項結果中過濾"
+            },
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            // paginate: false,
+            ordering: false,
+            searching: true
+        });
+        $('#selection_table_search5').DataTable({
+            "language": {
+                "search": "搜尋:",
+                "paginate": {
+                    "first": "第一頁",
+                    "previous": "上一頁",
+                    "next": "下一頁",
+                    "last": "最後一頁"
+                },
+                "emptyTable": "目前沒有資料",
+                "info": "顯示第 _START_ 至 _END_ 項結果，共 _TOTAL_ 項",
+                "lengthMenu": "顯示 _MENU_ 項結果",
+                "infoFiltered": "從 _MAX_ 項結果中過濾"
+            },
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            // paginate: false,
+            ordering: false,
+            searching: true
+        });
+        $('#selection_table_search6').DataTable({
+            "language": {
+                "search": "搜尋:",
+                "paginate": {
+                    "first": "第一頁",
+                    "previous": "上一頁",
+                    "next": "下一頁",
+                    "last": "最後一頁"
+                },
+                "emptyTable": "目前沒有資料",
+                "info": "顯示第 _START_ 至 _END_ 項結果，共 _TOTAL_ 項",
+                "lengthMenu": "顯示 _MENU_ 項結果",
+                "infoFiltered": "從 _MAX_ 項結果中過濾"
+            },
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            // paginate: false,
+            ordering: false,
+            searching: true
+        });
+        <% } else if(req.session.lang === 'zh-CN') { %>
+        $('#teacherTable').DataTable({
+            "language": {
+                "search": "搜索:",
+                "paginate": {
+                    "first": "首页",
+                    "previous": "上页",
+                    "next": "下页",
+                    "last": "末页"
+                },
+                "emptyTable": "表中数据为空",
+                "info": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                "lengthMenu": "显示 _MENU_ 项结果",
+                "infoFiltered": "由 _MAX_ 项结果过滤"
+            },
+            pageLength: 20,
+            info: false,
+            "lengthMenu": [ [20, 40, 100, -1], [20, 40, 100, "All"] ]
+        });
+        $('#myDataTable').DataTable({
+            "language": {
+                "search": "搜索:",
+                "paginate": {
+                    "first": "首页",
+                    "previous": "上页",
+                    "next": "下页",
+                    "last": "末页"
+                },
+                "emptyTable": "表中数据为空",
+                "info": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                "lengthMenu": "显示 _MENU_ 项结果",
+                "infoFiltered": "由 _MAX_ 项结果过滤"
+            },
+        });
+        $('#myDataTable2').DataTable({
+            "language": {
+                "search": "搜索:",
+                "paginate": {
+                    "first": "首页",
+                    "previous": "上页",
+                    "next": "下页",
+                    "last": "末页"
+                },
+                "emptyTable": "表中数据为空",
+                "info": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                "lengthMenu": "显示 _MENU_ 项结果",
+                "infoFiltered": "由 _MAX_ 项结果过滤"
+            },
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            order: [[0, 'asc']]
+        });
+        $('#myDataTable3').DataTable({
+            "language": {
+                "search": "搜索:",
+                "paginate": {
+                    "first": "首页",
+                    "previous": "上页",
+                    "next": "下页",
+                    "last": "末页"
+                },
+                "emptyTable": "表中数据为空",
+                "info": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                "lengthMenu": "显示 _MENU_ 项结果",
+                "infoFiltered": "由 _MAX_ 项结果过滤"
+            },
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            order: [[0, 'asc']]
+        });
+        $('#myDataTable4').DataTable({
+            "language": {
+                "search": "搜索:",
+                "paginate": {
+                    "first": "首页",
+                    "previous": "上页",
+                    "next": "下页",
+                    "last": "末页"
+                },
+                "emptyTable": "表中数据为空",
+                "info": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                "lengthMenu": "显示 _MENU_ 项结果",
+                "infoFiltered": "由 _MAX_ 项结果过滤"
+            },
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            order: [[0, 'asc']]
+        });
+        $('#invoice_details').DataTable({
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            paginate: false,
+            ordering: false,
+            searching: false
+        });
+        $('#invoice_details2').DataTable({
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            paginate: false,
+            ordering: false,
+            searching: false
+        });
+        $('#product_list_sm').DataTable({
+            "language": {
+                "search": "搜索:",
+                "paginate": {
+                    "first": "首页",
+                    "previous": "上页",
+                    "next": "下页",
+                    "last": "末页"
+                },
+                "emptyTable": "表中数据为空",
+                "info": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                "lengthMenu": "显示 _MENU_ 项结果",
+                "infoFiltered": "由 _MAX_ 项结果过滤"
+            },
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            // paginate: false,
+            ordering: false,
+            searching: false
+        });
+        $('#conflict_sm').DataTable({
+            "language": {
+                "search": "搜索:",
+                "paginate": {
+                    "first": "首页",
+                    "previous": "上页",
+                    "next": "下页",
+                    "last": "末页"
+                },
+                "emptyTable": "表中数据为空",
+                "info": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                "lengthMenu": "显示 _MENU_ 项结果",
+                "infoFiltered": "由 _MAX_ 项结果过滤"
+            },
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            // paginate: false,
+            ordering: false,
+            searching: false
+        });
+        $('#conflict_sm2').DataTable({
+            "language": {
+                "search": "搜索:",
+                "paginate": {
+                    "first": "首页",
+                    "previous": "上页",
+                    "next": "下页",
+                    "last": "末页"
+                },
+                "emptyTable": "表中数据为空",
+                "info": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                "lengthMenu": "显示 _MENU_ 项结果",
+                "infoFiltered": "由 _MAX_ 项结果过滤"
+            },
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            // paginate: false,
+            ordering: false,
+            searching: false
+        });
+        $('#selection_table_search').DataTable({
+            "language": {
+                "search": "搜索:",
+                "paginate": {
+                    "first": "首页",
+                    "previous": "上页",
+                    "next": "下页",
+                    "last": "末页"
+                },
+                "emptyTable": "表中数据为空",
+                "info": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                "lengthMenu": "显示 _MENU_ 项结果",
+                "infoFiltered": "由 _MAX_ 项结果过滤"
+            },
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            // paginate: false,
+            ordering: false,
+            searching: true
+        });
+        $('#selection_table_search2').DataTable({
+            "language": {
+                "search": "搜索:",
+                "paginate": {
+                    "first": "首页",
+                    "previous": "上页",
+                    "next": "下页",
+                    "last": "末页"
+                },
+                "emptyTable": "表中数据为空",
+                "info": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                "lengthMenu": "显示 _MENU_ 项结果",
+                "infoFiltered": "由 _MAX_ 项结果过滤"
+            },
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            // paginate: false,
+            ordering: false,
+            searching: true
+        });
+        $('#selection_table_search3').DataTable({
+            "language": {
+                "search": "搜索:",
+                "paginate": {
+                    "first": "首页",
+                    "previous": "上页",
+                    "next": "下页",
+                    "last": "末页"
+                },
+                "emptyTable": "表中数据为空",
+                "info": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                "lengthMenu": "显示 _MENU_ 项结果",
+                "infoFiltered": "由 _MAX_ 项结果过滤"
+            },
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            // paginate: false,
+            ordering: false,
+            searching: true
+        });
+        $('#selection_table_search4').DataTable({
+            "language": {
+                "search": "搜索:",
+                "paginate": {
+                    "first": "首页",
+                    "previous": "上页",
+                    "next": "下页",
+                    "last": "末页"
+                },
+                "emptyTable": "表中数据为空",
+                "info": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                "lengthMenu": "显示 _MENU_ 项结果",
+                "infoFiltered": "由 _MAX_ 项结果过滤"
+            },
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            // paginate: false,
+            ordering: false,
+            searching: true
+        });
+        $('#selection_table_search5').DataTable({
+            "language": {
+                "search": "搜索:",
+                "paginate": {
+                    "first": "首页",
+                    "previous": "上页",
+                    "next": "下页",
+                    "last": "末页"
+                },
+                "emptyTable": "表中数据为空",
+                "info": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                "lengthMenu": "显示 _MENU_ 项结果",
+                "infoFiltered": "由 _MAX_ 项结果过滤"
+            },
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            // paginate: false,
+            ordering: false,
+            searching: true
+        });
+        $('#selection_table_search6').DataTable({
+            "language": {
+                "search": "搜索:",
+                "paginate": {
+                    "first": "首页",
+                    "previous": "上页",
+                    "next": "下页",
+                    "last": "末页"
+                },
+                "emptyTable": "表中数据为空",
+                "info": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                "lengthMenu": "显示 _MENU_ 项结果",
+                "infoFiltered": "由 _MAX_ 项结果过滤"
+            },
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            // paginate: false,
+            ordering: false,
+            searching: true
+        });
+        <% } else { %>
+        $('#teacherTable').DataTable({
+            pageLength: 20,
+            info: false,
+            "lengthMenu": [ [20, 40, 100, -1], [20, 40, 100, "All"] ]
+        });
+        $('#myDataTable').DataTable({
+            pageLength: 10
+        });
+        $('#myDataTable2').DataTable({
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            order: [[0, 'asc']]
+        });
+        $('#myDataTable3').DataTable({
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            order: [[0, 'asc']]
+        });
+        $('#myDataTable4').DataTable({
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            order: [[0, 'asc']]
+        });
+        $('#invoice_details').DataTable({
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            paginate: false,
+            ordering: false,
+            searching: false
+        });
+        $('#invoice_details2').DataTable({
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            paginate: false,
+            ordering: false,
+            searching: false
+        });
+        $('#product_list_sm').DataTable({
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            // paginate: false,
+            ordering: false,
+            searching: false
+        });
+        $('#conflict_sm').DataTable({
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            // paginate: false,
+            ordering: false,
+            searching: false
+        });
+        $('#conflict_sm2').DataTable({
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            // paginate: false,
+            ordering: false,
+            searching: false
+        });
+        $('#selection_table_search').DataTable({
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            // paginate: false,
+            ordering: false,
+            searching: true
+        });
+        $('#selection_table_search2').DataTable({
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            // paginate: false,
+            ordering: false,
+            searching: true
+        });
+        $('#selection_table_search3').DataTable({
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            // paginate: false,
+            ordering: false,
+            searching: true
+        });
+        $('#selection_table_search4').DataTable({
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            // paginate: false,
+            ordering: false,
+            searching: true
+        });
+        $('#selection_table_search5').DataTable({
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            // paginate: false,
+            ordering: false,
+            searching: true
+        });
+        $('#selection_table_search6').DataTable({
+            lengthMenu: false,
+            lengthChange: false,
+            info: false,
+            // paginate: false,
+            ordering: false,
+            searching: true
+        });
+        <% } %>
+
+    });
+</script>
+

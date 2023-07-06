@@ -1,0 +1,453 @@
+<%- include('./header.ejs') %>
+
+<body onload="get_badge();get_task_list();">
+
+<!--wrapper-->
+<div class="wrapper">
+
+    <%- include('./sidebar.ejs') %>
+    <%- include('./topbar.ejs') %>
+
+    <!--start page wrapper -->
+
+    <div class="page-wrapper">
+        <div class="page-content">
+
+            <!--breadcrumb-->
+            <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+                <div class="ps-3">
+                    <span class="font-30"><i class="bx bx-check"></i></span>
+                    <span class="font-24"><%= __("Task List") %></span>
+                </div>
+            </div>
+            <!--end breadcrumb-->
+            <!-- <div class="col-12 col-lg-9 mx-auto"> -->
+                <div class="card radius-10">
+                    <div class="card-body">
+
+                        <form id="add_t">
+                            <div class="pb-3 todo-item">
+                                <div class="input-group">
+                                    <input type="hidden" name="action" value="add_task">
+                                    <input id="new_task-input" name="new_task_input" type="text" onchange="task_added()"
+                                           class="form-control input-lg" required style="width: 400px;">
+                                    <input class="result form-control" type="text" id="date" onchange="date_changed()"
+                                           placeholder="<%= __("Target Date") %>" required style="width: 33px;"
+                                           name="tdate"
+                                           autocomplete="off">
+                                    <button type="button" onclick="add_task();"
+                                            class="btn btn-primary"><%= __("Add task") %></button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- the task -->
+                        <div class="form-row mt-3">
+                            <div id="todo-container"></div>
+                        </div>
+                        <!-- the task ended -->
+                    </div>
+                </div>
+            <!-- </div> -->
+
+            <!-- <div class="col-12 col-lg-9 mx-auto"> -->
+                <div class="card radius-10">
+                    <div class="card-body">
+                        <div class="row gy-3">
+                            <div class="col-md-10">
+                                <%= __("Completed Tasks") %>
+                            </div>
+                        </div>
+                        <!-- the task -->
+                        <div class="form-row mt-3">
+                            <div id="todo-container-done"></div>
+                        </div>
+                        <!-- the task ended -->
+                    </div>
+                </div>
+            <!-- </div> -->
+
+            <%- include('./copyright.ejs') %>
+        </div>
+    </div>
+
+    <!--end page wrapper -->
+
+    <!-- Change user modal -->
+    <div class="modal fade" id="assignuser_Modal" role="dialog">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><%= __("Assign To User") %></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table class="table mb-0 table-striped table-bordered" id="myDataTable2">
+                                <thead class="table-light">
+                                <tr>
+                                    <th class="text-md-center"><%= __("User") %></th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                                <tfoot>
+                                <tr>
+                                    <td class="text-left">
+                                        <a class="btn btn-primary btn-sm radius-30 px-4" id="btn_assign" data-bs-dismiss="modal"><%= __("Assign") %></a>
+                                    </td>
+                                    <td class="text-center">
+                                        <a class="btn btn-secondary btn-sm radius-30 px-4"
+                                           data-bs-dismiss="modal"><%= __("Cancel") %></a>
+                                    </td>
+                                </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Change user modal ended-->
+
+    <!-- check/uncheck remark modal -->
+    <div class="modal fade" id="remark_Modal" role="dialog">
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form id="task_remark">
+                        <input type="hidden" id="this_taskid">
+                        <div class="text-md-left">
+                            <span class="text-secondary font-14"><%= __("Remarks") %></span><br>
+                        </div>
+                        <div class="text-md-center">
+                        <input type="text" class="form-control" id="remark" autocomplete="off">
+                        </div>
+                        <hr>
+                        <div class="text-md-center">
+                            <a class="btn btn-sm bg-secondary text-white" data-bs-dismiss="modal"
+                               id="btn_void_cancel"><%= __("Cancel") %></a> &nbsp;&nbsp;
+                            <a class="btn btn-sm bg-primary text-white"
+                               id="btn_void_confirm"
+                               onclick="do_check_task()"><%= __("Confirm") %></a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- check/uncheck remark modal ended -->
+
+    <%- include('./footer.ejs') %>
+
+</div>
+<!--wrapper ended-->
+
+<script type="text/javascript">
+    function task_added() {
+        $('#date').removeClass("border-danger-input_alert");
+    }
+
+    function date_changed() {
+        $('#new_task-input').removeClass("border-danger-input_alert");
+    }
+
+    function get_task_list() {
+        const list = document.getElementById("todo-container");
+        while (list.hasChildNodes()) {
+            list.removeChild(list.firstChild);
+        }
+        const list_d = document.getElementById("todo-container-done");
+        while (list_d.hasChildNodes()) {
+            list_d.removeChild(list_d.firstChild);
+        }
+        $.ajax({
+            type: 'post',
+            data: {action: 'get_list'},
+            url: '/user/task',
+            success: function (task_list) {
+                let mycode = "<%= req.session.usercode %>";
+                $.each(task_list, function (i) {
+                    let d_date = new Date(task_list[i].DueDate);
+                    d_date = d_date.toLocaleDateString('en-CA', {timeZone: 'GMT'});
+                    let c_date = new Date(task_list[i].CompletedDate);
+                    c_date = c_date.toLocaleDateString('en-CA', {timeZone: 'GMT'});
+                    let today = new Date().toLocaleDateString('en-CA', {timeZone: 'GMT'});
+                    let t_status;
+                    if (task_list[i].Completed)
+                        t_status = "Completed";
+                    else {
+                        //console.log(today);
+                        //console.log(d_date);
+                        if (today > d_date) {
+                            t_status = "Expired";
+                        } else {
+                            t_status = "Pending";
+                        }
+                    }
+                    let TaskHTML = ``;
+                    TaskHTML += `<div class="pb-3 todo-item" id="todo-id-` + task_list[i].TaskID + `">`;
+                    if (t_status !== "Completed") {
+                        TaskHTML += `<div><span class="small font-weight-bold"> <%= __("Target Due Date") %>: ` + d_date + ` <%= __("created by") %> ` + task_list[i].CreatedByName ;
+                        if (task_list[i].AssignedTo!=='<%=req.session.usercode%>' && task_list[i].AName!==null && task_list[i].AName!==undefined) {
+                            TaskHTML += `<span class="text-primary"> ( assigned to `+ task_list[i].AName + ` )</span> </span></div>`;
+                        } else {
+                            TaskHTML += ` </span></div>`;
+                        }
+                    } else {
+                        TaskHTML += `<div><span class="small font-weight-bold"> <%= __("Completed by") %> ` + task_list[i].CompletedByName + ` @ ` + c_date + ` </span></div>`;
+                    }
+                    if (task_list[i].Remarks!==null && task_list[i].Remarks!==undefined && task_list[i].Remarks!=='' ) {
+                        TaskHTML += `<span class="small text-success">  ( ` + task_list[i].Remarks + ` ) </span>`;
+                    }
+                    TaskHTML += `<div class="input-group">`;
+                    TaskHTML += `<div class="input-group-text">`;
+                    if (t_status === "Completed") {
+                        if (task_list[i].CompletedBy === mycode && (c_date === today)) {
+                            TaskHTML += `<input id="checkbox` + task_list[i].TaskID + `" type="checkbox" onchange="check_task(` + task_list[i].TaskID + `)" checked>`;
+                        }
+                        ;
+                        TaskHTML += `</div>`;
+                        TaskHTML += `<input id="task` + task_list[i].TaskID + `" type="text" readonly class="form-control todo-done" value="` + task_list[i].Task.replace(/[\u0000-\u001F\u007F-\u009F]/g, "") + `">`;
+                    } else {
+                        TaskHTML += `<input id="checkbox` + task_list[i].TaskID + `" type="checkbox" onchange="check_task(` + task_list[i].TaskID + `)">`;
+                        TaskHTML += `</div>`;
+                        TaskHTML += `<input id="task` + task_list[i].TaskID + `" type="text" readonly class="form-control" value="` + task_list[i].Task.replace(/[\u0000-\u001F\u007F-\u009F]/g, "") + `">`;
+                    }
+                    if (task_list[i].CreatedBy === mycode) {
+                        TaskHTML += `<button class="btn btn-outline-black btn-primary text-white" type="button" onclick="del_task(` + task_list[i].TaskID + `)">X</button>`;
+                    } else {
+                        TaskHTML += `<button todo-id="` + task_list[i].TaskID + `" class="btn btn-outline-black btn-primary text-white" type="button" id="button-addon2">--</button>`;
+                    }
+                    if (t_status !== "Completed") {
+                        TaskHTML += `<button todo-id="` + task_list[i].TaskID + `" class="btn btn-outline-light-primary btn-primary text-white" type="button" onclick="assign_task(` + task_list[i].TaskID + `)">A</button>`;
+                        if (t_status === "Expired") {
+                            TaskHTML += `<div class="square text-danger bg-light-danger p-3"><i class="bx bxs-circle me-1"></i></div>`;
+                        } else if (t_status === "Pending") {
+                            TaskHTML += `<div class="square text-success bg-light-success p-3"><i class="bx bxs-circle me-1"></i></div>`;
+                        }
+                    }
+                    TaskHTML += `</div>`;
+
+                    // console.log(TaskHTML);
+                    let dummy = document.createElement("div");
+                    dummy.innerHTML = TaskHTML;
+                    let newTodo = $.parseHTML(TaskHTML);
+
+                    if (t_status === "Completed") {
+                        $("#todo-container-done").append(newTodo);
+                    } else {
+                        $("#todo-container").append(newTodo);
+                    }
+                });
+            },
+        });
+    }
+
+    function add_task() {
+
+        if ($('#new_task-input').val() === '') {
+            $('#new_task-input').addClass("border-danger-input_alert");
+            let t = "<%= __("Please input task") %>"
+            $('#promptMSG').text(t);
+            $('#msgModal').modal('show');
+            return;
+        } else {
+            $('#new_task-input').removeClass("border-danger-input_alert");
+        }
+        if ($('#date').val() === '') {
+            $('#date').addClass("border-danger-input_alert");
+            let t = "<%= __("Target date is required") %>";
+            $('#promptMSG').text(t);
+            $('#msgModal').modal('show');
+            return;
+        } else {
+            $('#date').removeClass("border-danger-input_alert");
+        }
+        if ($('#date').val() && $('#new_task-input').val()) {
+            let form = $('#add_t');
+            $.ajax({
+                type: 'post',
+                data: form.serialize(),
+                url: '/user/task',
+                success: function (result) {
+                    $('#promptMSG').text(result);
+                    $('#msgModal').modal('show');
+                    document.forms["add_t"].reset();
+                    get_task_list();
+                }
+            });
+        }
+    }
+
+    function del_task(taskid) {
+        //alert('del '+ taskid)
+        $.ajax({
+            type: 'post',
+            data: {action: 'del_task', task_id: taskid},
+            url: '/user/task',
+            success: function (result) {
+                //alert(result);
+                let t;
+                if (result === "Successful") {
+                    t = "<%= __("Successful") %>";
+                } else {
+                    t = result;
+                }
+                $('#promptMSG').text(t);
+                $('#msgModal').modal('show');
+                $('#todo-id-' + taskid).empty();
+            }
+        });
+    }
+
+    function check_task(taskid) {
+        $('#this_taskid').val(taskid);
+		$('#remark_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#remark_Modal').modal('show');
+    }
+
+    function do_check_task() {
+        $('#remark_Modal').modal('hide');
+        taskid = $('#this_taskid').val();
+        remark = $('#remark').val();
+        if (document.getElementById('checkbox' + taskid).checked) {
+            // previously uncheck, check it now.
+            $('#task' + taskid).addClass("todo-done");
+            $.ajax({
+                async: false,
+                type: 'post',
+                data: {action: 'chk_task', task_id: taskid, remark: remark},
+                url: '/user/task',
+                success: function (result) {
+                    let t;
+                    if (result === "Successful") {
+                        t = "<%= __("Successful") %>";
+                    } else {
+                        t = result;
+                    }
+                    $('#promptMSG').text(t);
+                    $('#msgModal').modal('show');
+                }
+            });
+        } else {
+            // previously checked, do uncheck now
+            $('#task' + taskid).removeClass('todo-done');
+            $.ajax({
+                async: false,
+                type: 'post',
+                data: {action: 'unchk_task', task_id: taskid, remark: remark},
+                url: '/user/task',
+                success: function (result) {
+                    let t;
+                    if (result === "Successful") {
+                        t = "<%= __("Rollback Successful") %>";
+                    } else {
+                        t = result;
+                    }
+                    $('#promptMSG').text(t);
+                    $('#msgModal').modal('show');
+                }
+            });
+        }
+        $('#task_remark').trigger('reset');
+        get_task_list();
+
+    }
+
+    function assign_task(taskid) {
+        $('input[name="assign_to_this_user"]').each(function() {
+            this.checked = false;
+        });
+        $('#myDataTable2').DataTable().data().clear();
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/user/assign_user',
+            data: {action: 'get_user'},
+            success: function (return_data) {
+                if (return_data.length > 0) {
+                    $.each(return_data, function (i) {
+                        let chk_img;
+                        this_row = '<tr>';
+                        this_row += '<td>';
+                        this_row += '		<div class="d-flex align-items-center">';
+                        chk_img ='/assets/images/avatars/' + return_data[i].UserCode + '.jpg'
+                        let img = new Image();
+                        img.src = 'http://'+ window.location.hostname + chk_img;
+                        if (img.complete) {
+                            img_use = chk_img;
+                        } else {
+                            img_use = '/assets/images/avatars/default.png';
+                        }
+                        this_row += `<div><img src="` + img_use + `" class="rounded-circle" width="40" height="40"> </a></div>`;
+                        this_row += `			<div class="ms-2">` + return_data[i].Name + `</span></div>`;
+                        this_row += `		</div>`;
+                        this_row += `</td>`;
+                        this_row += `<td class="text-md-center"><input type="checkbox" value="` + return_data[i].UserCode + `~#~` + return_data[i].Name + `" id="assign_to_this_user" name="assign_to_this_user"></td>`;
+                        this_row += `</tr>`;
+                        // console.log(this_row);
+                        $('#myDataTable2').DataTable().row.add($(this_row)).draw();
+                    });
+                }
+            }
+        });
+        $('#btn_assign').attr('onclick', 'assign_to(\''+taskid+'\')');
+		$('#assignuser_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#assignuser_Modal').modal('show');
+    }
+
+    function assign_to(e) {
+        let uc;
+        let na;
+        let x = $('#myDataTable2').DataTable().$('input[type=checkbox]:checked');
+        $.each(x, function (i) {
+            code = x[i].value.split('~#~')[0];
+            name = x[i].value.split('~#~')[1];
+            if (i > 0) {
+                uc = uc + ',' + code;
+                na = na + ',' + name;
+            } else {
+                uc = code;
+                na = name;
+            }
+        });
+        //console.log(uc)
+        //console.log(na)
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/user/assign_user',
+            data: {action: 'assign_to', new_user: uc, task_id: e, new_username: na}
+        });
+        get_task_list();
+    }
+
+    $(document).ready(function () {
+        $('#date').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            format: "yyyy-mm-dd",
+            <% if(req.session.lang === 'zh-HK') { %>
+            language: "zh-TW",
+            <% } else if(req.session.lang === 'zh-CN') { %>
+            language: "zh-CN",
+            <% } else { %>
+            language: "en-CA",
+            <% } %>
+        });
+    });
+
+</script>
+
+</body>
+
+</html>

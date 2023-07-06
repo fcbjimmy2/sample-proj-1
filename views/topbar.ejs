@@ -1,0 +1,131 @@
+<header>
+    <div class="topbar d-flex align-items-center">
+        <nav class="navbar navbar-expand">
+            <div class="mobile-toggle-menu"><i class='bx bx-slider'></i>
+
+            </div>
+
+            <!-- Functions -->
+
+            <div class="top-menu ms-auto">
+                <ul class="navbar-nav align-items-center">
+
+                    <!-- Apps -->
+                    <li class="d-flex nav-item dropdown dropdown-large">
+                        <a class="nav-link dropdown-toggle dropdown-toggle-nocaret"  role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="position-relative" id="total_badge"></span>
+                            <i class='bx bx-grid-alt'></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end">
+                            <div class="row row-cols-3 g-3 p-3">
+                                <div class="col text-center">
+                                    <a class="dropdown-item" href="/user/schedule">
+                                       <div class="app-box mx-auto bg-success text-white"><i class='bx bx-calendar'></i>
+                                       </div>
+                                       <div class="app-title text-md-center"><%= __("Schedule") %></div>
+                                    </a>
+                                </div>
+                                <div class="col text-center">
+                                    <a class="dropdown-item" href="/user/punch">
+                                        <div class="app-box mx-auto bg-secondary text-white"><i class='bx bx-time'></i>
+                                        </div>
+                                        <div id="p-out" class="app-title text-md-center"><%= __("Punch OUT") %></div>
+                                        <div id="p-in" class="app-title text-md-center"><%= __("Punch IN") %></div>
+                                    </a>
+                                </div>
+                                <div class="col text-center">
+                                    <a class="dropdown-item" href="/user/leaves">
+                                        <div class="app-box mx-auto bg-danger text-white"><i class='bx bx-calendar-edit'></i>
+                                        </div>
+                                        <div class="app-title text-md-center"><%= __("Leaves") %></div>
+                                    </a>
+                                </div>
+                                <div class="col text-center">
+                                    <a class="dropdown-item" href="/user/task">
+                                        <div> &nbsp; <span class="position-relative" id="total_task"></span></div>
+                                        <div class="app-box mx-auto bg-warning text-white">
+                                            <i class='bx bx-check'></i>
+                                        </div>
+                                        <div class="app-title text-md-center"><%= __("Task") %></div>
+                                    </a>
+                                </div>
+                                <div class="col text-center">
+                                    <a class="dropdown-item" href="/user/messenger">
+                                        <div> &nbsp; <span class="position-relative" id="total_inbox"></span></div>
+                                        <div class="app-box mx-auto bg-info text-white">
+                                            <i class='bx bx-chat'></i>
+                                        </div>
+                                        <div class="app-title text-md-center"><%= __("Messenger") %></div>
+                                    </a>
+                                </div>
+                                <div class="col text-center">
+                                    <a class="dropdown-item" href="/user/claims">
+                                        <div> &nbsp; </div>
+                                        <div class="app-box mx-auto bg-primary text-white"><i class='bx bx-dollar-circle'></i>
+                                        </div>
+                                        <div class="app-title text-md-center"><%= __("Claims") %></div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <!-- Apps End -->
+
+                    <!-- Messages -->
+                    <li class="d-flex nav-item dropdown dropdown-large">
+                        <!--
+                        <a class="nav-link"  role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class='bx bx-comment'></i>
+                        </a>
+                        -->
+                        <div class="dropdown-menu dropdown-menu-end">
+                            <!-- must be kept -->
+                            <div class="header-notifications-list" style="display:none"></div>
+                            <div class="header-message-list" style="display:none"></div>
+
+                            <!-- end -->
+                        </div>
+                    </li>
+                    <!-- Messages Ended -->
+
+
+                </ul>
+            </div>
+
+            <!-- End Functions -->
+
+            <!-- User Profile -->
+            <div class="user-box dropdown" id="sm-pf-div">
+                <a class="d-flex align-items-center nav-link dropdown-toggle dropdown-toggle-nocaret"  role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img id="sm-pf-image" src="/assets/images/avatars/<%= req.session.usercode %>.jpg" class="user-img">
+                    <div class="user-info ps-3">
+                        <p class="user-name mb-0"><%= req.session.user %></p>
+                        <p class="designattion mb-0"><%= req.session.userrole %></p>
+                    </div>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="/user/profile"><i class="bx bx-user"></i><span><%= __("My Profile") %></span></a></li>
+                    <li><a class="dropdown-item"  onClick="password_reset()"><i class="bx bx-command"></i><span><%= __("Reset Password") %></span></a></li>
+                    <div class="dropdown-divider mb-0"></div>
+                    <li><a class="dropdown-item" href="/logout"><i class='bx bx-log-out-circle'></i><span><%= __("Logout") %></span></a></li>
+                </ul>
+            </div>
+            <!-- Language Toggle -->
+            <div class="user-box dropdown" id="sel_lang_dummy" style="display: none;">
+                <a class="d-flex align-items-center nav-link dropdown-toggle dropdown-toggle-nocaret"  role="button" aria-expanded="false">
+                    <i class="bx bx-world" style="font-size:28px"></i>
+                </a>
+            </div>
+            <div class="user-box dropdown" id="sel_lang">
+                 <a class="d-flex align-items-center nav-link dropdown-toggle dropdown-toggle-nocaret"  role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bx bx-spin bx-world" style="font-size:28px"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-lg-end">
+                    <li><a class="dropdown-item"  onclick="checklang('zh-HK');" class="msg-header-title"><span>中文繁體</span></a></li>
+                    <li><a class="dropdown-item"  onclick="checklang('zh-CN');" class="msg-header-title"><span>中文简体</span></a></li>
+                    <li><a class="dropdown-item"  onclick="checklang('en');" class="msg-header-title"><span>ENGLISH</span></a></li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+</header>

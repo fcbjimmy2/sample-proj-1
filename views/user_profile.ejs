@@ -1,0 +1,266 @@
+<%- include('./header.ejs') %>
+
+<body onload="get_badge()">
+
+<!--wrapper-->
+<div class="wrapper">
+
+<%- include('./sidebar.ejs') %>
+<%- include('./topbar.ejs') %>
+
+<!--start page wrapper -->
+
+<div class="page-wrapper">
+    <div class="page-content">
+        <!--breadcrumb-->
+        <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+            <div class="ps-3">
+                <span class="font-30"><i class="bx bx-grid-alt"></i></span>
+                <span class="font-24"><%= __("Profile") %></span>
+            </div>
+        </div>
+        <!--end breadcrumb-->
+        <div class="col-12 col-lg-9 mx-auto">
+            <div class="card radius-10">
+                <div class="card-body">
+                    <div class="d-flex flex-column align-items-center text-center">
+                        <img id="lg-pf-image" src="/assets/images/avatars/<%= req.session.usercode %>.jpg"
+                             class="rounded-circle p-1 bg-primary" width="110">
+                        <div class="mt-3">
+                            <h4 id="displayName"><%= profile_data[0].Name %></h4>
+                            <p class="text-secondary mb-1">User Code: <%= profile_data[0].UserCode %></p>
+                            <p class="text-muted font-size-sm">Login ID: <%= profile_data[0].Login %></p>
+                        </div>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                data-bs-target="#uploadPhoto"><%= __("Change photo") %></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <form id="MyProfileData">
+
+            <div class="col-12 col-lg-9 mx-auto">
+                <div class="card radius-10">
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0"><%= __("User Name") %></h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                <input type="text" class="form-control" id="username" name="username"
+                                       value="<%= profile_data[0].Name %>"/>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0"><%= __("Email") %></h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                <input type="text" class="form-control" name="email"
+                                       value="<%= profile_data[0].Email %>"/>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0"><%= __("Phone") %></h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                <input type="text" class="form-control" name="phone"
+                                       value="<%= profile_data[0].Phone %>"/>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0"><%= __("Address") %></h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                <input type="text" class="form-control" name="address" disabled value="Hong Kong"/>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0"><%= __("Branch Code(s)") %></h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                <input type="text" class="form-control" name="branchcode" disabled
+                                       value="<%= profile_data[0].BranchCode %>"/>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0"><%= __("Main Branch") %></h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                <input type="text" class="form-control" name="mainbranchcode" disabled
+                                       value="<%= profile_data[0].MainBranch %>"/>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0"><%= __("User Group") %></h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                <input type="text" class="form-control" name="usergroup" disabled
+                                       value="<%= profile_data[0].UserGroup %>"/>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0"><%= __("User Role") %></h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                <input type="text" class="form-control" name="role" disabled
+                                       value="<%= profile_data[0].Role %>"/>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0"><%= __("Homepage") %></h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                <input type='radio' id='r_messenger' name='defaulthome'
+                                       value='messenger'/> <%= __("Messenger") %> </input> &nbsp;
+                                <input type='radio' id='r_messenger' name='defaulthome'
+                                       value='schedule'/> <%= __("Schedule") %> </input> &nbsp;
+                                <% if (req.session.userrole==="Admin") { %>
+                                <input type='radio' id='r_dashboard' name='defaulthome'
+                                       value='dashboard'/> <%= __("Dashboard") %> </input>
+                                <% } %>&nbsp;
+                                <input type='radio' id='r_task' name='defaulthome'
+                                       value='task'/> <%= __("Task") %> </input> &nbsp;
+                                <input type='radio' id='r_blank' name='defaulthome'
+                                       value='blank'/> <%= __("Blank") %> </input> &nbsp;
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3"></div>
+                            <div class="col-sm-9 text-secondary">
+                                <input type="hidden" name="usercode" value="<%= profile_data[0].UserCode %>">
+                                <input type="hidden" name="action" value="update_profiledata">
+                                <input type="button" id="saveChange" class="btn btn-primary px-4"
+                                       value="<%= __("Save Changes") %>"/> &nbsp <h6 id="returnMSG"></h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </form>
+
+        <%- include('./copyright.ejs') %>
+    </div>
+</div>
+
+<!--end page wrapper -->
+
+<!-- Modal -->
+<div class="modal fade" id="uploadPhoto" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"><%= __("Photo upload") %></h4>
+                <button type="button" class="close" data-bs-dismiss="modal">X</button>
+            </div>
+            <div class="modal-body">
+                <!-- Form -->
+                <form method='post' id="uploadphoto" action="/fup/photo-pf" enctype="multipart/form-data">
+                    <%= __("Select file") %>: <input type="file" name="uploaded_file" class="form-control"
+                                                     accept=".jpg, .png, image/jpeg, image/png"><br>
+                    <input type="button" class="btn btn-primary" value='<%= __("Upload") %>' id="btn_upload">
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<%- include('./footer.ejs') %>
+
+</div>
+<!--wrapper ended-->
+
+<script type="text/javascript">
+    let current_home = '<%= profile_data[0].Default_Home %>';
+    switch (current_home) {
+        case 'messenger' :
+            $('#r_messenger').attr('checked', 'checked');
+            break;
+        case 'dashboard' :
+            $('#r_dashboard').attr('checked', 'checked');
+            break;
+        case 'task' :
+            $('#r_task').attr('checked', 'checked');
+            break;
+        case 'blank' :
+            $('#r_blank').attr('checked', 'checked');
+            break;
+    }
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        //update profile
+        $('#saveChange').click(function () {
+            let form = $('#MyProfileData');
+            $.ajax({
+                type: 'post',
+                url: '/user/profile',
+                data: form.serialize(),
+                success: function (pf_data) {
+                    // alert(JSON.stringify(pf_data.returnMSG));
+                    // document.getElementById("displayName").textContent = pf_data[0].Name;
+                    $('#displayName').text(pf_data.Name);
+                    $('#username').val(pf_data.Name);
+                    $('#email').val(pf_data.Email);
+                    $('#phone').val(pf_data.Phone);
+                    $('#promptMSG').text(pf_data.returnMSG);
+                    let new_home = pf_data.Default_Home;
+                    switch (new_home) {
+                        case 'messenger' :
+                            $('#r_messenger').attr('checked', 'checked');
+                            break;
+                        case 'dashboard' :
+                            $('#r_dashboard').attr('checked', 'checked');
+                            break;
+                        case 'task' :
+                            $('#r_task').attr('checked', 'checked');
+                            break;
+                        case 'task' :
+                            $('#r_blank').attr('checked', 'checked');
+                            break;
+                    }
+                    $('#msgModal').modal('show');
+                }
+            });
+        });
+        //upload photo
+        $('#btn_upload').click(function () {
+            let formData = new FormData($("#uploadphoto")[0]);
+            $.ajax({
+                type: 'post',
+                url: '/fup/photo-pf',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    // alert(response);
+                    $('#uploadPhoto').modal('hide');
+                    let url = "/assets/images/avatars/<%= req.session.usercode %>.jpg";
+                    document.getElementById('sm-pf-image').setAttribute("src", url + "?v=${new Date().getTime()}");
+                    document.getElementById('lg-pf-image').setAttribute("src", url + "?v=${new Date().getTime()}");
+                }
+            });
+            document.getElementById("uploadphoto").reset()
+            $('img').on('error', function () {
+                $(this).attr('src', '/assets/images/avatars/default.png');
+            });
+        });
+    });
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,1539 @@
+<%- include('./header.ejs') %>
+<style>
+
+    #calendar {
+        max-width: 3000px;
+        margin: 40px auto;
+        padding: 0 10px;
+    }
+
+    .popover {
+        border: 2px ridge #fe0015;
+    }
+
+    .popover-title {
+        background-color: #73AD21;
+        color: #FFFFFF;
+        font-size: 28px;
+        text-align: center;
+    }
+
+    .popover-content {
+        background-color: #e3d51d;
+        color: #006efe;
+        padding: 25px;
+    }
+
+    .pull-left {
+        float: left !important;
+    }
+
+    .pull-right {
+        float: right !important;
+    }
+    .hovertext {
+        position: relative;
+        border-bottom: 1px dotted rgba(0, 0, 0, 0);
+    }
+
+    .hovertext:before {
+        content: attr(data-hover);
+        visibility: hidden;
+        opacity: 0;
+        width: max-content;
+        background-color: #f5e751;
+        color: #2200fe;
+        text-align: center;
+        border-radius: 5px;
+        padding: 5px 2px;
+
+        position: absolute;
+        z-index: 1;
+        left: 50%;
+        top: -80%;
+    }
+
+    .hovertext:hover:before {
+        opacity: 1;
+        visibility: visible;
+    }
+</style>
+
+<body onload="get_badge()">
+
+<!--wrapper-->
+<div class="wrapper">
+
+    <%- include('./sidebar.ejs') %>
+    <%- include('./topbar.ejs') %>
+
+    <!--start page wrapper -->
+    <div class="page-wrapper">
+        <div class="page-content">
+
+            <!--breadcrumb-->
+            <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+                <div>
+                    <span class="font-30"><i class="bx bx-door-open"></i></span>
+                    <span class="font-24"><%= __("Schedules (Cal)") %></span>
+                    <div class="input-group">
+                        <select class="single-select" id="view_select" onChange="switch_view()">
+                            <option value="schedules"><%= __("Schedules") %></option>
+                            <option value="resources"><%= __("Rooms") %></option>
+                        </select>
+                        <select class="single-select" id="branch_select" onChange="switch_branch()">
+                            <option value="*"><%= __("All Branches") %></option>
+                            <% for(let i = 0; i < branch.length; i++) { %>
+                                <option value="<%= branch[i].BranchCode %>"><%= branch[i].BranchCode %></option>
+                            <% } %>
+                        </select>
+
+                    </div>
+                    <input type="text" class="form-control" onchange="change_date()" id="show_date" value="<%= date %>">
+                </div>
+            </div>
+            <!--end breadcrumb-->
+            <div class="row" onload="get_schlist()">
+                <div class="col-lg-2">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="my-3"><%= __("Course code") %></h5>
+                            <table class="table mb-0 table-striped table-bordered" id="clist"
+                                   data-ordering="false" data-searching="true" data-paging="false"
+                                   data-info="false">
+                                <thead class="table-light">
+                                <tr>
+                                    <th class="text-md-center"></th>
+                                </tr>
+                                <tr>
+                                    <th><input type="checkbox" id="tick_all" class="cs form-check-input"
+                                           onclick="tickall()"> All
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-10">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id='course_calendar'></div>
+                            <div id='calendar'></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <label id="my_label" style="display:none">abc</label>
+            <%- include('./copyright.ejs') %>
+        </div>
+    </div>
+    <!--end page wrapper -->
+
+    <!-- Change sch modal -->
+    <div class="modal fade" id="change_sch_Modal" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><%= __("Change Scheduled Date") %></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="card-body">
+                        <form id="form_change_sch">
+                            <div class="row mb-3">
+                                <div class="col-sm-3">
+                                    <h6 class="mb-0"><%= __("Start Date") %></h6>
+                                </div>
+                                <div class="col-sm-9 text-secondary">
+                                    <input type="text" id="new_date" class="form-control">
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-3">
+                                    <h6 class="mb-0"></h6>
+                                </div>
+                                <div class="col-sm-9 text-secondary">
+                                    <a class="btn btn-danger btn-sm radius-30 px-4"
+                                       id="btn_apply_new_sch"><%= __("Apply") %></a>
+                                    <a class="btn btn-secondary btn-sm radius-30 px-4" data-bs-dismiss="modal"
+                                       id="btn_cancel_new_sch"><%= __("Cancel") %></a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- Change sch modal ended -->
+
+    <!-- event detail modal -->
+    <div class="modal fade" id="event_Modal" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><%= __("Class Detail") %></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="row">
+                        <div class="btn-group col-lg-8" role="group" style="margin: auto; padding: 10px;">
+                            <div class="col-lg-2 text-md-center"><span class="font-20 text-info">(A)</span></div>
+
+                            <button type="button" class="btn btn-secondary hovertext" onclick="transfer('L-R')" data-hover="<%=__("Transfer Student(s) from (A) to (B)")%>" style="cursor: pointer; color: #0d6efd;"><i class="bx bx-right-arrow text-white"></i></button>
+                            <button type="button" class="btn btn-secondary hovertext" onclick="reset_tbls()" data-hover="<%=__("RESET")%>" style="cursor: pointer; color: #0d6efd;"><i class="bx bx-refresh text-white"></i></button>
+                            <button type="button" class="btn btn-secondary hovertext" onclick="transfer('R-L')" data-hover="<%=__("Transfer Student(s) from (B) to (A)")%>" style="cursor: pointer; color: #0d6efd;"><i class="bx bx-left-arrow text-white"></i></button>
+
+                            <div class="col-lg-2 text-md-center"><span class="font-20 text-info">(B)</span></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div>
+                                <table><input type="hidden" id="code_tbl2">
+                                    <tr>
+                                        <td class="text-md-end"><h6><%= __("Class Code") %>: </h6></td>
+                                        <td><h6><span class="text-secondary" id="show_class_code2"></span></h6></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-md-end"><h6><%= __("Course") %>: </h6></td>
+                                        <td><h6><span class="text-secondary" id="show_course2"></span></h6></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-md-end"><h6><%= __("Teacher") %>:</h6></td>
+                                        <td><h6><span class="text-primary hovertext" data-hover="<%=__("Change teacher")%>" id="teacher_name2" style="cursor: pointer;"></span></h6></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-md-end"><h6><%= __("Date") %>: </h6></td>
+                                        <td><h6><span class="text-secondary" id="date2"></span></h6></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-md-end"><h6><%= __("Start Time") %>: </h6></td>
+                                        <td><h6><span class="text-secondary" id="start_time2"></span></h6></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-md-end"><h6><%= __("End Time") %>: </h6></td>
+                                        <td><h6><span class="text-secondary" id="end_time2"></span></h6></td>
+                                    </tr>
+                                </table>
+                                <table class="table mb-0 table-striped table-bordered" id="myDataTable2">
+                                    <thead class="table-light">
+                                    <tr>
+                                        <th class="text-md-center"><input type="checkbox" id="tick_all2"
+                                                                          class="form-check-input"
+                                                                          onclick="tickall_students('2')"></th>
+                                        <th class="text-md-center"><%= __("Student Code") %></th>
+                                        <th class="text-md-center"><%= __("Student Name") %></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div id="right_table">
+                                <table><input type="hidden" id="code_tbl3">
+                                    <tr>
+                                        <td class="text-md-end"><h6><%= __("Class Code") %>: </h6></td>
+                                        <td><h6><span class="text-secondary" id="show_class_code3"></span></h6></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-md-end"><h6><%= __("Course") %>: </h6></td>
+                                        <td><h6><span class="text-secondary" id="show_course3"></span></h6></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-md-end"><h6><%= __("Teacher") %>:</h6></td>
+                                        <td><h6><span class="text-primary hovertext" data-hover="<%=__("Change teacher")%>" id="teacher_name3" style="cursor: pointer;"></span></h6></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-md-end"><h6><%= __("Date") %>: </h6></td>
+                                        <td><h6><span class="text-secondary" id="date3"></span></h6></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-md-end"><h6><%= __("Start Time") %>: </h6></td>
+                                        <td><h6><span class="text-secondary" id="start_time3"></span></h6></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-md-end"><h6><%= __("End Time") %>: </h6></td>
+                                        <td><h6><span class="text-secondary" id="end_time3"></span></h6></td>
+                                    </tr>
+                                </table>
+                                <table class="table mb-0 table-striped table-bordered" id="myDataTable3">
+                                    <thead class="table-light">
+                                    <tr>
+                                        <th class="text-md-center"><input type="checkbox" id="tick_all3"
+                                                                          class="form-check-input"
+                                                                          onclick="tickall_students('3')"></th>
+                                        <th class="text-md-center"><%= __("Student Code") %></th>
+                                        <th class="text-md-center"><%= __("Student Name") %></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- event detail modal ended -->
+
+    <!-- Change teacher modal -->
+    <div class="modal fade" id="changeteacher_Modal" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><%= __("Change Teacher") %></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table class="table mb-0 table-striped table-bordered" id="myDataTable5" data-info="false"
+                                   data-ordering="false" data-scrollX="false" style="width:100%">
+                                <thead class="table-light">
+                                <tr>
+                                    <th class="text-md-center" style="width: 70%"><%= __("Teacher") %></th>
+                                    <th style="width: 30%"></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                                <tfoot>
+                                <tr>
+                                    <td class="text-left">
+                                        <a class="btn btn-danger btn-sm radius-30 px-4"
+                                           onclick="change_to_this_teacher()"><%= __("Apply") %></a>
+                                    </td>
+                                    <td class="text-center">
+                                        <a class="btn btn-secondary btn-sm radius-30 px-4"
+                                           data-bs-dismiss="modal"><%= __("Cancel") %></a>
+                                    </td>
+                                </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Change teacher modal ended-->
+
+    <%- include('./footer.ejs') %>
+
+</div>
+<!--wrapper ended-->
+
+<script src="/assets/plugins/fullcalendar/js/main.min.js"></script>
+
+    <head>
+        <meta charset="UTF-8">
+            <meta name="viewport"
+                  content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+                <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                    <title>Document</title>
+    </head>
+    <body>
+
+    </body>
+    </html>);
+
+<script>
+
+    // save initial full course code list for search filter processing in calendar
+   $(function (){
+        let count = document.getElementById("clist").rows.length;
+        let schstr = "";
+        for(let i = 2; i < count; i++){
+            schstr = schstr + document.getElementById("clist").rows[i].innerText + ",";
+        }
+        document.getElementById("my_label").innerText = schstr;
+    });
+
+    // get schedules according to search box input
+    $(function() {
+        $('input[aria-controls=clist]').on("change paste keyup", function() {
+            let searchstr = $(this).val()
+            if(searchstr === ""){
+                load_sch();
+            }else{
+                search_sch(searchstr);
+            }
+        })
+       $('input[aria-controls=clist]').css({"margin-bottom":"3px","max-width":"120px"});
+    });
+
+</script>
+
+<script type="application/javascript">
+    var new_classlist = [];
+    var total_chg_days;
+    var tbl = '';
+    var tcolor = '';
+
+    function reset_tbls() {
+        tbl = '';
+        $('#code_tbl2').val('');
+        $('#code_tbl3').val('');
+        $('#myDataTable2').DataTable().data().clear().draw();
+        $('#myDataTable3').DataTable().data().clear().draw();
+        $('#date2').text('');
+        $('#show_class_code2').text('');
+        $('#show_course2').text('');
+        $('#teacher_name2').text('')
+        $('#start_time2').text('');
+        $('#end_time2').text('');
+        $('#date3').text('');
+        $('#show_class_code3').text('');
+        $('#show_course3').text('');
+        $('#teacher_name3').text('')
+        $('#start_time3').text('');
+        $('#end_time3').text('');
+    }
+
+    function tickall_students(e) {
+            let table = $('#myDataTable'+e).DataTable();
+            let cells = table.cells().nodes();
+            if ($('#tick_all'+e).is(':checked')) {
+                // then tick all
+                $('input[type="checkbox"]', cells).prop('checked', true);
+            } else {
+                // untick all
+                $('input[type="checkbox"]', cells).prop('checked', false);
+            }
+    }
+
+    function transfer(e) {
+        //console.log(e)
+        if(e==='R-L') {
+            // tbl3 -> tbl2
+            // get all checked
+            let x = $('#myDataTable3').DataTable().$('input[type=checkbox]:checked');
+            $.each(x, function (i) {
+                code = x[i].value
+                $.ajax({
+                    async: false,
+                    type: 'post',
+                    url: '/oper/class_change',
+                    data: {action: 'student_class_change', class_code: $('#code_tbl2').val(), student_code: code, oc_code: $('#code_tbl3').val()}
+                });
+            });
+        } else {
+            // tbls2 -> tbl3
+            let x = $('#myDataTable2').DataTable().$('input[type=checkbox]:checked');
+            $.each(x, function (i) {
+                code = x[i].value
+                $.ajax({
+                    async: false,
+                    type: 'post',
+                    url: '/oper/class_change',
+                    data: {action: 'student_class_change', class_code: $('#code_tbl3').val(), student_code: code, oc_code: $('#code_tbl2').val()}
+                });
+            });
+        }
+        if(tbl==='3') {
+            get_students_teachers($('#code_tbl3').val())
+            tbl='2'
+            get_students_teachers($('#code_tbl2').val())
+            tbl='3'
+        } else {
+            get_students_teachers($('#code_tbl2').val())
+        }
+        load_sch()
+    }
+
+    function get_students_teachers(id) {
+        let class_code = id;
+
+        $('#code_tbl' + tbl).val(id);
+        $('#show_class_code' + tbl).text(id);
+        $('#myDataTable' + tbl).DataTable().data().clear().draw();
+        $('#teacher_name'+tbl).text('');
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/oper/attend_taking',
+            data: {action: 'get_class_for_att_taking', class_code: class_code},
+            success: function (return_data) {
+                if (return_data.length > 0) {
+                    $('#teacher_name'+tbl).text(return_data[0].Name)
+                    $('#teacher_name'+tbl).click(function () {
+                        change_teacher(return_data[0].ClassCode);
+                    });
+                    $.each(return_data, function (i) {
+                        if(return_data[i].StudentCode!==null) {
+                            this_row = `<tr>`;
+                            this_row += `<td class="text-md-center" style="width: 10%"><input type="checkbox" class="form-check-input" name="student_code" value="` + return_data[i].StudentCode + `"></td>`;
+                            this_row += `<td class="text-md-center" style="width: 30%">` + return_data[i].StudentCode + `</td>`;
+                            this_row += `<td class="text-md-center" style="width: 60%">` + return_data[i].FirstName + ` ` + return_data[i].LastName+ `</td>`;
+                            this_row += `</tr>`;
+                            $('#myDataTable' + tbl).DataTable().row.add($(this_row)).draw(false);
+                        }
+                    });
+                }
+            }
+        });
+        $('#event_Modal').modal('show')
+    }
+
+    function show_student(code) {
+        // alert(code);
+        $.ajax({
+            type: 'post',
+            url: '/oper/attend_taking',
+            data: {action: 'show_student', student_code: code},
+            success: function (return_data) {
+                $('#student_email').val(return_data[0].Email);
+                $('#student_mobile').val(return_data[0].Mobile);
+                $('#student_flname').val(return_data[0].FirstName + ' ' + return_data[0].LastName);
+                $('#student_parentmobile').val(return_data[0].EmergencyContactNo1);
+                $('#student_parentinfo').val(return_data[0].EmergencyContactPerson1);
+            }
+        });
+        $('#student_contact_Modal').modal('show');
+    }
+
+    function get_all_schedules() {
+        let schedules;
+        let bcode = $('#branch_select').val();
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/oper/resources',
+            data: {action: 'all_schedules', date: $('#show_date').val(), branchcode: bcode},
+            success: function (return_data) {
+                schedules = return_data
+            }
+        })
+        return schedules;
+    }
+
+
+    function get_all_venues() {
+        let venues;
+        let bcode = $('#branch_select').val();
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/oper/resources',
+            data: {action: 'all_venues', branchcode: bcode},
+            success: function (return_data) {
+                venues = return_data
+            }
+        })
+        return venues;
+    }
+
+    function GetSortOrder(prop) {
+        return function (a, b) {
+            if (a[prop] > b[prop]) {
+                return 1;
+            } else if (a[prop] < b[prop]) {
+                return -1;
+            }
+            return 0;
+        }
+    }
+
+    function uniq(obj) {
+        obj.sort(GetSortOrder("cid"))
+        let uniques = [];
+        let stringify = {};
+        for (let i = 0; i < obj.length; i++) {
+            let keys = Object.keys(obj[i]);
+            keys.sort(function (a, b) {
+                return a - b
+            });
+            let str = '';
+            for (let j = 0; j < keys.length; j++) {
+                str += JSON.stringify(keys[j]);
+                str += JSON.stringify(obj[i][keys[j]]);
+            }
+            if (!stringify.hasOwnProperty(str)) {
+                uniques.push(obj[i]);
+                stringify[str] = true;
+            }
+        }
+        return uniques;
+    }
+
+    function addDays(date, days) {
+        let result = new Date(date);
+        result.setDate(result.getDate() + days);
+        return result;
+    }
+
+    function getDatesInRange(start, end) {
+        let arr = [];
+        for (dt = new Date(start); dt < new Date(end); dt.setDate(dt.getDate() + 1)) {
+            arr.push(new Date(dt));
+        }
+        return arr;
+    }
+
+    function batch_change(old_date) {
+
+        if ($('#new_date').val() === '') {
+            $('#promptMSG').text('<%= __("Please provide new class date") %>');
+            $('#msgModal').modal('show');
+            $('#new_date').addClass("border-danger-input_alert");
+            return;
+        } else {
+            $('#new_date').removeClass("border-danger-input_alert");
+        }
+
+        $('#change_sch_Modal').modal('hide');
+        console.log($('#new_date').val())
+        let total_days = new Date($('#new_date').val()) - new Date(old_date);
+        let total_chg_days = Math.round(total_days / (1000 * 3600 * 24));
+        console.log(total_chg_days)
+        if (new_classlist) {
+            $.each(new_classlist, function (i) {
+                class_code = new_classlist[i].code
+                new_start_time = new Date(new_classlist[i].start_time).toLocaleTimeString('en-CA', {
+                    timeZone: 'GMT',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                })
+                new_end_time = new Date(new_classlist[i].end_time).toLocaleTimeString('en-CA', {
+                    timeZone: 'GMT',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                })
+                new_date = new Date(addDays(new_classlist[i].date, total_chg_days)).toLocaleDateString('en-CA', {timeZone: 'GMT',})
+                $.ajax({
+                    async: false,
+                    type: 'post',
+                    url: '/oper/change_sch',
+                    data: {
+                        action: 'change_1sch',
+                        class_code: class_code,
+                        start: new_start_time,
+                        end: new_end_time,
+                        date: new_date
+                    }
+                });
+                //console.log(class_code)
+                //console.log(new_start_time)
+                //console.log(new_end_time)
+                //console.log(new_date)
+            });
+
+        } else {
+            console.log('do nothing')
+        }
+        new_classlist = [];
+        load_sch();
+    }
+
+    function change_date() {
+        let new_date = $('#show_date').val();
+        let url = new URL(window.location.href);
+        url.searchParams.set("date", new_date)
+        window.location.href = url;
+    }
+
+    function switch_view() {
+        let view_select = $('#view_select').val();
+        let url = new URL(window.location.href);
+        url.searchParams.set("view", view_select)
+        window.location.href = url;
+    }
+
+    function switch_branch() {
+        let branch_select = $('#branch_select').val();
+        let url = new URL(window.location.href);
+        url.searchParams.set("branchcode", branch_select)
+        window.location.href = url;
+    }
+
+    function tickall() {
+        let table = $('#clist').DataTable();
+        let cells = table.cells().nodes();
+        if ($('#tick_all').is(':checked')) {
+            // then tick all
+            $('input[type="checkbox"]', cells).prop('checked', true);
+        } else {
+            // untick all
+            $('input[type="checkbox"]', cells).prop('checked', false);
+        }
+        load_sch();
+    }
+
+    function load_res() {
+        <% if(req.session.lang === 'zh-HK') { %>
+        let initialLocaleCode = "zh-tw";
+        <% } else if(req.session.lang === 'zh-CN') { %>
+        let initialLocaleCode = "zh-cn";
+        <% } else { %>
+        let initialLocaleCode = "en";
+        <% } %>
+
+        let schedules = get_all_schedules();
+        let venues = get_all_venues();
+        let events = [];
+        let csa = [];
+        let resources = [];
+        let t;
+        let c;
+
+        $.each(venues, (i) => {
+            resources.push({
+                id: venues[i].VenueCode,
+                title: venues[i].VenueName
+            });
+        });
+        $.each(schedules, (i) => {
+            if (schedules[i].ClassCode !== '') {
+                t = '';
+                c = '#33ab90';
+                dt = 'block';
+                desc = schedules[i].CourseCode;
+            } else {
+                t = '';
+                c = '#f5ae51';
+                dt = 'item-list';
+                desc = '';
+            }
+            csa.push({
+                cid: schedules[i].CourseCode,
+            });
+            events.push({
+                id: schedules[i].ClassCode,
+                cid: schedules[i].CourseCode,
+                title: schedules[i].ClassDesc,
+                resourceId: schedules[i].VenueCode,
+                start: schedules[i].StartTime,
+                end: schedules[i].EndTime,
+                description: desc,
+                display: dt,
+                color: c,
+                extendedProps: {
+                    ClassCode: schedules[i].ClassCode,
+                    ClassDesc: schedules[i].ClassDesc
+                },
+            });
+        });
+   
+
+        let calendarEl = document.getElementById('calendar');
+        let calendar = new FullCalendar.Calendar(calendarEl, {
+            schedulerLicenseKey: '0136077518-fcs-1656054867',
+            initialDate: new Date('<%=date%>'),
+            timeZone: 'UTC',
+            locale: initialLocaleCode,
+            initialView: 'resourceTimelineDay',
+            aspectRatio: 1.5,
+            headerToolbar: {
+                left: 'prev,next',
+                center: 'title',
+                right: 'resourceTimelineDay,resourceTimelineWeek,resourceTimelineMonth'
+            },
+            editable: true,
+            buttonIcons: true,
+            eventDurationEditable: false,
+            slotMinTime: '08:00',
+            slotMaxTime: '23:00',
+            resourceAreaHeaderContent: 'Venues',
+            resources: resources,
+            events: (fetchInfo, successCallback, failureCallback) => {
+                successCallback(events);
+            },
+            eventDragStart: (info) => {
+
+            },
+            eventDragStop: (info) => {
+                calendar.destroy();
+                load_res();
+            },
+            eventChange: (info) => {
+
+            },
+            eventDrop: (info) => {
+                // alert(info.event.extendedProps.ClassCode + " was dropped on " + info.newResource.id );
+                $('.popover').remove();
+                if(info.newResource) {
+                    $.ajax({
+                        async: false,
+                        type: 'post',
+                        url: '/oper/change_sch',
+                        data: {
+                            action: 'change_venue',
+                            class_code: info.event.extendedProps.ClassCode,
+                            venue: info.newResource.id
+                        }
+                    });
+                }
+                load_res();
+            },
+            eventDidMount: (info) => {
+                 $(info.el).popover({
+                    placement: 'top',
+                    html: true,
+                    animation: false,
+                    delay: 50,
+                    content: info.event.extendedProps.ClassCode + '<br>' + info.event.extendedProps.ClassDesc,
+                    trigger: 'hover',
+                });
+            },
+        });
+        $('#tick_all').prop('checked',true)
+        calendar.render();
+    }
+
+    function load_sch(retick) {
+        <% if(req.session.lang === 'zh-HK') { %>
+        let initialLocaleCode = "zh-tw";
+        <% } else if(req.session.lang === 'zh-CN') { %>
+        let initialLocaleCode = "zh-cn";
+        <% } else { %>
+        let initialLocaleCode = "en";
+        <% } %>
+        let schedules = get_all_schedules();
+        let venues = get_all_venues();
+        let csa = [];
+        let events = [];
+        let resources = [];
+        let t;
+        let c;
+
+        console.log(schedules);
+
+        $.each(schedules, (i) => {
+            if (schedules[i].ClassCode !== '') {
+                t = '';
+                c = '#33ab90';
+                dt = 'block';
+                desc = schedules[i].ClassDesc;
+            } else {
+                t = '';
+                c = '#f5ae51';
+                dt = 'item-list';
+                desc = '';
+            }
+            csa.push({
+                cid: schedules[i].CourseCode,
+            });
+            events.push({
+                id: schedules[i].ClassCode,
+                cid: schedules[i].CourseCode,
+                title: schedules[i].CourseMasterCode + ' (' + schedules[i].NoofStudent + '/' + schedules[i].ClassQuota + ')',
+                resourceId: schedules[i].VenueCode,
+                start: schedules[i].StartTime,
+                end: schedules[i].EndTime,
+                description: desc,
+                display: dt,
+                color: c,
+                extendedProps: {
+                    ClassCode: schedules[i].ClassCode,
+                    ClassDesc: schedules[i].ClassDesc,
+                },
+            });
+        });
+        // console.log(events)
+        let c_calendarEl = document.getElementById('course_calendar');
+        let c_calendar = new FullCalendar.Calendar(c_calendarEl, {
+            schedulerLicenseKey: '0136077518-fcs-1656054867',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,listMonth'
+            },
+            eventTimeFormat: {
+                hour: 'numeric',
+                minute: '2-digit'
+            },
+            initialView: 'dayGridMonth',
+            initialDate: new Date('<%=date%>'),
+            timeZone: 'UTC',
+            locale: initialLocaleCode,
+            events: (fetchInfo, successCallback, failureCallback) => {
+                successCallback(events);
+            },
+            selectable: true,
+            editable: true,
+            dayMaxEvents: true,
+            droppable: true,
+            buttonIcons: true,
+            displayEventEnd: false,
+            eventDurationEditable: false,
+            slotMinTime: '08:00',
+            slotMaxTime: '23:00',
+            dateClick: (info) => {
+                //alert('clicked ' + info.dateStr);
+            },
+            select: (info) => {
+                all_dates = getDatesInRange(info.startStr, info.endStr);
+                $.each(all_dates, function (i) {
+                    $.each(schedules, function (j) {
+                        if (new Date(schedules[j].StartTime).toLocaleDateString('en-CA', {timeZone: 'GMT',}) === new Date(all_dates[i]).toLocaleDateString('en-CA', {timeZone: 'GMT',})) {
+                            new_classlist.push({
+                                code: schedules[j].ClassCode,
+                                start_time: schedules[j].StartTime,
+                                end_time: schedules[j].EndTime,
+                                date: schedules[j].ClassDate
+                            });
+                        }
+                    });
+                })
+                $('#form_change_sch').trigger('reset')
+                $('#change_sch_Modal').modal({backdrop: 'static', keyboard: false})
+                $('#change_sch_Modal').modal('show');
+                $('#btn_apply_new_sch').attr('onclick', 'batch_change(\'' + info.startStr + '\')');
+            },
+            eventClick: (info) => {
+                // alert('event clicked ' + info.event.start );
+
+                if (tbl === '') {
+                    //console.log('set2')
+                    tbl = '2'
+                    $('#show_course2').text(info.event.extendedProps.ClassDesc)
+                    $('#start_time2').text(new Date(info.event.start).toLocaleTimeString('en-CA', {
+                        timeZone: 'GMT',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }))
+                    $('#end_time2').text(new Date(info.event.end).toLocaleTimeString('en-CA', {
+                        timeZone: 'GMT',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }))
+                    $('#date2').text(new Date(info.event.start).toLocaleDateString('en-CA', {timeZone: 'GMT',}))
+                } else {
+                    //console.log('set3')
+                    if (tcolor==='#FFFFE0') {
+                        tcolor='rgba(188,217,213,0.87)'
+                    } else {
+                        tcolor='#FFFFE0'
+                    }
+                    $("#right_table").css({'background-color': tcolor});
+                    $("#right_table").css({'background-color': tcolor});
+                    tbl = '3'
+                    $('#show_course3').text(info.event.extendedProps.ClassDesc)
+                    $('#start_time3').text(new Date(info.event.start).toLocaleTimeString('en-CA', {
+                        timeZone: 'GMT',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }))
+                    $('#end_time3').text(new Date(info.event.end).toLocaleTimeString('en-CA', {
+                        timeZone: 'GMT',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }))
+                    $('#date3').text(new Date(info.event.start).toLocaleDateString('en-CA', {timeZone: 'GMT',}))
+                }
+                // console.log(tbl)
+                get_students_teachers(info.event.id)
+            },
+            eventMouseEnter: (info) => {
+                //alert('hover' + info.event.extendedProps.description );
+            },
+            eventMouseLeave: (info) => {
+                //alert('move out' + info.event.extendedProps.description );
+            },
+            eventChange: (info) =>  {
+                //alert('change' + info.event.extendedProps.description );
+                //alert('old' + info.oldEvent.extendedProps.description)
+            },
+            eventDrop: (info) => {
+                //alert(info.event.extendedProps.ClassCode + " was dropped on " + info.event.start.toISOString() + " to " + info.event.end.toISOString() );
+                $('.popover').remove();
+                $.ajax({
+                    async: false,
+                    type: 'post',
+                    url: '/oper/change_sch',
+                    data: {
+                        action: 'change_1sch',
+                        class_code: info.event.extendedProps.ClassCode,
+                        start: info.event.start.toISOString(),
+                        end: info.event.end.toISOString(),
+                        date: new Date(info.event.start).toLocaleDateString('en-CA', {timeZone: 'GMT',})
+                    }
+                });
+            },
+            eventDidMount: (info) => {
+                let cs = document.querySelectorAll(".cs");
+                cs.forEach(function (v) {
+                    if (v.checked) {
+                        if (info.event.extendedProps.cid === v.value) {
+                            info.el.style.display = "block";
+                        }
+                    } else {
+                        if (info.event.extendedProps.cid === v.value) {
+                            info.el.style.display = "none";
+                        }
+                    }
+                });
+                $(info.el).popover({
+                    placement: 'top',
+                    html: true,
+                    animation: true,
+                    delay: 100,
+                    content: info.event.extendedProps.ClassCode + '<br>' + info.event.extendedProps.ClassDesc,
+                    trigger: 'hover',
+                });
+            },
+            customButtons: {
+                prev: {
+                    text: "PREV",
+                    click: () => {
+                        console.log(c_calendar.getDate());
+                        console.log($(".fc-toolbar-title").text());
+                        updatePicker("PREV");
+                        c_calendar.prev();
+                    }
+                },
+                next: {
+                    text: "NEXT",
+                    click: () => {
+                        console.log(c_calendar.getDate());
+                        console.log($(".fc-toolbar-title").text());
+                        updatePicker("NEXT");
+                        c_calendar.next();
+                    }
+                },
+                today: {
+                    text: "today",
+                    click: () => {
+                        console.log(c_calendar.getDate());
+                        console.log($(".fc-toolbar-title").text());
+                        updatePicker("TODAY");
+                        c_calendar.today();
+                    }
+                }
+            }
+        });
+        c_calendar.render();
+        console.log('----------------------------before uniq----------------------------')
+        console.log(csa);
+        csa = uniq(csa);
+        console.log(csa);
+        console.log(csa[0]['cid']);
+        let tempstr = "";
+        for (let i = 0; i < csa.length; i++ ){
+            tempstr = tempstr + csa[i]['cid']+",";
+        }
+        document.getElementById("my_label").innerHTML = tempstr;
+        let temparr = tempstr.split(",");
+        for(let i = 0; i<temparr.length; i++){
+            console.log(temparr[i]);
+        }
+        console.log("temparrstr",temparr.toString());
+
+
+        if(retick) {
+            $('#clist').DataTable().data().clear().draw();
+            console.log(retick)
+            $.each(csa.sort(), (i) => {
+                clist_HTML = `<tr><td>`;
+                clist_HTML += `<input name="clist_checkbox" class="cs form-check-input" value="` + csa[i].cid + `" type="checkbox" checked> ` + csa[i].cid;
+                clist_HTML += `</td></tr>`;
+                $('#clist').DataTable().row.add($(clist_HTML)).draw(false);
+            });
+        }
+
+        let csx = document.querySelectorAll(".cs");
+        csx.forEach((el)=> {
+            el.addEventListener("change", () => {
+                c_calendar.refetchEvents();
+            });
+        });
+    }
+
+    function change_teacher(ccode) {
+        // alert(id);
+        let class_code = ccode;
+
+        $('#myDataTable5').DataTable().data().clear().draw();
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/oper/change_teacher',
+            data: {action: 'get_teacher_list', class_code: class_code},
+            success: function (return_data) {
+                if (return_data.length > 0) {
+                    $.each(return_data, function (i) {
+                        let chk_img;
+                        this_row = '<tr>';
+                        this_row += '<td>';
+                        this_row += '		<div class="d-flex align-items-center">';
+                        chk_img = '/assets/images/avatars/' + return_data[i].UserCode + '.jpg'
+                        let img = new Image();
+                        img.src = 'http://' + window.location.hostname + chk_img;
+                        if (img.complete) {
+                            img_use = chk_img;
+                        } else {
+                            img_use = '/assets/images/avatars/default.png';
+                        }
+                        this_row += `<div><img src="` + img_use + `" class="rounded-circle" width="40" height="40"> </a></div>`;
+                        this_row += `			<div class="ms-2">` + return_data[i].Name + `</span></div>`;
+                        this_row += `		</div>`;
+                        this_row += `</td>`;
+                        this_row += `<td class="text-md-center"><input type="radio" value="` + class_code + `#tcode#` + return_data[i].UserCode + `" id="change_to_this_teacher" name="change_to_this_teacher"></td>`;
+                        this_row += `</tr>`;
+                        // console.log(this_row);
+                        $('#myDataTable5').DataTable().row.add($(this_row)).draw();
+                    });
+                }
+            }
+        });
+        $('#btn_apply_teacher').removeAttr('onclick');
+        $('#btn_apply_teacher').attr('onclick', 'change_to_this_teacher(\'' + ccode + '\')')
+        $('#changeteacher_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#changeteacher_Modal').modal('show');
+    }
+
+    function change_to_this_teacher(cc) {
+        let id = $('input[name="change_to_this_teacher"]:checked').val();
+        if(id===undefined) {
+            $('#promptMSG').text('<%= __("Please select teacher") %>');
+            $('#msgModal').modal('show');
+            $('input[name="change_to_this_teacher"]').addClass("border-danger-input_alert");
+            return;
+        } else {
+            $('input[name="change_to_this_teacher"]').removeClass("border-danger-input_alert");
+        };
+
+        let class_code = id.split("#tcode#")[0];
+        let teacher_code = id.split("#tcode#")[1];
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/oper/change_teacher',
+            data: {action: 'change_teacher', class_code: class_code, teacher_code: teacher_code},
+            success: function (return_data) {
+                // console.log(return_data);
+                if(tbl==='3') {
+                    get_students_teachers($('#code_tbl3').val())
+                    tbl='2'
+                    get_students_teachers($('#code_tbl2').val())
+                    tbl='3'
+                } else {
+                    get_students_teachers($('#code_tbl2').val())
+                }
+                load_sch();
+            }
+        });
+        $('#changeteacher_Modal').modal('hide');
+    }
+
+    $(document).ready(function () {
+
+        let urlParams = new URLSearchParams(window.location.search);
+        let view = urlParams.get('view');
+        let bcode = urlParams.get('branchcode');
+
+        if (view === undefined || view === '' || view === null) {
+            $('#view_select option[value=' + view + ']').prop('selected', 'selected');
+            if (bcode !== undefined && bcode !== '' && bcode !== null && bcode !== '*') {
+                $('#branch_select option[value=' + bcode + ']').prop('selected', 'selected');
+            }
+            $('#calendar').hide()
+            $('#course_calendar').show();
+            $('#view_select').select2({
+                theme: 'bootstrap4 single-select'
+            });
+            $('#branch_select').select2({
+                theme: 'bootstrap4 single-select'
+            });
+            load_sch(true);
+        } else if (view === 'schedules') {
+            $('#view_select option[value=' + view + ']').prop('selected', 'selected');
+            if (bcode !== undefined && bcode !== '' && bcode !== null && bcode !== '*') {
+                $('#branch_select option[value=' + bcode + ']').prop('selected', 'selected');
+            }
+            $('#calendar').hide()
+            $('#course_calendar').show();
+            $('#view_select').select2({
+                theme: 'bootstrap4 single-select'
+            });
+            $('#branch_select').select2({
+                theme: 'bootstrap4 single-select'
+            });
+            load_sch();
+        } else if (view === 'resources') {
+            $('#view_select option[value=' + view + ']').prop('selected', 'selected');
+            if (bcode !== undefined && bcode !== '' && bcode !== null && bcode !== '*') {
+                $('#branch_select option[value=' + bcode + ']').prop('selected', 'selected');
+            }
+            $('#course_calendar').hide();
+            $('#calendar').show();
+            $('#view_select').select2({
+                theme: 'bootstrap4 single-select'
+            });
+            $('#branch_select').select2({
+                theme: 'bootstrap4 single-select'
+            });
+            load_res();
+            $('input[name="clist_checkbox"]').prop('disabled', true);
+        }
+
+        $('.dataTables_filter input[type="search"]').css(
+            {'width': '152px', 'display': 'inline-block'}
+        );
+
+        $('#new_date').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            format: "yyyy-mm-dd",
+            <% if(req.session.lang === 'zh-HK') { %>
+            language: "zh-TW",
+            <% } else if(req.session.lang === 'zh-CN') { %>
+            language: "zh-CN",
+            <% } else { %>
+            language: "en-CA",
+            <% } %>
+        });
+
+        $('#show_date').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            startView: "months",
+            minViewMode: "months",
+            format: "yyyy-mm-dd",
+            <% if(req.session.lang === 'zh-HK') { %>
+            language: "zh-TW",
+            <% } else if(req.session.lang === 'zh-CN') { %>
+            language: "zh-CN",
+            <% } else { %>
+            language: "en-CA",
+            <% } %>
+        });
+    });
+
+    function search_sch(searchstr) {
+        let inputstr = searchstr.toLowerCase();
+        let schstr = document.getElementById('my_label').innerText;
+        let scharr = schstr.split(",");
+        let searcharr = [];
+        for(let i = 0; i<scharr.length; i++){
+            if (scharr[i].toLowerCase().includes(inputstr)){
+                searcharr.push(scharr[i]);
+            }
+        }
+
+        <% if(req.session.lang === 'zh-HK') { %>
+        let initialLocaleCode = "zh-tw";
+        <% } else if(req.session.lang === 'zh-CN') { %>
+        let initialLocaleCode = "zh-cn";
+        <% } else { %>
+        let initialLocaleCode = "en";
+        <% } %>
+        let schedules = get_all_schedules();
+        let venues = get_all_venues();
+        let csa = [];
+        let events = [];
+        let resources = [];
+        let t;
+        let c;
+
+        $.each(schedules, (i) => {
+            console.log('schedules[i].ClassCode',schedules[i].ClassCode);
+            let temparr = schedules[i].ClassCode.split('#');
+            if(searcharr.includes(temparr[0])) {
+                if (schedules[i].ClassCode !== '') {
+                    t = '';
+                    c = '#33ab90';
+                    dt = 'block';
+                    desc = schedules[i].ClassDesc;
+                } else {
+                    t = '';
+                    c = '#f5ae51';
+                    dt = 'item-list';
+                    desc = '';
+                }
+                csa.push({
+                    cid: schedules[i].CourseCode,
+                });
+                events.push({
+                    id: schedules[i].ClassCode,
+                    cid: schedules[i].CourseCode,
+                    title: schedules[i].CourseMasterCode + ' (' + schedules[i].NoofStudent + '/' + schedules[i].ClassQuota + ')',
+                    resourceId: schedules[i].VenueCode,
+                    start: schedules[i].StartTime,
+                    end: schedules[i].EndTime,
+                    description: desc,
+                    display: dt,
+                    color: c,
+                    extendedProps: {
+                        ClassCode: schedules[i].ClassCode,
+                        ClassDesc: schedules[i].ClassDesc,
+                    },
+                });
+            }
+        });
+        // console.log(events)
+        let c_calendarEl = document.getElementById('course_calendar');
+        let c_calendar = new FullCalendar.Calendar(c_calendarEl, {
+            schedulerLicenseKey: '0136077518-fcs-1656054867',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,listMonth'
+            },
+            eventTimeFormat: {
+                hour: 'numeric',
+                minute: '2-digit'
+            },
+            initialView: 'dayGridMonth',
+            initialDate: new Date('<%=date%>'),
+            timeZone: 'UTC',
+            locale: initialLocaleCode,
+            events: (fetchInfo, successCallback, failureCallback) => {
+                successCallback(events);
+            },
+            selectable: true,
+            editable: true,
+            dayMaxEvents: true,
+            droppable: true,
+            buttonIcons: true,
+            displayEventEnd: false,
+            eventDurationEditable: false,
+            slotMinTime: '08:00',
+            slotMaxTime: '23:00',
+            dateClick: (info) => {
+                //alert('clicked ' + info.dateStr);
+            },
+            select: (info) => {
+                all_dates = getDatesInRange(info.startStr, info.endStr);
+                $.each(all_dates, function (i) {
+                    $.each(schedules, function (j) {
+                        if (new Date(schedules[j].StartTime).toLocaleDateString('en-CA', {timeZone: 'GMT',}) === new Date(all_dates[i]).toLocaleDateString('en-CA', {timeZone: 'GMT',})) {
+                            new_classlist.push({
+                                code: schedules[j].ClassCode,
+                                start_time: schedules[j].StartTime,
+                                end_time: schedules[j].EndTime,
+                                date: schedules[j].ClassDate
+                            });
+                        }
+                    });
+                })
+                $('#form_change_sch').trigger('reset')
+                $('#change_sch_Modal').modal({backdrop: 'static', keyboard: false})
+                $('#change_sch_Modal').modal('show');
+                $('#btn_apply_new_sch').attr('onclick', 'batch_change(\'' + info.startStr + '\')');
+            },
+            eventClick: (info) => {
+                // alert('event clicked ' + info.event.start );
+
+                if (tbl === '') {
+                    //console.log('set2')
+                    tbl = '2'
+                    $('#show_course2').text(info.event.extendedProps.ClassDesc)
+                    $('#start_time2').text(new Date(info.event.start).toLocaleTimeString('en-CA', {
+                        timeZone: 'GMT',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }))
+                    $('#end_time2').text(new Date(info.event.end).toLocaleTimeString('en-CA', {
+                        timeZone: 'GMT',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }))
+                    $('#date2').text(new Date(info.event.start).toLocaleDateString('en-CA', {timeZone: 'GMT',}))
+                } else {
+                    //console.log('set3')
+                    if (tcolor==='#FFFFE0') {
+                        tcolor='rgba(188,217,213,0.87)'
+                    } else {
+                        tcolor='#FFFFE0'
+                    }
+                    $("#right_table").css({'background-color': tcolor});
+                    $("#right_table").css({'background-color': tcolor});
+                    tbl = '3'
+                    $('#show_course3').text(info.event.extendedProps.ClassDesc)
+                    $('#start_time3').text(new Date(info.event.start).toLocaleTimeString('en-CA', {
+                        timeZone: 'GMT',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }))
+                    $('#end_time3').text(new Date(info.event.end).toLocaleTimeString('en-CA', {
+                        timeZone: 'GMT',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }))
+                    $('#date3').text(new Date(info.event.start).toLocaleDateString('en-CA', {timeZone: 'GMT',}))
+                }
+                // console.log(tbl)
+                get_students_teachers(info.event.id)
+            },
+            eventMouseEnter: (info) => {
+                //alert('hover' + info.event.extendedProps.description );
+            },
+            eventMouseLeave: (info) => {
+                //alert('move out' + info.event.extendedProps.description );
+            },
+            eventChange: (info) =>  {
+                //alert('change' + info.event.extendedProps.description );
+                //alert('old' + info.oldEvent.extendedProps.description)
+            },
+            eventDrop: (info) => {
+                //alert(info.event.extendedProps.ClassCode + " was dropped on " + info.event.start.toISOString() + " to " + info.event.end.toISOString() );
+                $('.popover').remove();
+                $.ajax({
+                    async: false,
+                    type: 'post',
+                    url: '/oper/change_sch',
+                    data: {
+                        action: 'change_1sch',
+                        class_code: info.event.extendedProps.ClassCode,
+                        start: info.event.start.toISOString(),
+                        end: info.event.end.toISOString(),
+                        date: new Date(info.event.start).toLocaleDateString('en-CA', {timeZone: 'GMT',})
+                    }
+                });
+            },
+            eventDidMount: (info) => {
+                let cs = document.querySelectorAll(".cs");
+                cs.forEach(function (v) {
+                    if (v.checked) {
+                        if (info.event.extendedProps.cid === v.value) {
+                            info.el.style.display = "block";
+                        }
+                    } else {
+                        if (info.event.extendedProps.cid === v.value) {
+                            info.el.style.display = "none";
+                        }
+                    }
+                });
+                $(info.el).popover({
+                    placement: 'top',
+                    html: true,
+                    animation: true,
+                    delay: 100,
+                    content: info.event.extendedProps.ClassCode + '<br>' + info.event.extendedProps.ClassDesc,
+                    trigger: 'hover',
+                });
+            },
+            customButtons: {
+                prev: {
+                    text: "PREV",
+                    click: () => {
+                        console.log(c_calendar.getDate());
+                        updatePicker("PREV");
+                        c_calendar.prev();
+                    }
+                },
+                next: {
+                    text: "NEXT",
+                    click: () => {
+                        console.log(c_calendar.getDate());
+                        updatePicker("NEX");
+                        c_calendar.next();
+                    }
+                },
+                today: {
+                    text: "today",
+                    click: () => {
+                        console.log(c_calendar.getDate());
+                        updatePicker("TODAY");
+                        c_calendar.today();
+                    }
+                }
+            }
+        });
+        c_calendar.render();
+        console.log(csa);
+        csa = uniq(csa);
+        console.log(csa);
+        console.log(csa[0]['cid']);
+
+        let csx = document.querySelectorAll(".cs");
+        csx.forEach((el)=> {
+            el.addEventListener("change", () => {
+                c_calendar.refetchEvents();
+            });
+        });
+    }
+
+    function updatePicker(type){
+        let newDate;
+        let mthStr;
+        let mthInt;
+        let mthIntStr;
+        let yrInt;
+        let tempArr = [];
+        let initialMth = $(".fc-toolbar-title").text();
+        tempArr = initialMth.split(" ");
+        mthStr = tempArr[0];
+        if (mthStr === "January"){
+            mthInt = 1;
+        }else if(mthStr === "February"){
+            mthInt = 2;
+        }else if(mthStr === "March") {
+            mthInt = 3;
+        }else if(mthStr === "April"){
+            mthInt = 4;
+        }else if(mthStr === "May") {
+            mthInt = 5;
+        }else if(mthStr === "June"){
+            mthInt = 6;
+        }else if(mthStr === "July") {
+            mthInt = 7;
+        }else if(mthStr === "August"){
+            mthInt = 8;
+        }else if(mthStr === "September") {
+            mthInt = 9;
+        }else if(mthStr === "October"){
+            mthInt = 10;
+        }else if(mthStr === "November") {
+            mthInt = 11;
+        }else if(mthStr === "December"){
+            mthInt = 12;
+        }
+        if (type==="PREV"){
+            if (mthStr==="Febuary") {
+                mthInt = 1;
+                mthIntStr = "0"+mthInt.toString();
+                newDate = tempArr[1].toString()+"-"+mthIntStr+"-01";
+            }else if (mthStr==="January"){
+                mthInt = 12;
+                yrInt = parseInt(tempArr[1]) - 1;
+                newDate = yrInt.toString()+"-"+mthInt.toString()+"-01";
+            }else{
+                mthInt = mthInt - 1;
+                if (mthInt<10){
+                    mthIntStr = "0"+mthInt.toString();
+                }else{
+                    mthIntStr = mthInt.toString();
+                }
+                newDate = tempArr[1].toString()+"-"+mthIntStr+"-01";
+            }
+        }else if (type==="NEXT"){
+            if (mthStr==="December"){
+                mthInt = 1;
+                yrInt = parseInt(tempArr[1]) + 1;
+                newDate = yrInt.toString()+"-0"+mthInt.toString()+"-01";
+            }else{
+                mthInt = mthInt + 1;
+                if (mthInt<10){
+                    mthIntStr = "0"+mthInt.toString();
+                }else{
+                    mthIntStr = mthInt.toString();
+                }
+                newDate = tempArr[1].toString()+"-"+mthIntStr+"-01";
+            }
+        }else if (type==="TODAY"){
+
+        }
+        $("#show_date").val(newDate);
+        $('#show_date').datepicker('setDate', new Date(newDate));
+    }
+</script>
+
+</body>
+
+</html>

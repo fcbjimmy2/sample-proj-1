@@ -1,0 +1,738 @@
+<%- include('./header.ejs') %>
+
+<body onload="get_badge()">
+
+<!--wrapper-->
+<div class="wrapper">
+
+    <%- include('./sidebar.ejs') %>
+    <%- include('./topbar.ejs') %>
+
+    <!--start page wrapper -->
+
+    <div class="page-wrapper">
+        <div class="page-content">
+            <!--breadcrumb-->
+            <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+                <div class="ps-3">
+                    <span class="font-30"><i class="bx bx-dollar-circle"></i></span>
+                    <span class="font-24"><%= __("Claims") %></span>
+                </div>
+            </div>
+            <!--end breadcrumb-->
+            <!-- <div class="col-12 col-lg-9 mx-auto"> -->
+            <div class="card">
+                <div class="card-body">
+                    <ul class="nav nav-pills nav-pills-success mb-3" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link active" data-bs-toggle="pill" href="#pills-form" role="tab"
+                               aria-selected="true">
+                                <div class="d-flex align-items-center">
+                                    <div class="tab-icon"><i class='bx bx-file font-18 me-1'></i>
+                                    </div>
+                                    <div class="tab-title"><%= __("Form") %></div>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" data-bs-toggle="pill" href="#pills-history" role="tab"
+                               onclick="update_pending_list()"
+                               aria-selected="false">
+                                <div class="d-flex align-items-center">
+                                    <div class="tab-icon"><i class='bx bx-list-ul font-18 me-1'></i>
+                                    </div>
+                                    <div class="tab-title"><%= __("History") %></div>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="pills-form" role="tabpanel">
+
+                            <div class="card radius-10">
+                                <div class="card-body">
+                                    <!-- ################################## -->
+                                    <div class="row g-3">
+                                        <div class="col-md-3 py-3">
+                                            <label for="claim_type_sel"
+                                                   class="form-label"><%= __("Select Claim type") %></label>
+                                            <div class="d-none d-md-flex" ondblclick="get_claimtype()">
+                                                <button type="button" class="btn btn-outline-primary ms-2"
+                                                        onclick="get_claimtype()"><i
+                                                            class='bx bx-search me-0'></i></button>
+                                                <input type="text" class="form-control border-primary"
+                                                       id="claim_type_sel"
+                                                       disabled required autocomplete="off">
+                                                <input type="hidden" class="form-control" id="claim_type"
+                                                       name="claim_type"
+                                                       required autocomplete="off">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 py-3">
+                                            <label for="amount" class="form-label"><%= __("Amount") %></label>
+                                            <input type="text" class="form-control" id="amount" required
+                                                   style="text-align: right;" onkeyup="decimalCheck('amount')">
+                                        </div>
+                                        <div class="col-md-6 py-3">
+                                            <label for="description"
+                                                   class="form-label"><%= __("Description") %></label>
+                                            <input type="text" class="form-control" id="description">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-3" id="add_claim">
+                                            <a class="btn btn-secondary btn-sm radius-30 px-4" id="btn_add_claim"
+                                               onclick="add_claim_item()" type="submit"><%= __("Add") %></a><br>&nbsp;
+                                        </div>
+                                    </div>
+
+                                    <!-- ################################## -->
+                                </div>
+                            </div>
+
+                            <div class="card radius-10">
+                                <div class="card-body">
+                                    <form id="claim_form">
+                                        <input type="hidden" id="claim_cartid" name="claim_cartid">
+                                        <input type="hidden" id="claim_grand_total" name="claim_grand_total">
+                                        <div class="invoice overflow-auto">
+                                            <div>
+                                                <div class="row contacts">
+                                                    <div class="col invoice-details">
+                                                        <div class="date"><h6>Date of
+                                                                Claim: <%= new Date().toLocaleDateString('en-CA', {timeZone: 'GMT'}) %></h6>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <table id="invoice_details">
+                                                    <thead>
+                                                    <tr>
+                                                        <!-- <th class="text-center" style="width: 5%;">#</th> -->
+                                                        <th class="text-center"
+                                                            style="width: 60%;"><%= __("DESCRIPTION") %></th>
+                                                        <th class="text-left"
+                                                            style="width: 30%;"><%= __("TYPE") %></th>
+                                                        <th class="text-end"
+                                                            style="width: 8%;"><%= __("AMOUNT") %></th>
+                                                        <th class="text-center" style="width: 2%;"></th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    </tbody>
+                                                    <tfoot>
+                                                    <tr>
+                                                        <td colspan="2" class="text-end"
+                                                            style="width: 90%;"><%= __("GRAND TOTAL") %></td>
+                                                        <td class="text-end" style="width: 8%;"><span
+                                                                    id="claim_grand_total_"></span>
+                                                        </td>
+                                                        <td style="width: 2%"></td>
+                                                    </tr>
+                                                    </tfoot>
+                                                </table>
+                                                <hr>
+                                                <div class="notices">
+                                                    <div><%= __("Remarks") %>:</div>
+                                                    <div class="notice" ondblclick="edit_Remark()">
+                                                <textarea type="text" class="form-control"
+                                                          style="background-color: #FBF3D5;" id="claim_remarks"
+                                                          name="claim_remarks" rows="3" disabled></textarea>
+                                                    </div>
+                                                </div>
+                                                <div id="claim_button_container">
+                                                    <div class="p-4 float-lg-end" id="claim_button">
+                                                        <a class="btn bg-primary text-white" id="btn_claim_confirm"
+                                                           onclick="confirm_claim()"
+                                                           type="submit"><%= __("Submit") %></a>
+                                                    </div>
+                                                    <div class="p-4 float-lg-end" id="upload">
+                                                        <a class="btn bg-primary text-white" data-bs-toggle="modal"
+                                                           data-bs-target="#uploadFile"><%= __("Upload file(s)") %></a>
+                                                    </div>
+                                                    <div id="filelist_container">
+                                                    </div>
+                                                </div>
+
+
+                                                <div class="table-responsive">
+                                                    <table class="table table-striped table-sm mb-0"
+                                                           id="product_list_sm">
+                                                        <thead>
+                                                        <tr>
+                                                            <th style="width: 95%"><%= __("File(s)") %></th>
+                                                            <th style="width: 5%"></th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+                                                <div class="mx-1" id="div_btn_submit">
+                                                        <span id="confirmation"
+                                                              class="text-center text-primary font-18"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+
+                        </div>
+                        <div class="tab-pane fade" id="pills-history" role="tabpanel">
+
+                            <div class="col">
+                                <div class="card radius-10">
+                                    <div class="card-body">
+                                        <ul class="nav nav-tabs nav-secordary" role="tablist">
+                                            <li class="nav-item" role="presentation">
+                                                <a class="nav-link active" data-bs-toggle="tab"
+                                                   href="#primaryPending" role="tab"
+                                                   aria-selected="true">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="tab-icon"><i
+                                                                    class='bx bx-home font-18 me-1'></i>
+                                                        </div>
+                                                        <div class="tab-title"><%= __("Pending") %></div>
+                                                    </div>
+                                                </a>
+                                            </li>
+                                            <li class="nav-item" role="presentation">
+                                                <a class="nav-link" data-bs-toggle="tab" href="#primaryApproved"
+                                                   role="tab"
+                                                   aria-selected="false">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="tab-icon"><i
+                                                                    class='bx bx-user-pin font-18 me-1'></i>
+                                                        </div>
+                                                        <div class="tab-title"><%= __("Approved") %></div>
+                                                    </div>
+                                                </a>
+                                            </li>
+                                            <li class="nav-item" role="presentation">
+                                                <a class="nav-link" data-bs-toggle="tab" href="#primaryRejected"
+                                                   role="tab"
+                                                   aria-selected="false">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="tab-icon"><i
+                                                                    class='bx bx-user-pin font-18 me-1'></i>
+                                                        </div>
+                                                        <div class="tab-title"><%= __("Rejected") %></div>
+                                                    </div>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                        <div class="tab-content py-3">
+                                            <div class="tab-pane fade show active" id="primaryPending"
+                                                 role="tabpanel">
+                                                <div class="card">
+                                                    <div class="table-responsive">
+                                                        <table class="table mb-0 table-striped table-bordered"
+                                                               id="selection_table_search2">
+                                                            <thead class="table-light">
+                                                            <tr>
+                                                                <th class="text-md-center"
+                                                                    style="width: 10%"><%= __("Reference") %></th>
+                                                                <th class="text-md-center"
+                                                                    style="width: 10%"><%= __("Apply Date") %></th>
+                                                                <th class="text-md-center"
+                                                                    style="width: 10%"><%= __("Approver") %></th>
+                                                                <th class="text-md-center"
+                                                                    style="width: 10%"><%= __("Amount") %></th>
+                                                                <th class="text-md-center"
+                                                                    style="width: 40%"><%= __("Remarks") %></th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            <% for(let i = 0; i < claim_history.length; i++) { %>
+                                                                <% if( claim_history[i].Status === "Pending") { %>
+                                                                    <tr>
+                                                                        <td class="text-md-center"
+                                                                            style="width: 10%"><%= claim_history[i].RefNo %></td>
+                                                                        <td class="text-md-center"
+                                                                            style="width: 10%"><%= new Date(claim_history[i].AppliedDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) %></td>
+                                                                        <td class="text-md-center"
+                                                                            style="width: 10%"><%= claim_history[i].ApproverName %></td>
+                                                                        <td class="text-end"
+                                                                            style="width: 10%"><%= claim_history[i].TotalAmount %></td>
+                                                                        <td class="text-md-left"
+                                                                            style="width: 50%"><%= claim_history[i].Remarks %></td>
+                                                                    </tr>
+                                                                <% } %>
+                                                            <% } %>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="tab-pane fade" id="primaryApproved" role="tabpanel">
+                                                <div class="card">
+                                                    <div class="table-responsive">
+                                                        <table class="table mb-0 table-striped table-bordered"
+                                                               id="selection_table_search3">
+                                                            <thead class="table-light">
+                                                            <tr>
+                                                                <th class="text-md-center"
+                                                                    style="width: 10%"><%= __("Reference") %></th>
+                                                                <th class="text-md-center"
+                                                                    style="width: 10%"><%= __("Apply Date") %></th>
+                                                                <th class="text-md-center"
+                                                                    style="width: 10%"><%= __("Approver") %></th>
+                                                                <th class="text-md-center"
+                                                                    style="width: 10%"><%= __("Amount") %></th>
+                                                                <th class="text-md-center"
+                                                                    style="width: 50%"><%= __("Remarks") %></th>
+                                                                <th class="text-md-center"
+                                                                    style="width: 10%"><%= __("Date") %></th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            <% for(let i = 0; i < claim_history.length; i++) { %>
+                                                                <% if( claim_history[i].Status === "Approved") { %>
+                                                                    <tr>
+                                                                        <td class="text-md-center"
+                                                                            style="width: 10%"><%= claim_history[i].RefNo %></td>
+                                                                        <td class="text-md-center"
+                                                                            style="width: 10%"><%= new Date(claim_history[i].AppliedDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) %></td>
+                                                                        <td class="text-md-center"
+                                                                            style="width: 10%"><%= claim_history[i].ApproverName %></td>
+                                                                        <td class="text-end"
+                                                                            style="width: 10%"><%= claim_history[i].TotalAmount %></td>
+                                                                        <td class="text-md-left"
+                                                                            style="width: 50%"><%= claim_history[i].Remarks %></td>
+                                                                        <td class="text-md-center"
+                                                                            style="width: 10%"><%= new Date(claim_history[i].ApproveDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) %></td>
+                                                                    </tr>
+                                                                <% } %>
+                                                            <% } %>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="tab-pane fade" id="primaryRejected" role="tabpanel">
+                                                <div class="card">
+                                                    <div class="table-responsive">
+                                                        <table class="table mb-0 table-striped table-bordered"
+                                                               id="selection_table_search4">
+                                                            <thead class="table-light">
+                                                            <tr>
+                                                                <th class="text-md-center"
+                                                                    style="width: 10%"><%= __("Reference") %></th>
+                                                                <th class="text-md-center"
+                                                                    style="width: 10%"><%= __("Apply Date") %></th>
+                                                                <th class="text-md-center"
+                                                                    style="width: 10%"><%= __("Approver") %></th>
+                                                                <th class="text-md-center"
+                                                                    style="width: 10%"><%= __("Amount") %></th>
+                                                                <th class="text-md-center"
+                                                                    style="width: 50%"><%= __("Reject Reason") %></th>
+                                                                <th class="text-md-center"
+                                                                    style="width: 10%"><%= __("Date") %></th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            <% for(let i = 0; i < claim_history.length; i++) { %>
+                                                                <% if( claim_history[i].Status === "Rejected") { %>
+                                                                    <tr>
+                                                                        <td class="text-md-center"
+                                                                            style="width: 10%"><%= claim_history[i].RefNo %></td>
+                                                                        <td class="text-md-center"
+                                                                            style="width: 10%"><%= new Date(claim_history[i].AppliedDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) %></td>
+                                                                        <td class="text-md-center"
+                                                                            style="width: 10%"><%= claim_history[i].ApproverName %></td>
+                                                                        <td class="text-end"
+                                                                            style="width: 10%"><%= claim_history[i].TotalAmount %></td>
+                                                                        <td class="text-md-left"
+                                                                            style="width: 50%"><%= claim_history[i].RejectReason %></td>
+                                                                        <td class="text-md-center"
+                                                                            style="width: 10%"><%= new Date(claim_history[i].ApproveDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) %></td>
+                                                                    </tr>
+                                                                <% } %>
+                                                            <% } %>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- </div> -->
+
+
+            <%- include('./copyright.ejs') %>
+        </div>
+    </div>
+
+    <!--end page wrapper -->
+
+    <!-- upload Modal -->
+    <div class="modal fade" id="uploadFile" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title"><%= __("Upload file") %></h4>
+                    <button type="button" class="close" data-bs-dismiss="modal">X</button>
+                </div>
+                <div class="modal-body">
+                    <!-- Form -->
+                    <form method='post' id="uploadphoto" action="/fup/claim-img" enctype="multipart/form-data">
+                        <%= __("Select file") %>: <input type="file" name="uploaded_file" class="form-control"
+                                                         accept=".jpg, .png, .pdf, image/jpeg, image/png"><br>
+                        <input type="button" class="btn btn-secondary" value='<%= __("Upload") %>' id="btn_upload">
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- upload Modal ended -->
+
+    <!-- claim type modal -->
+    <div class="modal fade" id="claimtype_Modal" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table class="table mb-0 table-striped table-sm table-bordered table-hover"
+                                   id="selection_table_search3">
+                                <thead class="table-light">
+                                <tr>
+                                    <th class="text-md-center"><%= __("Please select claim type") %></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <% var show_claim_type;
+                                for(let i = 0; i < claim_type.length; i++) {
+                                    if (req.session.lang === 'zh-HK') {
+                                        show_claim_type = claim_type[i].HK
+                                    } else if (req.session.lang === 'zh-CN') {
+                                        show_claim_type = claim_type[i].CN
+                                    } else {
+                                        show_claim_type = claim_type[i].Type
+                                    }
+                                %>
+                                <tr onclick="use_this_claimtype('<%= show_claim_type %>','<%= claim_type[i].Type %>')">
+                                    <td class="text-md-center"><%= show_claim_type %></td>
+                                </tr>
+                                <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- claim type modal ended -->
+
+    <%- include('./footer.ejs') %>
+
+</div>
+<!--wrapper ended-->
+
+<script type="text/javascript">
+    var sTempid = get_tempid();
+    var claim_submitted = false;
+
+    function get_tempid() {
+        var e = '';
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/prod/prod_create',
+            data: {action: 'get_tempid'},
+            success: function (return_data) {
+                e = return_data[0].UID;
+            }
+        });
+        return e;
+    }
+
+    function decimalCheck(e) {
+        let dec = $('#' + e).val();
+        // console.log(dec);
+        $('#' + e).val(dec.replace(/[^0-9.,-]/g, ''));
+        if (dec.includes(".")) {
+            let res = dec.substring(dec.indexOf(".") + 1);
+            let kl = res.split("");
+            if (kl.length > 1) {
+                $('#' + e).val((parseInt(dec * 100) / 100).toFixed(2));
+            }
+        }
+    }
+
+    function intCheck(e) {
+        let dec = $('#' + e).val();
+        //console.log('check int for '+ dec);
+        //console.log('row id = '+ e);
+        //console.log('replace with : ' + dec.replace(/[^0-9]/g, ''));
+        $('#' + e).val(dec.replace(/[^0-9]/g, ''));
+    }
+
+    function del_claim_item(id) {
+        if (!(claim_submitted)) {
+            let e = 'claim_unitprice-' + id;
+            let del_item_price = $('#' + e).val();
+            let current_grand_total = $('#claim_grand_total').val();
+            let new_grand_total = Number(current_grand_total - del_item_price); // take out item
+            // set new grand total
+            $('#claim_grand_total_').text(new_grand_total);
+            $('#claim_grand_total').val(new_grand_total);
+            // then update database
+            remove_claim_item(id);
+            // update_claim_grandtotal(id, new_grand_total);
+            // remove the row
+            console.log('removing + #claim_table-row-' + id)
+            $("#invoice_details").DataTable().rows($('#claim_table-row-' + id)).remove();
+            $('#invoice_details').DataTable().draw(false);
+        }
+    }
+
+    function add_claim_item() {
+        if (!(claim_submitted)) {
+            let id;
+            let exp_type = $('#claim_type').val();
+            let details = $('#description').val();
+            let amount = $('#amount').val();
+            let grand_total = Number($('#claim_grand_total').val());
+            if (exp_type === '') {
+                $('#promptMSG').text('<%= __("Please select claim type") %>');
+                $('#msgModal').modal('show');
+                $('#claim_type_sel').addClass("border-danger-input_alert");
+                return;
+            } else {
+                $('#claim_type_sel').removeClass("border-danger-input_alert");
+            }
+            if (amount === '') {
+                $('#promptMSG').text('<%= __("Please enter amount") %>');
+                $('#msgModal').modal('show');
+                $('#amount').addClass("border-danger-input_alert");
+                return;
+            } else {
+                $('#amount').removeClass("border-danger-input_alert");
+            }
+            if (details === '') {
+                $('#promptMSG').text('<%= __("Please enter amount") %>');
+                $('#msgModal').modal('show');
+                $('#description').addClass("border-danger-input_alert");
+                return;
+            } else {
+                $('#description').removeClass("border-danger-input_alert");
+            }
+            $.ajax({
+                type: 'post',
+                url: '/user/claims',
+                data: {
+                    action: 'add_claim_item',
+                    cartid: sTempid,
+                    exp_type: exp_type,
+                    details: details,
+                    amount: amount
+                },
+                success: function (return_data) {
+                    id = return_data[0].Idx;
+                    grand_total += return_data[0].Amount;
+                    this_row = ``;
+                    this_row += `<tr id="claim_table-row-` + return_data[0].Idx + `">`;
+                    this_row += `	<td class="text-left" style="width: 60%;">`;
+                    this_row += `		<h3>` + return_data[0].Details + `</h3>`;
+                    this_row += `	</td>`;
+                    this_row += `	<td class="text-left" style="width: 30%;">`;
+                    this_row += `		<h3>` + return_data[0].ExpensesType + `</h3>`;
+                    this_row += `	</td>`;
+                    this_row += `	<td class="text-end" style="width: 8%;">`;
+                    this_row += `		<h3>` + return_data[0].Amount + `</h3>`;
+                    this_row += `	</td>`;
+                    this_row += `	<td class="total text-end"  style="width: 2%;">`;
+                    this_row += `   	<button type="button" class="btn-close" onclick="del_claim_item(` + return_data[0].Idx + `)"></button>`;
+                    this_row += `   </td>`;
+                    this_row += `</tr>`;
+                    $('#invoice_details').DataTable().row.add($(this_row)).draw(false);
+                    $('#claim_grand_total_').text(grand_total);
+                    $('#claim_grand_total').val(grand_total);
+                    $('#claim_type_sel').val('');
+                    $('#description').val('');
+                    $('#amount').val('');
+                    $('#claim_type_sel').val('');
+                    $('#description').val('');
+                    $('#amount').val('');
+                }
+            });
+        }
+    }
+
+    function remove_claim_item(idx) {
+        if (!(claim_submitted)) {
+            $.ajax({
+                type: 'post',
+                url: '/user/claims',
+                data: {action: 'remove_claim_item', idx: idx},
+                success: function (return_data) {
+                    return true;
+                }
+            });
+        }
+    }
+
+    function edit_Remark() {
+        if (!(claim_submitted)) {
+            $('#claim_remarks').prop('disabled', false);
+            $('#claim_remarks').focus();
+        }
+    }
+
+    function confirm_claim() {
+        if ($('#claim_grand_total').val() < 1) {
+            $('#promptMSG').text('<%= __("Please add claim item") %>');
+            $('#msgModal').modal('show');
+            return false;
+        }
+        let remarks = $('#claim_remarks').val();
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/user/claims',
+            data: {action: 'save_claim', cartid: sTempid, remarks: remarks},
+            success: function (return_data) {
+                // console.log(return_data);
+                $('#claim_button_container').hide();
+                $('#confirmation').text('Form Submitted');
+            }
+        });
+        // resume everything after 2 sec
+        setTimeout(resume_normal, 4000)
+    }
+
+    function resume_normal() {
+        sTempid = get_tempid();
+        claim_submitted = false;
+        $('#claim_button_container').show();
+        $('#confirmation').text('');
+        $('#invoice_details').DataTable().data().clear().draw();
+        $('#product_list_sm').DataTable().data().clear().draw();
+        $('#claim_grand_total_').text('');
+        $('#claim_grand_total').val('');
+        $('#claim_type_sel').val('');
+        $('#claim_remarks').val('');
+    }
+
+    function listfile() {
+        $('#product_list_sm').DataTable().data().clear().draw();
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/fup/claim-img',
+            data: {action: 'listF', id: sTempid},
+            success: function (return_data) {
+                $.each(return_data, function (i) {
+                    this_row = `<tr>`;
+                    this_row += `<td> <a  onclick="show_f('` + return_data[i] + `')">` + return_data[i] + `</a> </td>`;
+                    this_row += `<td><button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="delete_this_file('` + return_data[i] + `')"><i class='bx bx-trash me-0'></i></button></td>`;
+                    this_row += `</tr>`;
+                    // alert(this_row);
+                    $('#product_list_sm').DataTable().row.add($(this_row)).draw(false);
+                });
+            }
+        });
+    }
+
+    function delete_this_file(fn) {
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/fup/claim-img',
+            data: {action: 'removeF', id: sTempid, fn: fn},
+            success: function (return_data) {
+                // alert(return_data);
+            }
+        });
+        listfile();
+    }
+
+    function update_pending_list() {
+        $('#selection_table_search2').DataTable().data().clear();
+        $.ajax({
+            type: 'post',
+            url: '/user/claims',
+            data: {action: 'update_claim_history'},
+            success: function (return_data) {
+                $.each(return_data, function (i) {
+                    if (return_data[i].Status === "Pending") {
+                        this_row = ``;
+                        this_row += `<tr>`;
+                        this_row += `    <td class="text-md-center" style="width: 10%">` + return_data[i].RefNo + `</td>`;
+                        this_row += `    <td class="text-md-center" style="width: 10%">` + new Date(return_data[i].AppliedDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) + `</td>`;
+                        this_row += `    <td class="text-md-center" style="width: 10%">` + return_data[i].ApproverName + `</td>`;
+                        this_row += `    <td class="text-end" style="width: 10%">` + return_data[i].TotalAmount + `</td>`;
+                        this_row += `    <td class="text-md-left" style="width: 50%">` + return_data[i].Remarks + `</td>`;
+                        this_row += `</tr>`;
+                        $('#selection_table_search2').DataTable().row.add($(this_row)).draw();
+                    }
+                });
+            }
+        });
+    }
+
+    function get_claimtype() {
+        $('#claimtype_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#claimtype_Modal').modal('show');
+    }
+
+    function use_this_claimtype(v, n) {
+        // value used to pass to the form
+        $('#claim_type_sel').val(v);
+        // showing
+        $('#claim_type').val(n);
+        $('#claimtype_Modal').modal('hide');
+    }
+
+    function show_f(e) {
+        let f_url = '<embed src="/fup/claim-img-view?id=' + sTempid + '&fn=' + e + ' " frameborder="0" width="100%" height="600px">';
+        //alert(f_url)
+        $('#file_url').html(f_url);
+        $('#showFile_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#showFile_Modal').modal('show');
+    }
+
+    //upload file
+    $('#btn_upload').click(function () {
+        let formData = new FormData($("#uploadphoto")[0]);
+        formData.append("id", sTempid);
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/fup/claim-img-up',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (return_data) {
+                document.getElementById("uploadphoto").reset()
+                $('#uploadFile').modal('hide');
+                // let file_id = return_data.split('Successful-')[1];
+                listfile();
+            }
+        });
+
+    });
+
+</script>
+
+</body>
+
+</html>

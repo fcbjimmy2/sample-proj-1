@@ -1,0 +1,728 @@
+<%- include('./header.ejs') %>
+
+<body onload="get_badge()">
+
+<!--wrapper-->
+<div class="wrapper">
+
+    <%- include('./sidebar.ejs') %>
+    <%- include('./topbar.ejs') %>
+
+    <!--start page wrapper -->
+
+    <div class="page-wrapper">
+        <div class="page-content">
+            <!--breadcrumb-->
+            <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+                <div class="ps-3">
+                    <span class="font-30"><i class="bx bx-calendar-edit"></i></span>
+                    <span class="font-24"><%= __("Leaves") %></span>
+                </div>
+            </div>
+            <!--end breadcrumb-->
+
+            <!-- <div class="col-12 col-lg-9 mx-auto"> -->
+
+                <div class="card">
+                    <div class="card-body">
+                        <ul class="nav nav-pills nav-pills-success mb-3" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link active" data-bs-toggle="pill" href="#pills-form" role="tab"
+                                   aria-selected="true">
+                                    <div class="d-flex align-items-center">
+                                        <div class="tab-icon"><i class='bx bx-file font-18 me-1'></i>
+                                        </div>
+                                        <div class="tab-title"><%=__("Form")%></div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link" data-bs-toggle="pill" href="#pills-history" role="tab" onclick="update_leaves_history()"
+                                   aria-selected="false">
+                                    <div class="d-flex align-items-center">
+                                        <div class="tab-icon"><i class='bx bx-list-ul font-18 me-1'></i>
+                                        </div>
+                                        <div class="tab-title"><%=__("History")%></div>
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane fade show active" id="pills-form" role="tabpanel">
+
+                                <div class="card radius-10">
+                                    <div class="card-body">
+                                        <div class="row mx-3">
+                                            <div class="col-sm-4">
+                                                <label for="start_date"
+                                                       class="form-label"><%= __("Start From") %></label>
+                                                <input type="text" class="form-control" id="start_date"
+                                                       name="start_date" onchange="check_sch()" required
+                                                       autocomplete="off">
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <br><br>
+                                                <input type="radio" class="form-check-input" id="start_am" name="start_apm" value="AM"
+                                                       onchange="check_sch()" required> <%= __("AM") %>
+                                                <input type="radio" class="form-check-input" id="start_pm" name="start_apm" value="PM"
+                                                       onchange="check_sch()" required> <%= __("PM") %>
+                                            </div>
+                                        </div>
+                                        <div class="row mx-3">
+                                            <div class="col-sm-4">
+                                                <label for="end_date" class="form-label"><%= __("Up To") %></label>
+                                                <input type="text" class="form-control" id="end_date" name="end_date"
+                                                       onchange="check_sch()" required autocomplete="off">
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <br><br>
+                                                <input type="radio" class="form-check-input" id="end_am" name="end_apm" value="AM"
+                                                       onchange="check_sch()" required> <%= __("AM") %>
+                                                <input type="radio" class="form-check-input" id="end_pm" name="end_apm" value="PM"
+                                                       onchange="check_sch()" required> <%= __("PM") %>
+                                            </div>
+                                        </div>
+                                        <div class="row mx-3">
+                                            <div class="col-sm-4">
+                                                <label for="leave_type"
+                                                       class="form-label"><%= __("Please select leave type") %></label>
+                                                <div class="d-none d-md-flex" ondblclick="get_claimtype()">
+                                                <button type="button" class="btn btn-outline-primary ms-2"
+                                                        onclick="get_leavetype()"><i
+                                                            class='bx bx-search me-0'></i></button>
+                                                <input type="text" class="form-control border-primary"
+                                                       id="leave_type_sel"
+                                                       disabled required autocomplete="off">
+                                                <input type="hidden" class="form-control" id="leave_type"
+                                                       name="leave_type"
+                                                       required autocomplete="off">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mx-3">
+                                            <div class="col-sm-4">
+                                                <label for="remark" class="form-label"><%= __("Remark") %></label>
+                                                <textarea type="text" class="form-control" id="remark" name="remark"
+                                                          rows="4"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="row mx-3">
+                                            <p class="text-center text-primary"><%= __("Affected time slots") %></p>
+                                        </div>
+                                        <div class="row mx-3">
+                                            <div class="text-center">
+                                                <div class="table-responsive">
+                                                    <table class="table mb-0 table-striped table-bordered"
+                                                           id="product_list_sm">
+                                                        <thead class="table-light">
+                                                        <tr>
+                                                            <th class="text-md-center"><%= __("Course Code") %></th>
+                                                            <th class="text-md-center"><%= __("Class Code") %></th>
+                                                            <th class="text-md-center"><%= __("Class Description") %></th>
+                                                            <th class="text-md-center"><%= __("Class Date") %></th>
+                                                            <th class="text-md-center"><%= __("Start Time") %></th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row mx-3 col-9">
+                                            <div class="mx-1" id="div_btn_submit"><br>
+                                                <a class="btn btn-primary" id="btn_submit"
+                                                   onclick="submit_sch()"><%= __("Submit") %></a>
+                                            </div>
+                                            <div class="mx-1" id="div_btn_submit">
+                                                <span id="confirmation" class="text-center text-primary font-18"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="tab-pane fade" id="pills-history" role="tabpanel">
+
+                                <div class="col">
+                                    <div class="card radius-10">
+                                        <div class="card-body">
+                                            <ul class="nav nav-tabs nav-secordary" role="tablist">
+                                                <li class="nav-item" role="presentation">
+                                                    <a class="nav-link active" data-bs-toggle="tab"
+                                                       href="#primaryPending" role="tab"
+                                                       aria-selected="true">
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="tab-icon"><i
+                                                                        class='bx bx-home font-18 me-1'></i>
+                                                            </div>
+                                                            <div class="tab-title"><%=__("Pending")%></div>
+                                                        </div>
+                                                    </a>
+                                                </li>
+                                                <li class="nav-item" role="presentation">
+                                                    <a class="nav-link" data-bs-toggle="tab" href="#primaryApproved"
+                                                       role="tab"
+                                                       aria-selected="false">
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="tab-icon"><i
+                                                                        class='bx bx-user-pin font-18 me-1'></i>
+                                                            </div>
+                                                            <div class="tab-title"><%=__("Approved")%></div>
+                                                        </div>
+                                                    </a>
+                                                </li>
+                                                <li class="nav-item" role="presentation">
+                                                    <a class="nav-link" data-bs-toggle="tab" href="#primaryRejected"
+                                                       role="tab"
+                                                       aria-selected="false">
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="tab-icon"><i
+                                                                        class='bx bx-user-pin font-18 me-1'></i>
+                                                            </div>
+                                                            <div class="tab-title"><%=__("Rejected")%></div>
+                                                        </div>
+                                                    </a>
+                                                </li>
+                                                <li class="nav-item" role="presentation">
+                                                    <a class="nav-link" data-bs-toggle="tab" href="#primaryCancelled"
+                                                       role="tab"
+                                                       aria-selected="false">
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="tab-icon"><i
+                                                                        class='bx bx-user-pin font-18 me-1'></i>
+                                                            </div>
+                                                            <div class="tab-title"><%=__("Cancelled")%></div>
+                                                        </div>
+                                                    </a>
+                                                </li>
+                                            </ul>
+
+                                            <div class="tab-content py-3">
+                                                <div class="tab-pane fade show active" id="primaryPending"
+                                                     role="tabpanel">
+                                                    <div class="card">
+                                                        <div class="table-responsive">
+                                                            <table class="table mb-0 table-striped table-bordered"
+                                                                   id="selection_table_search2">
+                                                                <thead class="table-light">
+                                                                <tr>
+                                                                    <th class="text-md-center"
+                                                                        style="width: 10%"><%= __("Reference") %></th>
+                                                                    <th class="text-md-center"
+                                                                        style="width: 10%"><%= __("Apply Date") %></th>
+                                                                    <th class="text-md-center"
+                                                                        style="width: 10%"><%= __("Approver") %></th>
+                                                                    <th class="text-md-center"
+                                                                        style="width: 10%"><%= __("Start Date") %></th>
+                                                                    <th class="text-md-center"
+                                                                        style="width: 10%"><%= __("Total Days") %></th>
+                                                                    <th class="text-md-center"
+                                                                        style="width: 47%"><%= __("Remarks") %></th>
+                                                                    <th style="width: 3%"></th>
+                                                                </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                <% for(let i = 0; i < leaves_apply_history.length; i++) { %>
+                                                                    <% if( leaves_apply_history[i].Status === "Pending") { %>
+                                                                        <tr>
+                                                                            <td class="text-md-center"
+                                                                                style="width: 10%"><%= leaves_apply_history[i].RefNo %></td>
+                                                                            <td class="text-md-center"
+                                                                                style="width: 10%"><%= new Date(leaves_apply_history[i].AppliedDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) %></td>
+                                                                            <td class="text-md-center"
+                                                                                style="width: 10%"><%= leaves_apply_history[i].ApproverName %></td>
+                                                                            <td class="text-md-center"
+                                                                                style="width: 10%"><%= leaves_apply_history[i].StartDate %></td>
+                                                                            <td class="text-md-right"
+                                                                                style="width: 10%"><%= leaves_apply_history[i].TotalDays %></td>
+                                                                            <td class="text-md-left"
+                                                                                style="width: 47%"><%= leaves_apply_history[i].Remarks %></td>
+                                                                            <td style="width: 3%">
+                                                                                <button type="button" class="btn btn-sm btn-outline-danger ms-2"  onclick="delete_this_sch('<%= leaves_apply_history[i].RefNo %>')"><i class='bx bx-trash me-0'></i></button></td>
+                                                                     </tr>
+                                                                    <% } %>
+                                                                <% } %>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="tab-pane fade" id="primaryApproved" role="tabpanel">
+                                                    <div class="card">
+                                                        <div class="table-responsive">
+                                                            <table class="table mb-0 table-striped table-bordered"
+                                                                   id="selection_table_search3">
+                                                                <thead class="table-light">
+                                                                <tr>
+                                                                    <th class="text-md-center"
+                                                                        style="width: 10%"><%= __("Reference") %></th>
+                                                                    <th class="text-md-center"
+                                                                        style="width: 10%"><%= __("Apply Date") %></th>
+                                                                    <th class="text-md-center"
+                                                                        style="width: 10%"><%= __("Approver") %></th>
+                                                                    <th class="text-md-center"
+                                                                        style="width: 10%"><%= __("Start Date") %></th>
+                                                                    <th class="text-md-center"
+                                                                        style="width: 10%"><%= __("Total Days") %></th>
+                                                                    <th class="text-md-center"
+                                                                        style="width: 40%"><%= __("Approver Remarks") %></th>
+                                                                    <th class="text-md-center"
+                                                                        style="width: 10%"><%= __("Date") %></th>
+                                                                </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                <% for(let i = 0; i < leaves_apply_history.length; i++) { %>
+                                                                    <% if( leaves_apply_history[i].Status === "Approved") { %>
+                                                                        <tr>
+                                                                            <td class="text-md-center"
+                                                                                style="width: 10%"><%= leaves_apply_history[i].RefNo %></td>
+                                                                            <td class="text-md-center"
+                                                                                style="width: 10%"><%= new Date(leaves_apply_history[i].AppliedDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) %></td>
+                                                                            <td class="text-md-center"
+                                                                                style="width: 10%"><%= leaves_apply_history[i].ApproverName %></td>
+                                                                            <td class="text-md-center"
+                                                                                style="width: 10%"><%= leaves_apply_history[i].StartDate %></td>
+                                                                            <td class="text-md-right"
+                                                                                style="width: 10%"><%= leaves_apply_history[i].TotalDays %></td>
+                                                                            <td class="text-md-left"
+                                                                                style="width: 40%"><%= leaves_apply_history[i].RejectReason %></td>
+                                                                            <td class="text-md-center"
+                                                                                style="width: 10%"><%= new Date(leaves_apply_history[i].ApproveDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) %></td>
+                                                                        </tr>
+                                                                    <% } %>
+                                                                <% } %>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="tab-pane fade" id="primaryRejected" role="tabpanel">
+                                                    <div class="card">
+                                                        <div class="table-responsive">
+                                                            <table class="table mb-0 table-striped table-bordered"
+                                                                   id="selection_table_search4">
+                                                                <thead class="table-light">
+                                                                <tr>
+                                                                    <th class="text-md-center"
+                                                                        style="width: 10%"><%= __("Reference") %></th>
+                                                                    <th class="text-md-center"
+                                                                        style="width: 10%"><%= __("Apply Date") %></th>
+                                                                    <th class="text-md-center"
+                                                                        style="width: 10%"><%= __("Approver") %></th>
+                                                                    <th class="text-md-center"
+                                                                        style="width: 10%"><%= __("Start Date") %></th>
+                                                                    <th class="text-md-center"
+                                                                        style="width: 10%"><%= __("Total Days") %></th>
+                                                                    <th class="text-md-center"
+                                                                        style="width: 40%"><%= __("Reject Reason") %></th>
+                                                                    <th class="text-md-center"
+                                                                        style="width: 10%"><%= __("Date") %></th>
+                                                                </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                <% for(let i = 0; i < leaves_apply_history.length; i++) { %>
+                                                                    <% if( leaves_apply_history[i].Status === "Rejected") { %>
+                                                                        <tr>
+                                                                            <td class="text-md-center"
+                                                                                style="width: 10%"><%= leaves_apply_history[i].RefNo %></td>
+                                                                            <td class="text-md-center"
+                                                                                style="width: 10%"><%= new Date(leaves_apply_history[i].AppliedDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) %></td>
+                                                                            <td class="text-md-center"
+                                                                                style="width: 10%"><%= leaves_apply_history[i].ApproverName %></td>
+                                                                            <td class="text-md-center"
+                                                                                style="width: 10%"><%= leaves_apply_history[i].StartDate %></td>
+                                                                            <td class="text-md-right"
+                                                                                style="width: 10%"><%= leaves_apply_history[i].TotalDays %></td>
+                                                                            <td class="text-md-left"
+                                                                                style="width: 40%"><%= leaves_apply_history[i].RejectReason %></td>
+                                                                            <td class="text-md-center"
+                                                                                style="width: 10%"><%= new Date(leaves_apply_history[i].ApproveDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) %></td>
+                                                                        </tr>
+                                                                    <% } %>
+                                                                <% } %>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="tab-pane fade" id="primaryCancelled" role="tabpanel">
+                                                    <div class="card">
+                                                        <div class="table-responsive">
+                                                            <table class="table mb-0 table-striped table-bordered"
+                                                                   id="selection_table_search5">
+                                                                <thead class="table-light">
+                                                                <tr>
+                                                                    <th class="text-md-center"
+                                                                        style="width: 10%"><%= __("Reference") %></th>
+                                                                    <th class="text-md-center"
+                                                                        style="width: 10%"><%= __("Apply Date") %></th>
+                                                                    <th class="text-md-center"
+                                                                        style="width: 10%"><%= __("Approver") %></th>
+                                                                    <th class="text-md-center"
+                                                                        style="width: 10%"><%= __("Start Date") %></th>
+                                                                    <th class="text-md-center"
+                                                                        style="width: 10%"><%= __("Total Days") %></th>
+                                                                    <th class="text-md-center"
+                                                                        style="width: 50%"><%= __("Remarks") %></th>
+                                                                </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                <% for(let i = 0; i < leaves_apply_history.length; i++) { %>
+                                                                    <% if( leaves_apply_history[i].Status === "Cancelled") { %>
+                                                                        <tr>
+                                                                            <td class="text-md-center"
+                                                                                style="width: 10%"><%= leaves_apply_history[i].RefNo %></td>
+                                                                            <td class="text-md-center"
+                                                                                style="width: 10%"><%= new Date(leaves_apply_history[i].AppliedDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) %></td>
+                                                                            <td class="text-md-center"
+                                                                                style="width: 10%"><%= leaves_apply_history[i].ApproverName %></td>
+                                                                            <td class="text-md-center"
+                                                                                style="width: 10%"><%= leaves_apply_history[i].StartDate %></td>
+                                                                            <td class="text-md-right"
+                                                                                style="width: 10%"><%= leaves_apply_history[i].TotalDays %></td>
+                                                                            <td class="text-md-left"
+                                                                                style="width: 50%"><%= leaves_apply_history[i].Remarks %></td>
+                                                                        </tr>
+                                                                    <% } %>
+                                                                <% } %>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            <!-- </div> -->
+
+            <%- include('./copyright.ejs') %>
+        </div>
+    </div>
+
+    <!--end page wrapper -->
+
+    <!-- leave type modal -->
+    <div class="modal fade" id="leavetype_Modal" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table class="table mb-0 table-striped table-sm table-bordered table-hover"
+                                   id="selection_table_search3">
+                                <thead class="table-light">
+                                <tr>
+                                    <th class="text-md-center"><%= __("Please select leave type") %></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <%  var show_leave_type;
+                                for(let i = 0; i < return_data.length; i++) {
+                                    if (req.session.lang==='zh-HK') {
+                                        show_leave_type =  return_data[i].HK
+                                    } else if (req.session.lang==='zh-CN') {
+                                        show_leave_type =  return_data[i].CN
+                                    } else {
+                                        show_leave_type =  return_data[i].Type
+                                    }
+                                %>
+                                <tr onclick="use_this_leavetype('<%= show_leave_type %>','<%=return_data[i].Type%>')">
+                                    <td class="text-md-center"><%= show_leave_type %></td>
+                                </tr>
+                                <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- leave type modal ended -->
+
+    <%- include('./footer.ejs') %>
+
+</div>
+<!--wrapper ended-->
+
+<script type="text/javascript">
+
+    function check_leave_type() {
+        let e = $('#leave_type').val();
+        if (e === '') {
+            $('#promptMSG').text('<%= __("Please select a leave type") %>');
+            $('#msgModal').modal('show');
+            $('#leave_type').addClass("border-danger-input_alert");
+            return false;
+        } else {
+            $('#leave_type').removeClass("border-danger-input_alert");
+            return true;
+        }
+    }
+
+    function use_this_leavetype(v,n) {
+        // value used to pass to the form
+        $('#leave_type_sel').val(v);
+        // showing
+        $('#leave_type').val(n);
+        $('#leavetype_Modal').modal('hide');
+    }
+
+    function get_leavetype() {
+		$('#leavetype_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#leavetype_Modal').modal('show');
+    }
+
+    function check_start_date() {
+        let e = $('#start_date').val();
+        if (e === '') {
+            $('#promptMSG').text('<%= __("Please enter start date") %>');
+            $('#msgModal').modal('show');
+            $('#start_date').addClass("border-danger-input_alert");
+            return false;
+        } else {
+            $('#start_date').removeClass("border-danger-input_alert");
+            return true;
+        }
+    }
+
+    function check_start_time() {
+        let e = $('input[name="start_apm"]:checked').val();
+        if (e === undefined) {
+            $('#promptMSG').text('<%= __("Please select AM/PM of start date") %>');
+            $('#msgModal').modal('show');
+            $('#start_am').addClass("border-danger-input_alert");
+            $('#start_pm').addClass("border-danger-input_alert");
+            return false;
+        } else {
+            $('#start_am').removeClass("border-danger-input_alert");
+            $('#start_pm').removeClass("border-danger-input_alert");
+            return true;
+        }
+    }
+
+    function check_end_date() {
+        let e = $('#end_date').val();
+        if (e === '') {
+            $('#promptMSG').text('<%= __("Please enter last date") %>');
+            $('#msgModal').modal('show');
+            $('#end_date').addClass("border-danger-input_alert");
+            return false;
+        } else {
+            $('#end_date').removeClass("border-danger-input_alert");
+            return true;
+        }
+    }
+
+    function check_end_time() {
+        let e = $('input[name="end_apm"]:checked').val();
+        if (e === undefined) {
+            $('#promptMSG').text('<%= __("Please select AM/PM of last date") %>');
+            $('#msgModal').modal('show');
+            $('#end_am').addClass("border-danger-input_alert");
+            $('#end_pm').addClass("border-danger-input_alert");
+            return false;
+        } else {
+            $('#end_am').removeClass("border-danger-input_alert");
+            $('#end_pm').removeClass("border-danger-input_alert");
+            return true;
+        }
+    }
+
+    function check_sch() {
+        let sdate = $('#start_date').val();
+        let edate = $('#end_date').val();
+        let sapm = $('input[name="start_apm"]:checked').val();
+        let eapm = $('input[name="end_apm"]:checked').val();
+        if (sdate !== '' && edate !== '' && sapm !== undefined && eapm !== undefined) {
+            if ((new Date(sdate) < new Date(edate)) || ((sdate === edate) && (sapm === 'AM' && eapm === 'PM')) || ((sdate === edate) && (sapm === eapm))) {
+                //console.log('check schedule');
+                $('#product_list_sm').DataTable().data().clear();
+                $.ajax({
+                    type: 'post',
+                    url: '/user/leaves',
+                    data: {action: 'check_job_sch', sdate: sdate, edate: edate, sapm: sapm, eapm: eapm},
+                    success: function (return_data) {
+                        // console.log(return_data);
+                        if (return_data.length > 0) {
+                            $.each(return_data, function (i) {
+                                this_row = `<tr>`;
+                                this_row += `<td class="text-md-left">` + return_data[i].CourseCode + `</td>`;
+                                this_row += `<td class="text-md-left">` + return_data[i].ClassCode + `</td>`;
+                                this_row += `<td class="text-md-center">` + return_data[i].ClassDesc + `</td>`;
+                                this_row += `<td class="text-md-center">` + new Date(return_data[i].ClassDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) + `</td>`;
+                                this_row += `<td class="text-md-center">` + new Date(return_data[i].StartTime).toLocaleTimeString('en-CA', {timeZone: 'GMT'}) + `</td>`;
+                                this_row += `</tr>`;
+                                $('#product_list_sm').DataTable().row.add($(this_row)).draw(false);
+                            });
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    function submit_sch() {
+        let sdate = $('#start_date').val();
+        let edate = $('#end_date').val();
+        let sapm = $('input[name="start_apm"]:checked').val();
+        let eapm = $('input[name="end_apm"]:checked').val();
+        let remark = $('#remark').val();
+        let leave_type = $('#leave_type').val();
+
+        if (check_start_date() && check_start_time() && check_end_date() && check_end_time() && check_leave_type()) {
+            // lock up the button first
+            $('#btn_submit').removeAttr('onclick');
+            $('#btn_submit').attr('disabled', 'disabled');
+            $.ajax({
+                async: false,
+                type: 'post',
+                url: '/user/leaves',
+                data: {
+                    action: 'submit_sch',
+                    sdate: sdate,
+                    edate: edate,
+                    sapm: sapm,
+                    eapm: eapm,
+                    remark: remark,
+                    leave_type: leave_type
+                },
+                success: function (return_data) {
+                    // console.log(return_data);
+                    $('#div_btn_submit').hide();
+                    $('#confirmation').text('Form Submitted');
+                }
+            });
+            // resume everything after 2 sec
+            setTimeout(resume_normal, 4000)
+        }
+        update_leaves_history();
+    }
+
+    function resume_normal() {
+        $('#btn_submit').removeAttr('disabled');
+        $('#btn_submit').attr('onclick', 'submit_sch()');
+        $('#div_btn_submit').show();
+        $('#confirmation').text('');
+        $('#start_date').val('');
+        $('#end_date').val('');
+        $('input[name=start_apm]').prop('checked', false);
+        $('input[name=end_apm]').prop('checked', false);
+        $('#remark').val('');
+        $('#leave_type').val('');
+        $('#leave_type_sel').val('');
+        $('#product_list_sm').DataTable().data().clear().draw();
+    }
+
+    function delete_this_sch(ref) {
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/user/leaves',
+            data: {
+                action: 'delete_sch',
+                ref: ref
+            },
+            success: function (return_data) {
+                // console.log(return_data);
+                $('#div_btn_submit').hide();
+                $('#confirmation').text('Form Submitted');
+            }
+        });
+        update_leaves_history()
+    }
+
+    function update_leaves_history() {
+        // update history for pend and canelled
+        $('#selection_table_search2').DataTable().data().clear();
+        $('#selection_table_search5').DataTable().data().clear();
+        $.ajax({
+            type: 'post',
+            url: '/user/leaves',
+            data: {action: 'update_leaves_history'},
+            success: function (return_data) {
+                $.each(return_data, function (i) {
+                    this_row = `
+                    <tr>
+                        <td class="text-md-center"
+                            style="width: 10%">`+ return_data[i].RefNo +`</td>
+                        <td class="text-md-center"
+                            style="width: 10%">`+ new Date(return_data[i].AppliedDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) +`</td>
+                        <td class="text-md-center"
+                            style="width: 10%">`+ return_data[i].ApproverName +`</td>
+                        <td class="text-md-center"
+                            style="width: 10%">`+ return_data[i].StartDate +`</td>
+                        <td class="text-md-right"
+                            style="width: 10%">`+ return_data[i].TotalDays +`</td>`;
+                    if (return_data[i].Status === "Pending") {
+                        this_row += `
+                            <td class="text-md-left" style="width: 47%">` + return_data[i].Remarks + `</td>
+                            <td class="style="width: 3%">
+                            <button type="button" class="btn btn-sm btn-outline-danger ms-2"  
+                            onclick="delete_this_sch('` + return_data[i].RefNo + `')"><i class='bx bx-trash me-0'></i></button></td>
+                          </tr>`;
+                        $('#selection_table_search2').DataTable().row.add($(this_row)).draw();
+                    }
+                    if (return_data[i].Status === "Cancelled") {
+                        this_row += `
+                        <td class="text-md-left"
+                            style="width: 50%">` + return_data[i].Remarks + `</td>
+                    </tr>`;
+                        $('#selection_table_search5').DataTable().row.add($(this_row)).draw();
+                    }
+                });
+            }
+        });
+    }
+    $(document).ready(function () {
+        $('#start_date').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            format: "yyyy-mm-dd",
+            <% if(req.session.lang === 'zh-HK') { %>
+            language: "zh-TW",
+            <% } else if(req.session.lang === 'zh-CN') { %>
+            language: "zh-CN",
+            <% } else { %>
+            language: "en-CA",
+            <% } %>
+        });
+        $('#end_date').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            format: "yyyy-mm-dd",
+            <% if(req.session.lang === 'zh-HK') { %>
+            language: "zh-TW",
+            <% } else if(req.session.lang === 'zh-CN') { %>
+            language: "zh-CN",
+            <% } else { %>
+            language: "en-CA",
+            <% } %>
+        });
+    });
+</script>
+
+</body>
+
+</html>
+
+
+
+
+
+
+
+

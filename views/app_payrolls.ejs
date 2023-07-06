@@ -1,0 +1,156 @@
+<%- include('./header.ejs') %>
+
+<body onload="get_badge()">
+
+<!--wrapper-->
+<div class="wrapper">
+
+    <%- include('./sidebar.ejs') %>
+    <%- include('./topbar.ejs') %>
+
+    <!--start page wrapper -->
+    <div class="page-wrapper">
+        <div class="page-content">
+            <!--breadcrumb-->
+            <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+                <div class="ps-3">
+                        <span class="font-30">
+                            <i class="bx bx-dollar"></i>
+                        </span>
+                    <span class="font-24"><%= __("Payrolls Management") %></span>
+                </div>
+            </div>
+            <!--end breadcrumb-->
+            <form id="query">
+                <!-- <div class="col-12 col-lg-9 mx-auto"> -->
+                <div class="card radius-10">
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0"><%= __("Start Date") %></h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                <input type="text" class="form-control" id="rpt_start_date">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0"><%= __("End Date") %></h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                <input type="text" class="form-control" id="rpt_end_date">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0"></h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                <a class="btn btn-primary btn-sm radius-30 px-4" id="btn_apply"
+                                   onclick="get_report()"><%= __("Get Report") %></a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <!-- </div> -->
+            </form>
+            <%- include('./copyright.ejs') %>
+        </div>
+    </div>
+    <!--end page wrapper -->
+
+    <%- include('./footer.ejs') %>
+
+</div>
+<!--wrapper ended-->
+
+<script type="application/javascript">
+    function get_report() {
+        if ($('#rpt_start_date')
+            .val() === '') {
+            $('#promptMSG')
+                .text('<%= __("Missing start date") %>');
+            $('#msgModal')
+                .modal('show');
+            $('#rpt_start_date')
+                .addClass("border-danger-input_alert");
+            return;
+        } else {
+            $('#rpt_start_date')
+                .removeClass("border-danger-input_alert");
+        }
+        if ($('#rpt_end_date')
+            .val() === '') {
+            $('#promptMSG')
+                .text('<%= __("Missing end date") %>');
+            $('#msgModal')
+                .modal('show');
+            $('#rpt_end_date')
+                .addClass("border-danger-input_alert");
+            return;
+        } else {
+            $('#rpt_end_date')
+                .removeClass("border-danger-input_alert");
+        }
+        $.ajax({
+            type: 'post',
+            async: false,
+            url: '/applications/payrolls',
+            data: {
+                action: 'get_report',
+                start_date: $('#rpt_start_date')
+                    .val(),
+                end_date: $('#rpt_end_date')
+                    .val()
+            },
+            success: function (return_data) {
+                let csv = Papa.unparse(return_data)
+                let hiddenElement = document.createElement('a');
+                hiddenElement.href = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURI(csv);
+                hiddenElement.target = '_blank';
+
+                hiddenElement.download = 'Report.csv';
+                hiddenElement.click();
+            }
+        });
+        $('#query')
+            .trigger('reset')
+    }
+
+    $(document)
+        .ready(function () {
+            $('#rpt_start_date')
+                .datepicker({
+                    autoclose: true,
+                    todayHighlight: true,
+                    format: "yyyy-mm-dd",
+                    <%
+                    if (req.session.lang === 'zh-HK') {
+                    %> language: "zh-TW", <%
+                    } else if (req.session.lang === 'zh-CN') {
+                    %> language: "zh-CN", <%
+                    } else {
+                    %> language: "en-CA", <%
+                    } %>
+                });
+            $('#rpt_end_date')
+                .datepicker({
+                    autoclose: true,
+                    todayHighlight: true,
+                    format: "yyyy-mm-dd",
+                    <%
+                    if (req.session.lang === 'zh-HK') {
+                    %> language: "zh-TW", <%
+                    } else if (req.session.lang === 'zh-CN') {
+                    %> language: "zh-CN", <%
+                    } else {
+                    %> language: "en-CA", <%
+                    } %>
+                });
+        })
+</script>
+
+</body>
+
+</html>

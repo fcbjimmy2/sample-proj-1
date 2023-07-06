@@ -1,0 +1,593 @@
+<%- include('./header.ejs') %>
+
+<style>
+    .fa-star {
+        font-size: 15px;
+    }
+</style>
+
+
+<body onload="get_badge()">
+
+<!--wrapper-->
+<div class="wrapper">
+
+    <%- include('./sidebar.ejs') %>
+    <%- include('./topbar.ejs') %>
+
+    <!--start page wrapper -->
+
+    <div class="page-wrapper">
+        <div class="page-content">
+
+            <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+                <div class="ps-3">
+                    <span class="font-30"><i class="bx bx-command"></i></span>
+                    <span class="font-24"><%= __("Classes") %></span>
+                    <input type="text" class="form-control" onchange="change_date()" id="show_date" value="<%= date %>">
+                </div>
+            </div>
+            <% for(let i = 0; i < branch.length; i++) { %>
+                <!-- <div class="col-12 col-lg-9 mx-auto"> -->
+                    <h6 class="mb-0 text-uppercase"><span class="font-24 color-header">
+                            <% if(req.session.lang === 'zh-CN' ) { %>
+                                <%= branch[i].RegistrationNameCN %>
+                            <% } else if(req.session.lang === 'zh-HK') { %>
+                                <%= branch[i].RegistrationNameChi %>
+                            <% } else { %>
+                                <%= branch[i].RegistrationName %>
+                            <% } %>
+                        </span></h6>
+                    <hr/>
+                    <% for(let j = 0; j < venue.length; j++) { %>
+                        <% if (branch[i].BranchCode === venue[j].BranchCode) { %>
+                            <div class="card radius-10">
+                                <div class="card-body">
+                                    <div class="table-responsive lead-table">
+                                        <span class="font-24 text-primary"><%= venue[j].VenueName %></span>
+                                        <table class="table mb-0 align-middle"
+                                               id="table-draggable1-<%= branch[i].BranchCode+'_'+venue[j].VenueCode %>">
+                                            <thead class="table-light">
+                                            <tr>
+                                                <th class="text-left" style="width: 160px"><%= __("Start Time") %></th>
+                                                <th class="text-left" style="width: 160px"><%= __("End Time") %></th>
+                                                <th class="text-center" colspan="2"
+                                                    style="width: 130px;"><%= __("Attendance") %></th>
+                                                <th class="text-center" style="width: 240px"><%= __("Teacher") %></th>
+                                                <th class="text-left" style="width: 150px"><%= __("Course Code") %></th>
+                                                <th class="text-left"><%= __("Description") %></th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <% if(classes.length > 0) { %>
+                                                <% for(let k = 0; k < classes.length; k++) { %>
+                                                    <% if(classes[k].VenueCode === venue[j].VenueCode && classes[k].BranchCode === branch[i].BranchCode) { %>
+                                                        <tr>
+                                                            <td style="width: 160px">
+                                                                <span class="font-20 text-dark"><%= classes[k].StartTime.toLocaleTimeString('en-CA', {timeZone: 'GMT',hour: '2-digit', minute: '2-digit'}) %></span>
+                                                            </td>
+                                                            <td style="width: 160px">`
+                                                                <span class="font-20 text-dark"><%= classes[k].EndTime.toLocaleTimeString('en-CA', {timeZone: 'GMT',hour: '2-digit', minute: '2-digit'}) %></span>
+                                                            </td>
+                                                            <td class="text-left" style="width: 45px;"><a
+                                                                        onclick="take_att('<%= classes[k].ClassCode %>')"
+                                                                        style="cursor: pointer;"><i
+                                                                            class="bx font-24 text-danger bx-check-circle"></i></a>
+                                                            </td>
+                                                            <td style="width: 85px;"><span class="font-20 text-primary"
+                                                                                           id="<%= classes[k].ClassCode %>"><%= classes[k].Attended %>/<%= classes[k].NoofStudent %></span>
+                                                            </td>
+                                                            <td style="width: 240px">
+                                                                <div class="d-flex align-items-center">
+                                                                    <div><a 
+                                                                            onclick="change_teacher('<%= classes[k].ClassCode %>')"
+                                                                            style="cursor: pointer;"><img
+                                                                                    onerror="javascript:this.src='/assets/images/avatars/default.png'"
+                                                                                    src="/assets/images/avatars/<%= classes[k].TeacherCode %>.jpg"
+                                                                                    id="teacher_img_<%= classes[k].ClassCode %>"
+                                                                                    class="rounded-circle" width="40"
+                                                                                    height="40"></a></div>
+                                                                    <div class="ms-2 text-primary"><span
+                                                                                id="teacher_name_<%= classes[k].ClassCode %>"
+                                                                                class="font-18"><%= classes[k].Name %></span>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td style="width: 150px"><span
+                                                                        class="font-18 text-dark"><%= classes[k].CourseCode %></span>
+                                                            </td>
+                                                            <td>
+                                                                <span class="font-18 text-dark"><%= classes[k].ClassDesc %></span>
+                                                            </td>
+                                                        </tr>
+                                                    <% } %>
+                                                <% } %>
+                                            <% } %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        <% } %>
+                    <% } %>
+
+                <!-- </div> -->
+
+            <% } %>
+
+            <%- include('./copyright.ejs') %>
+        </div>
+    </div>
+
+    <!--end page wrapper -->
+
+    <!-- Take att modal -->
+    <div class="modal fade" id="takeatt_Modal" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><%= __("Attendance") %></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table class="table mb-0 table-striped table-bordered" id="conflict_sm2">
+                                <thead class="table-light">
+                                <tr>
+                                    <th class="text-md-center" style="width: 10%"><%= __("Student Code") %></th>
+                                    <th class="text-md-center" style="width: 40%"><%= __("Student Name") %></th>
+                                    <th class="text-md-center" style="width: 20%"><%= __("Attendance") %></th>
+                                    <!-- <th class="text-md-center" style="width: 30%"><%= __("Rate") %></th> -->
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                                <tfoot>
+                                <tr>
+                                    <td colspan="3" class="text-md-center">
+                                        <a class="btn btn-secondary btn-sm radius-30 px-4"
+                                           data-bs-dismiss="modal"><%= __("Close") %></a>
+                                    </td>
+                                </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- Take att modal ended-->
+
+    <!-- Change teacher modal -->
+    <div class="modal fade" id="changeteacher_Modal" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><%= __("Change Teacher") %></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table class="table mb-0 table-striped table-bordered" id="myDataTable5" data-info="false"
+                                   data-ordering="false" data-scrollX="false" style="width:100%">
+                                <thead class="table-light">
+                                <tr>
+                                    <th class="text-md-center" style="width: 70%"><%= __("Teacher") %></th>
+                                    <th style="width: 30%"></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                                <tfoot>
+                                <tr>
+                                    <td class="text-left">
+                                        <a class="btn btn-danger btn-sm radius-30 px-4"
+                                           onclick="change_to_this_teacher()"><%= __("Apply") %></a>
+                                    </td>
+                                    <td class="text-center">
+                                        <a class="btn btn-secondary btn-sm radius-30 px-4"
+                                           data-bs-dismiss="modal"><%= __("Cancel") %></a>
+                                    </td>
+                                </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Change teacher modal ended-->
+
+    <!-- Student contact modal -->
+    <div class="modal fade" id="student_contact_Modal" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><%= __("Contact") %></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0"><%= __("Name") %></h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                <input type="text" class="form-control" id="student_flname" disabled>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0"><%= __("Mobile") %></h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                <input type="text" class="form-control" id="student_mobile" disabled>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0"><%= __("Email") %></h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                <input type="text" class="form-control" id="student_email" disabled>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0"><%= __("Emergency Contact") %></h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                <input type="text" class="form-control" id="student_parentinfo" disabled>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0"><%= __("Emergency Contact No") %></h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                <input type="text" class="form-control" id="student_parentmobile" disabled>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- Student contact modal ended-->
+
+    <!-- Get branch code modal -->
+    <div class="modal fade" id="branchcode_Modal" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table class="table mb-0 table-striped table-bordered table-sm table-hover"
+                                   id="invoice_details2"
+                                   data-paging="false">
+                                <thead class="table-light">
+                                <tr>
+                                    <th class="text-md-center" style="width: 80%"><%= __("Branch Code") %></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- get branch code modal ended -->
+
+    <%- include('./footer.ejs') %>
+
+</div>
+<!--wrapper ended-->
+
+<script type="text/javascript">
+    function take_att(id) {
+        let class_code = id;
+        $('#conflict_sm2').DataTable().data().clear().draw();
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/oper/attend_taking',
+            data: {action: 'get_class_for_att_taking', class_code: class_code},
+            success: function (return_data) {
+                console.log(return_data);
+                if (return_data.length > 0) {
+                    $.each(return_data, function (i) {
+                        this_row = `<tr>`;
+                        this_row += `<td class="text-md-center" style="width: 10%"><a onclick="show_student('` + return_data[i].StudentCode + `')" style="cursor: pointer;">` + return_data[i].StudentCode + `</a></td>`;
+                        this_row += `<td class="text-md-center" style="width: 40%"><a onclick="show_student('` + return_data[i].StudentCode + `')" style="cursor: pointer;">` + return_data[i].FirstName + ` ` + return_data[i].LastName + `</a></td>`;
+                        if (return_data[i].Attended) {
+                            this_row += `<td class="text-md-center" style="width: 20%"><input onchange="take_att_for_this('` + return_data[i].ClassCode + `#stcode#` + return_data[i].StudentCode + `')" id="input_` + return_data[i].ClassCode + `#stcode#` + return_data[i].StudentCode + `" type="checkbox" class="form-check-input" checked></td>`;
+                        } else {
+                            this_row += `<td class="text-md-center" style="width: 20%"><input onchange="take_att_for_this('` + return_data[i].ClassCode + `#stcode#` + return_data[i].StudentCode + `')" id="input_` + return_data[i].ClassCode + `#stcode#` + return_data[i].StudentCode + `" type="checkbox" class="form-check-input"></td>`;
+                        }
+                        /* this_row += `<td class="text-md-center" style="width: 30%">
+                                <i class = "fa fa-star" id="st1_` + return_data[i].StudentCode + `" onclick="rating(1,'` + return_data[i].StudentCode + `','` + return_data[i].ClassCode + `')"></i>
+                                <i class = "fa fa-star" id="st2_` + return_data[i].StudentCode + `" onclick="rating(2,'` + return_data[i].StudentCode + `','` + return_data[i].ClassCode + `')"></i>
+                                <i class = "fa fa-star" id="st3_` + return_data[i].StudentCode + `" onclick="rating(3,'` + return_data[i].StudentCode + `','` + return_data[i].ClassCode + `')"></i>
+                                <i class = "fa fa-star" id="st4_` + return_data[i].StudentCode + `" onclick="rating(4,'` + return_data[i].StudentCode + `','` + return_data[i].ClassCode + `')"></i>
+                                <i class = "fa fa-star" id="st5_` + return_data[i].StudentCode + `" onclick="rating(5,'` + return_data[i].StudentCode + `','` + return_data[i].ClassCode + `')"></i>
+                                    </td>`; */
+                        this_row += `</tr>`;
+                        $('#conflict_sm2').DataTable().row.add($(this_row)).draw(false);
+                        // set_rate(return_data[i].Points, return_data[i].StudentCode, return_data[i].ClassCode)
+                    });
+                }
+            }
+        });
+		$('#takeatt_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#takeatt_Modal').modal('show');
+    }
+
+    function take_att_for_this(id) {
+        let class_code = id.split("#stcode#")[0];
+        let student_code = id.split("#stcode#")[1];
+        let status;
+        if (document.getElementById('input_' + id).checked) {
+            status = 1;
+        } else {
+            status = 0;
+        }
+        $.ajax({
+            type: 'post',
+            url: '/oper/attend_taking',
+            data: {action: 'att_take', class_code: class_code, student_code: student_code, status: status},
+            success: function (return_data) {
+                if (return_data.length > 0) {
+                    $.each(return_data, function (i) {
+                        if (return_data[i].ClassCode === class_code) {
+                            document.getElementById(class_code).innerHTML = return_data[i].Attended + '/' + return_data[i].NoofStudent;
+                        }
+                    });
+                }
+                get_current_class_sts();
+            }
+        });
+    }
+
+    function change_to_this_teacher() {
+        let id = $('input[name="change_to_this_teacher"]:checked').val();
+        if(id===undefined) {
+            $('#promptMSG').text('<%= __("Please select teacher") %>');
+            $('#msgModal').modal('show');
+            $('input[name="change_to_this_teacher"]').addClass("border-danger-input_alert");
+            return;
+        } else {
+            $('input[name="change_to_this_teacher"]').removeClass("border-danger-input_alert");
+        };
+        $('#changeteacher_Modal').modal('hide');
+        let class_code = id.split("#tcode#")[0];
+        let teacher_code = id.split("#tcode#")[1];
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/oper/change_teacher',
+            data: {action: 'change_teacher', class_code: class_code, teacher_code: teacher_code},
+            success: function (return_data) {
+                // console.log(return_data);
+                if (return_data.length > 0) {
+                    let url = "/assets/images/avatars/" + return_data[0].TeacherCode + ".jpg";
+                    document.getElementById('teacher_img_' + class_code).setAttribute("src", url + "?v=${new Date().getTime()}");
+                    document.getElementById('teacher_name_' + class_code).innerHTML = return_data[0].Name;
+                }
+                get_current_class_sts();
+            }
+        });
+    }
+
+    function change_teacher(ccode) {
+        // alert(id);
+        let class_code = ccode;
+        // $('#conflict_sm2').DataTable().row().remove();
+        $('#myDataTable5').DataTable().data().clear();
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/oper/change_teacher',
+            data: {action: 'get_teacher_list', class_code: class_code},
+            success: function (return_data) {
+                if (return_data.length > 0) {
+                    $.each(return_data, function (i) {
+                        let chk_img;
+                        this_row = '<tr>';
+                        this_row += '<td style="width: 70%">';
+                        this_row += '		<div class="d-flex align-items-center">';
+                        chk_img = '/assets/images/avatars/' + return_data[i].UserCode + '.jpg'
+                        //let img = new Image();
+                        //img.src = 'http://'+ window.location.hostname + chk_img;
+                        //if (img.complete) {
+                        img_use = chk_img;
+                        //} else {
+                        //    img_use = '/assets/images/avatars/default.png';
+                        //}
+                        this_row += `<div><img src="` + img_use + `" class="rounded-circle" width="40" height="40" onerror="javascript:this.src='/assets/images/avatars/default.png'"></div>`;
+                        this_row += `			<div class="ms-2">` + return_data[i].Name + `</span></div>`;
+                        this_row += `		</div>`;
+                        this_row += `</td>`;
+                        this_row += `<td class="text-md-center" style="width: 30%"><input type="radio" value="` + class_code + `#tcode#` + return_data[i].UserCode + `" id="change_to_this_teacher" name="change_to_this_teacher"></td>`;
+                        this_row += `</tr>`;
+                        // console.log(this_row);
+                        $('#myDataTable5').DataTable().row.add($(this_row)).draw();
+                    });
+                }
+            }
+        });
+		$('#changeteacher_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#changeteacher_Modal').modal('show');
+    }
+
+    function get_current_class_sts() {
+        $.ajax({
+            type: 'post',
+            url: '/oper/attend_taking',
+            data: {action: 'check_all_status'},
+            success: function (return_data) {
+                $.each(return_data, function (i) {
+                    if (document.getElementById(return_data[i].ClassCode)) {
+                        let chk_img = "/assets/images/avatars/" + return_data[i].TeacherCode + ".jpg";
+                        let img = new Image();
+                        img.src = 'http://' + window.location.hostname + chk_img;
+                        if (img.complete) {
+                            img_use = chk_img;
+                        } else {
+                            img_use = '/assets/images/avatars/default.png';
+                        }
+                        document.getElementById(return_data[i].ClassCode).innerHTML = return_data[i].Attended + '/' + return_data[i].NoofStudent;
+                        document.getElementById('teacher_img_' + return_data[i].ClassCode).setAttribute("src", img_use + "?v=${new Date().getTime()}");
+                        document.getElementById('teacher_name_' + return_data[i].ClassCode).innerHTML = return_data[i].Name;
+                    }
+                });
+            }
+        });
+    }
+
+    function show_student(code) {
+        // alert(code);
+        $.ajax({
+            type: 'post',
+            url: '/oper/attend_taking',
+            data: {action: 'show_student', student_code: code},
+            success: function (return_data) {
+                console.log(return_data)
+                $('#student_email').val(return_data[0].Email);
+                $('#student_mobile').val(return_data[0].Mobile);
+                $('#student_flname').val(return_data[0].FirstName + ' ' + return_data[0].LastName);
+                $('#student_parentmobile').val(return_data[0].EmergencyContactNo1);
+                $('#student_parentinfo').val(return_data[0].EmergencyContactPerson1);
+            }
+        });
+		$('#student_contact_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#student_contact_Modal').modal('show');
+    }
+
+    function change_date() {
+        let new_date = $('#show_date').val();
+        let url = new URL(window.location.href);
+        url.searchParams.set("date", new_date)
+        window.location.href = url;
+    }
+
+    function change_branch() {
+        let new_branch = $('#show_branch').val();
+        let url = new URL(window.location.href);
+        url.searchParams.set("branch", new_branch)
+        window.location.href = url;
+    }
+
+    function set_rate(e, s, c) {
+        if (e === 1) {
+            $("#st1_" + s).css("color", "black");
+            $("#st2_" + s).css("color", "black");
+            $("#st3_" + s).css("color", "black");
+            $("#st4_" + s).css("color", "black");
+            $("#st5_" + s).css("color", "black");
+            $("#st1_" + s).css("color", "yellow");
+        }
+        if (e === 2) {
+            $("#st1_" + s).css("color", "yellow");
+            $("#st2_" + s).css("color", "yellow");
+            $("#st3_" + s).css("color", "black");
+            $("#st4_" + s).css("color", "black");
+            $("#st5_" + s).css("color", "black");
+
+        }
+        if (e === 3) {
+            $("#st1_" + s).css("color", "yellow");
+            $("#st2_" + s).css("color", "yellow");
+            $("#st3_" + s).css("color", "yellow");
+            $("#st4_" + s).css("color", "black");
+            $("#st5_" + s).css("color", "black");
+
+        }
+        if (e === 4) {
+            $("#st1_" + s).css("color", "yellow");
+            $("#st2_" + s).css("color", "yellow");
+            $("#st3_" + s).css("color", "yellow");
+            $("#st4_" + s).css("color", "yellow");
+            $("#st5_" + s).css("color", "black");
+
+        }
+        if (e === 5) {
+            $("#st1_" + s).css("color", "yellow");
+            $("#st2_" + s).css("color", "yellow");
+            $("#st3_" + s).css("color", "yellow");
+            $("#st4_" + s).css("color", "yellow");
+            $("#st5_" + s).css("color", "yellow");
+        }
+    }
+
+    function rating(e, s, c) {
+        set_rate(e, s, c);
+        $.ajax({
+            type: 'post',
+            url: '/students/info',
+            data: {action: 'add_rating', student_code: s, ccode: c, points: e}
+        });
+    }
+
+    function use_this_branchcode(e) {
+        $('#branchcode_Modal').modal('hide')
+        $('#show_branch').val(e)
+        change_branch();
+    }
+
+    function get_branchcode() {
+        $('#invoice_details2').DataTable().data().clear();
+        $.ajax({
+            type: 'post',
+            async: false,
+            url: '/system/users',
+            data: {action: 'get_branchcode'},
+            success: function (return_data) {
+                $.each(return_data, function (i) {
+                    this_row = `<tr onclick="use_this_branchcode('` + return_data[i].BranchCode + `')">`;
+                    this_row += `<td class="text-md-center">` + return_data[i].BranchCode + `</td>`;
+                    this_row += `</tr>`;
+                    $('#invoice_details2').DataTable().row.add($(this_row)).draw(false);
+                });
+            }
+        });
+		$('#branchcode_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#branchcode_Modal').modal('show');
+    }
+
+    $(document).ready(function () {
+        setInterval(get_current_class_sts, <%= config.db_refresh_sts %>);
+
+        $('#show_date').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            format: "yyyy-mm-dd",
+            <% if(req.session.lang === 'zh-HK') { %>
+            language: "zh-TW",
+            <% } else if(req.session.lang === 'zh-CN') { %>
+            language: "zh-CN",
+            <% } else { %>
+            language: "en-CA",
+            <% } %>
+        });
+
+    });
+</script>
+
+</body>
+
+</html>

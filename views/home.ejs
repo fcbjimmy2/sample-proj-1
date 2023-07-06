@@ -1,0 +1,36 @@
+<%- include('./header.ejs') %>
+
+<body onload="get_badge()">
+
+<!--wrapper-->
+<div class="wrapper">
+
+<%- include('./sidebar.ejs') %>
+<%- include('./topbar.ejs') %>
+
+<!--start page wrapper -->
+
+<div class="page-wrapper">
+    <div class="page-content">
+
+        <div class="col-12 col-lg-9 mx-auto">
+            <div class="text-center align-self-center">
+                <img class="img-fluid" src="/assets/logo/doCleverSquare.png" width="350" style="opacity: 0.1;"
+                     alt="Doclever Education ERP Suite">
+            </div>
+        </div>
+
+        <%- include('./copyright.ejs') %>
+    </div>
+</div>
+
+<!--end page wrapper -->
+
+<%- include('./footer.ejs') %>
+
+</div>
+<!--wrapper ended-->
+
+</body>
+
+</html>

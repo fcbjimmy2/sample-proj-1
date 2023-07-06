@@ -1,0 +1,229 @@
+<%- include('./header.ejs') %>
+
+<body onload="get_badge();refresh_msg_sts();">
+
+<!--wrapper-->
+<div class="wrapper">
+
+    <%- include('./sidebar.ejs') %>
+    <%- include('./topbar.ejs') %>
+
+    <!--start page wrapper -->
+
+    <!--start page wrapper -->
+    <div class="page-wrapper">
+        <div class="page-content">
+            <!--breadcrumb-->
+            <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+                <div class="ps-3">
+                    <span class="font-30"><i class="bx bx-chat"></i></span>
+                    <span class="font-24"><%= __("Messenger") %></span>
+                </div>
+            </div>
+            <!--end breadcrumb-->
+
+            <div class="col-12 col-lg-9 mx-auto">
+                <div class="chat-wrapper">
+                    <div class="chat-sidebar">
+                        <div class="chat-sidebar-header">
+                            <span class="font-18"><%= __("Contact") %></span>
+                        </div>
+                        <div class="chat-sidebar-content">
+                            <div class="tab-content" id="pills-tabContent">
+                                <div class="tab-pane fade show active" id="pills-Chats">
+
+                                    <div class="chat-list">
+                                        <div class="list-group list-group-flush" id="contact_list">
+
+                                            <table class="table mb-0 table-striped table-bordered" id="MsgContact"
+                                                   data-ordering="false" data-searching="false" data-paging="false"
+                                                   data-info="false">
+                                                <thead class="table-light">
+                                                <tr>
+                                                    <th class="text-md-center"></th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-header d-flex align-items-center">
+                        <div class="chat-toggle-btn"><i class='bx bx-menu-alt-left'></i>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <div class="chat-user-online">
+                                <img src="/assets/images/icons/user.png" id="toUserIMG" width="45" height="45"
+                                     class="rounded-circle"/>
+                            </div>
+                            <div class="flex-grow-1 ms-2">
+                                <p class="mb-0"><span id="toThisUserName"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-content" id="chat-content">
+
+                        <!--start chat overlay-->
+                        <!--
+                        <div class="overlay chat-toggle-btn-mobile"></div>
+                        -->
+                        <!--end chat overlay-->
+
+                    </div>
+                    <div class="chat-footer d-flex align-items-center">
+                        <div class="flex-grow-1 pe-2">
+                            <div class="input-group">
+                                <input type="hidden" id="chat_user_photo" value="">
+                                <input type="hidden" id="chat_user" value="">
+                                <input type="text" class="form-control" placeholder="<%= __("Type a message") %>"
+                                       id="chat_MSG" onchange="sendMSG()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <%- include('./copyright.ejs') %>
+        </div>
+    </div>
+    <!--end page wrapper -->
+
+    <%- include('./footer.ejs') %>
+
+</div>
+<!--wrapper ended-->
+
+<script src="/assets/js/app-chat-box.js"></script>
+<script type="text/javascript">
+    //var names = '<%= req.session.branchcode %>';
+    //var nameArr = names.split(',');
+    //console.log(nameArr);
+    function setToUser(u, c, n) {
+        $('#toThisUserName').text(n);
+        $('#toUserIMG').attr('src', "/assets/images/avatars/" + c + ".jpg");
+        showChat(u, c);
+    }
+
+    function showChat(rm_user, rm_user_ph) {
+        // clean it up first
+        $("#chat-content").empty();
+        $.ajax({
+            type: 'post',
+            url: '/user/chat',
+            data: {action: 'get_list', cu: rm_user},
+            success: function (response) {
+                let chat_list = response;
+                let mycode = "<%= req.session.usercode %>";
+                $.each(chat_list, function (i) {
+                    let c_datetime = chat_list[i].CreateTimeStr;
+                    let msgHTML = ``;
+                    if (chat_list[i].UserCode === mycode) {
+                        msgHTML += `<div class="chat-content-rightside">`;
+                        msgHTML += `	<div class="d-flex">`;
+                        msgHTML += `		<div class="flex-grow-1 ms-2">`;
+                        msgHTML += `            <p class="mb-0 chat-time text-end">` + chat_list[i].CreateTimeStr + `</p>`;
+                        msgHTML += `			<p class="chat-right-msg">` + chat_list[i].Message.replace(/[\u0000-\u001F\u007F-\u009F]/g, "") + `</p>`;
+                        msgHTML += `		</div>`;
+                        msgHTML += `	</div>`;
+                        msgHTML += `</div>`;
+                    } else {
+                        msgHTML += `<div class="chat-content-leftside">`;
+                        msgHTML += `	<div class="d-flex ms-auto">`;
+                        msgHTML += `	    <img src="/assets/images/avatars/` + rm_user_ph + `.jpg" width="48" height="48" class="rounded-circle" alt="" />`;
+                        msgHTML += `		<div class="flex-grow-1 me-2">`;
+                        msgHTML += `            <p class="mb-0 chat-time">` + chat_list[i].CreateTimeStr + `</p>`;
+                        msgHTML += `			<p class="chat-left-msg">` + chat_list[i].Message.replace(/[\u0000-\u001F\u007F-\u009F]/g, "") + `</p>`;
+                        msgHTML += `		</div>`;
+                        msgHTML += `	</div>`;
+                        msgHTML += `</div>`;
+                    }
+                    let dummy = document.createElement("div");
+                    dummy.innerHTML = msgHTML;
+                    let new_msg = $.parseHTML(msgHTML);
+                    $("#chat-content").append(new_msg);
+                });
+                // set chat user
+                $('#chat_user').val(rm_user);
+                $('#chat_user_photo').val(rm_user_ph);
+                // $('#chat-content').animate({scrollTop:10000},500);
+                $('#chat-content').scrollTop(10000);
+            }
+        });
+
+    }
+
+    function sendMSG() {
+        //alert($('#chat_user').val()+'--'+$('#chat_MSG').val());
+        let chat_MSG = $('#chat_MSG').val();
+        let chat_user = $('#chat_user').val();
+        let chat_user_photo = $('#chat_user_photo').val();
+        // then clean up the field
+        $('#chat_MSG').val('');
+        $.ajax({
+            type: 'post',
+            url: '/user/chat',
+            data: {action: 'send_msg', cu: chat_user, msg: chat_MSG},
+            success: function (response) {
+                $("#chat-content").empty();
+                showChat(chat_user, chat_user_photo);
+            }
+        });
+    }
+
+    function refresh_msg_sts() {
+        // console.log($('#chat_user').val());
+        check_msg_sts();
+    }
+
+    function check_msg_sts() {
+        //	if ($('#chat_user').val()==='') {
+        // get chat
+        // console.log('status with remote '+$('#chat_user').val());
+        $('#MsgContact').DataTable().data().clear();
+        $.ajax({
+            type: 'post',
+            url: '/user/chat',
+            data: {action: 'get_msg_status'},
+            success: function (response) {
+                contact_list = response;
+                $.each(contact_list, function (i) {
+                    // console.log(contact_list[i].UserCode);
+                    clist_HTML = `<tr>`;
+                    clist_HTML += `<td>`;
+                    clist_HTML += `<a  class="list-group-item" onClick="setToUser('` + contact_list[i].UserCode + `','` + contact_list[i].photo + `','` + contact_list[i].Name + `')">`;
+                    clist_HTML += `	<div class="d-flex">`;
+                    clist_HTML += `		<div class="chat-user-online">`;
+                    clist_HTML += `			<img src="/assets/images/avatars/` + contact_list[i].photo + `.jpg" width="42" height="42" class="rounded-circle" />`;
+                    clist_HTML += `		</div>`;
+                    if (contact_list[i].Unread > 0) {
+                        if (chat_user = $('#chat_user').val() === contact_list[i].UserCode) {
+                            // currently chatting so refresh the conversation
+                            showChat($('#chat_user').val(), $('#chat_user_photo').val());
+                        }
+                        clist_HTML += `     <div><span class="position-relative alert-count-alt-2" id="total_new_msg">` + contact_list[i].Unread + `</span></div>`;
+                    }
+                    clist_HTML += `		<div class="flex-grow-1 ms-2">`;
+                    clist_HTML += `			<h6 class="mb-0 chat-title">` + contact_list[i].Name + `</h6>`;
+                    clist_HTML += `		</div>`;
+                    clist_HTML += `	</div>`;
+                    clist_HTML += `</a>`;
+                    clist_HTML += `</td>`;
+                    clist_HTML += `</tr>`;
+                    $('#MsgContact').DataTable().row.add($(clist_HTML)).draw(false);
+                });
+            }
+        });
+    };
+    //}
+    $(document).ready(function () {
+        setInterval(refresh_msg_sts, 3000);
+    });
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,531 @@
+<%- include('./header.ejs') %>
+
+<script src="/assets/js/chart1.js"></script>
+
+<body onload="get_badge()">
+
+<!--wrapper-->
+<div class="wrapper">
+
+<%- include('./sidebar.ejs') %>
+<%- include('./topbar.ejs') %>
+
+<!--start page wrapper -->
+<div class="page-wrapper">
+    <div class="page-content">
+        <!-- top two card rows -->
+        <div class="row row-cols-1 row-cols-lg-2 row-cols-xl-3">
+<% if (req.session.userrole==='Admin') { %>
+            <!-- card 1 -->
+            <div class="col">
+                <div class="card radius-10">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <p class="mb-0 text-danger"><%= __("Total Students") %></p>
+                                <h4 class="my-1"><%= total_students[0].Total %></h4>
+                            </div>
+                            <div class="widgets-icons bg-light-danger text-danger ms-auto">
+                                <img src="/assets/images/icons/people.png" width="36" height="36" alt="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- card 1 ended -->
+
+            <!-- card 2 -->
+            <div class="col">
+                <div class="card radius-10">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <p class="mb-0 text-danger"><%= __("New Enrollment in 30 Days") %></p>
+                                <h4 class="my-1"><%= total_new_students[0].Total %></h4>
+                            </div>
+                            <div class="widgets-icons bg-light-danger ms-auto">
+                                <img src="/assets/images/icons/people.png" width="36" height="36" alt="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- card 2 ended -->
+
+            <!-- card 3 -->
+            <div class="col">
+                <div class="card radius-10">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <p class="mb-0 text-danger"><%= __("Withdraw in 30 Days") %></p>
+                                <h4 class="my-1"><%= total_withdraw[0].Total %></h4>
+                            </div>
+                            <div class="widgets-icons bg-light-danger text-danger ms-auto">
+                                <img src="/assets/images/icons/people.png" width="36" height="36" alt="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- card 3 ended -->
+
+            <!-- card 4 -->
+            <!--
+            <div class="col">
+                <div class="card radius-10">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <p class="mb-0 text-primary"><%= __("Cash In Bag") %></p>
+                                <h4 class="my-1"><%= cash_in_bag[0].Total %></h4>
+                            </div>
+                            <div class="widgets-icons bg-light-primary text-primary ms-auto">
+                                <i class='bx bx-dollar'></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            -->
+            <!-- card 4 ended -->
+
+            <!-- card 5 -->
+            <div class="col">
+                <div class="card radius-10">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <p class="mb-0 text-primary"><%= __("Daily Expenses") %></p>
+                                <h4 class="my-1"><%= daily_expenses[0].Total %></h4>
+                            </div>
+                            <div class="widgets-icons bg-light-primary text-primary ms-auto">
+                                <i class='bx bx-dollar'></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- card 5 ended -->
+
+            <!-- card 6 -->
+            <div class="col">
+                <div class="card radius-10">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <p class="mb-0 text-primary"><%= __("Daily Income") %></p>
+                                <h4 class="my-1"><%= daily_income[0].Total %></h4>
+                            </div>
+                            <div class="widgets-icons bg-light-primary text-primary ms-auto">
+                                <i class='bx bx-dollar'></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- card 6 ended -->
+
+            <!-- card 7 -->
+            <div class="col">
+                <div class="card radius-10">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <p class="mb-0 text-success"><%= __("Education Materials") %></p>
+                                <h4 class="my-1"><%= product_count[0].Total %></h4>
+                            </div>
+                            <div class="widgets-icons bg-light-success text-light-warning ms-auto">
+                                <i class='bx bx-cart-alt'></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- card 7 ended -->
+
+            <!-- card 8 -->
+            <!--
+            <div class="col">
+                <div class="card radius-10">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <p class="mb-0 text-success"><%= __("Waiting List") %></p>
+                                <h4 class="my-1"><%= waiting_list[0].Total %></h4>
+                            </div>
+                            <div class="widgets-icons bg-light-success text-light-warning ms-auto">
+                                <i class='bx bx-user-check'></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            -->
+            <!-- card 8 ended -->
+
+        </div>
+        <!-- end row -->
+
+        <div class="row row-cols-1 row-cols-lg-3 row-cols-xl-3">
+            <!-- chart 1 -->
+            <div class="col d-flex">
+                <div class="card radius-10 w-100">
+                    <div class="card-body">
+                        <div id="chart1"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- end chart 1 -->
+            <!-- chart 2 -->
+            <div class="col d-flex">
+                <div class="card radius-10 w-100">
+                    <div class="card-body">
+                        <div id="chart2"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- end chart 2 -->
+            <!-- chart 3 -->
+            <div class="col d-flex">
+                <div class="card radius-10 w-100">
+                    <div class="card-body">
+                        <div id="chart3"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- end chart 3 -->
+<% } %>
+        </div>
+        <!-- end row -->
+        <%- include('./copyright.ejs') %>
+    </div>
+</div>
+<!--end page wrapper -->
+
+<%- include('./footer.ejs') %>
+
+</div>
+<!--wrapper ended-->
+
+<script src="/assets/plugins/highcharts/js/highcharts.js"></script>
+
+<script type="text/javascript">
+    $(function () {
+        "use strict";
+
+        Highcharts.setOptions({
+            colors: ['#71BF45', '#FAA74B', '#FAA74A','#01BAF2']
+        });
+
+        Highcharts.chart("chart1", {
+            <%
+            let ent=0;
+            let ofc=0;
+            let trn=0;
+            let otr=0;
+
+            console.log("expenses_sum.length", expenses_sum.length);
+            for( let i = 0; i < expenses_sum.length; i++ ) {
+                if (expenses_sum[i].Category === 'Entertainment') {
+                    if (expenses_sum[i].Total) {
+                        ent = expenses_sum[i].Total;
+                        console.log("ent",ent);
+                    }
+                }
+                if (expenses_sum[i].Category === 'Office Expenses') {
+                    if (expenses_sum[i].Total) {
+                        ofc = expenses_sum[i].Total;
+                        console.log("ofc",ofc);
+                    }
+                }
+                if (expenses_sum[i].Category === 'Transportation') {
+                    if (expenses_sum[i].Total) {
+                        trn = expenses_sum[i].Total;
+                        console.log("trn",trn);
+                    }
+                }
+                if (expenses_sum[i].Category === 'Others') {
+                    if (expenses_sum[i].Total) {
+                        otr = expenses_sum[i].Total;
+                        console.log("otr",otr);
+                    }
+                }
+            }
+            %>
+            chart: {
+                height: 350,
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: !1,
+                type: "pie",
+                styledMode: !0
+            },
+            credits: {
+                enabled: !1
+            },
+            title: {
+                text: "<%=__("Expenses")%>"
+            },
+            subtitle: {
+                text: "<%=__("Ratio of spending")%>"
+            },
+            tooltip: {
+                pointFormat: "{series.name}: <b>{point.percentage:.1f}%</b>"
+            },
+            accessibility: {
+                point: {
+                    valueSuffix: "%"
+                }
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: !0,
+                    cursor: "pointer",
+                    colors: ['#FF530D', '#E82C0C', '#FF0000', '#E80C7A', '#E80C7A'],
+                    innerSize: 120,
+                    dataLabels: {
+                        enabled: !0,
+                        format: "<b>{point.name}</b>: {point.percentage:.1f} %"
+                    },
+                    showInLegend: !0
+                }
+            },
+            color: {
+                pattern: ["#f06292", "#6d60b0", "#5468da", "#009688"]
+            },
+            series: [{
+                name: "Spending",
+                colorByPoint: !0,
+                data: [{
+                    name: "<%=__("Entertainment")%>",
+                    y: <%= ent %>
+                }, {
+                    name: "<%=__("Office Expenses")%>",
+                    y: <%= ofc %>
+                }, {
+                    name: "<%=__("Transportation")%>",
+                    y: <%= trn %>
+                }, {
+                    name: "<%=__("Others")%>",
+                    y: <%= otr %>
+                }]
+            }],
+            responsive: {
+                rules: [{
+                    condition: {
+                        maxWidth: 500
+                    },
+                    chartOptions: {
+                        plotOptions: {
+                            pie: {
+                                innerSize: 140,
+                                dataLabels: {
+                                    enabled: !1
+                                }
+                            }
+                        }
+                    }
+                }]
+            }
+        }),
+
+        Highcharts.chart("chart2", {
+            <%
+            let cash_this_week=0;
+            let cash_last_week=0;
+            let cash_2e_week=0;
+            let cash_3e_week=0;
+            let oct_this_week=0;
+            let oct_last_week=0;
+            let oct_2e_week=0;
+            let oct_3e_week=0;
+            let pme_this_week=0;
+            let pme_last_week=0;
+            let pme_2e_week=0;
+            let pme_3e_week=0;
+            let visa_this_week=0;
+            let visa_last_week=0;
+            let visa_2e_week=0;
+            let visa_3e_week=0;
+
+            for( let i = 0; i < income_sum.length; i++ ) {
+                if (income_sum[i].PaymentMethod==='CASH') {
+                    if (income_sum[i].Column3==='this week' && (income_sum[i].Column3)) {
+                        cash_this_week=income_sum[i].Total
+                    }
+                    if (income_sum[i].Column3==='previous week' && (income_sum[i].Column3)) {
+                        cash_last_week=income_sum[i].Total
+                    }
+                    if (income_sum[i].Column3==='2 weeks earlier' && (income_sum[i].Column3)) {
+                        cash_2e_week=income_sum[i].Total
+                    }
+                    if (income_sum[i].Column3==='3 weeks earlier' && (income_sum[i].Column3)) {
+                        cash_3e_week==income_sum[i].Total
+                    }
+                }
+                if (income_sum[i].PaymentMethod==='OCTOPUS') {
+                    if (income_sum[i].Column3==='this week' && (income_sum[i].Column3)) {
+                        oct_this_week=income_sum[i].Total
+                    }
+                    if (income_sum[i].Column3==='previous week' && (income_sum[i].Column3)) {
+                        oct_last_week=income_sum[i].Total
+                    }
+                    if (income_sum[i].Column3==='2 weeks earlier' && (income_sum[i].Column3)) {
+                        oct_2e_week=income_sum[i].Total
+                    }
+                    if (income_sum[i].Column3==='3 weeks earlier' && (income_sum[i].Column3)) {
+                        oct_3e_week==income_sum[i].Total
+                    }
+                }
+                if (income_sum[i].PaymentMethod==='PAYME') {
+                    if (income_sum[i].Column3==='this week' && (income_sum[i].Column3)) {
+                        pme_this_week=income_sum[i].Total
+                    }
+                    if (income_sum[i].Column3==='previous week' && (income_sum[i].Column3)) {
+                        pme_last_week=income_sum[i].Total
+                    }
+                    if (income_sum[i].Column3==='2 weeks earlier' && (income_sum[i].Column3)) {
+                        pme_2e_week=income_sum[i].Total
+                    }
+                    if (income_sum[i].Column3==='3 weeks earlier' && (income_sum[i].Column3)) {
+                        pme_3e_week==income_sum[i].Total
+                    }
+                }
+                if (income_sum[i].PaymentMethod==='VISA/MASTER') {
+                    if (income_sum[i].Column3==='this week' && (income_sum[i].Column3)) {
+                        visa_this_week=income_sum[i].Total
+                    }
+                    if (income_sum[i].Column3==='previous week' && (income_sum[i].Column3)) {
+                        visa_last_week=income_sum[i].Total
+                    }
+                    if (income_sum[i].Column3==='2 weeks earlier' && (income_sum[i].Column3)) {
+                        visa_2e_week=income_sum[i].Total
+                    }
+                    if (income_sum[i].Column3==='3 weeks earlier' && (income_sum[i].Column3)) {
+                        visa_3e_week==income_sum[i].Total
+                    }
+                }
+            }
+            %>
+
+                chart: {
+                    type: "bar",
+                    styledMode: !0
+                },
+                credits: {
+                    enabled: !1
+                },
+                exporting: {
+                    buttons: {
+                        contextButton: {
+                            enabled: !1
+                        }
+                    }
+                },
+                title: {
+                    text: "<%=__("Income Summary")%>"
+                },
+
+                xAxis: {
+                    categories: ["3 weeks earlier", "2 weeks earlier", "previous week", "this week"]
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: "<%=__("Income by payment method")%>",
+                        style: {
+                            display: "none"
+                        }
+                    }
+                },
+                legend: {
+                    reversed: !1
+                },
+                plotOptions: {
+                    series: {
+                        stacking: "normal"
+                    }
+                },
+                color: {
+                    pattern: ["#f06292", "#6d60b0", "#5468da", "#009688"]
+                },
+                series: [{
+                    name: "<%=__("CASH")%>",
+                    data: [<%=cash_3e_week%>, <%=cash_2e_week%>, <%=cash_last_week%>, <%=cash_this_week%>]
+                }, {
+                    name: "<%=__("OCTOPUS")%>",
+                    data: [<%=oct_3e_week%>, <%=oct_2e_week%>, <%=oct_last_week%>, <%=oct_this_week%>]
+                }, {
+                    name: "PAYME",
+                    data: [<%=pme_this_week%>, <%=pme_this_week%>, <%=pme_last_week%>, <%=pme_this_week%>]
+                }, {
+                    name: "<%=__("VISA/MASTER")%>",
+                    data: [<%=visa_3e_week%>, <%=visa_2e_week%>, <%=visa_last_week%>, <%=visa_this_week%>]
+                }]
+            });
+
+        Highcharts.chart("chart3", {
+            <%
+            let new_sts1_c=student_sts[0].Month;
+            let new_sts1_d=student_sts[0].Total;
+            let new_sts2_c=student_sts[1].Month;
+            let new_sts2_d=student_sts[1].Total;
+            let new_sts3_c=student_sts[2].Month;
+            let new_sts3_d=student_sts[2].Total;
+            console.log("new_sts2_c",new_sts2_c);
+            console.log("new_sts2_d",new_sts2_d);
+            %>
+
+            chart: {
+                type: "bar",
+                styledMode: !0
+            },
+            credits: {
+                enabled: !1
+            },
+            exporting: {
+                buttons: {
+                    contextButton: {
+                        enabled: !1
+                    }
+                }
+            },
+            title: {
+                text: "<%=__("New Students")%>"
+            },
+            xAxis: {
+                categories: ['<%=new_sts1_c%>', '<%=new_sts2_c%>', '<%=new_sts3_c%>']
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: "<%=__("New students by month")%>",
+                    style: {
+                        display: "none"
+                    }
+                }
+            },
+            legend: {
+                reversed: !1
+            },
+            plotOptions: {
+                series: {
+                    stacking: "normal"
+                }
+            },
+            color: {
+                pattern: ["#6d60b0"]
+            },
+            series: [{
+                name: "<%=__("Number of students")%>",
+                data: [<%=new_sts1_d%>, <%=new_sts2_d%>, <%=new_sts3_d%>]
+            }]
+        });
+
+    });
+</script>
+
+</body>
+
+</html>

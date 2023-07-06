@@ -1,0 +1,1031 @@
+<%- include('./header.ejs') %>
+
+<body onload="get_badge()">
+
+<!--wrapper-->
+
+<div class="wrapper">
+
+    <%- include('./sidebar.ejs') %>
+    <%- include('./topbar.ejs') %>
+    <div id="mydiv" data-userbranch=<%= req.session.branchcode %>></div>
+    <!--start page wrapper -->
+    <div class="page-wrapper">
+        <div class="page-content">
+            <!--breadcrumb-->
+            <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+                <div class="ps-3">
+                    <span class="font-30"><i class="bx bxs-user-account"></i></span>
+                    <span class="font-24"><%= __("User Manager") %></span>
+                </div>
+            </div>
+            <!--end breadcrumb-->
+            <!-- <div class="col-12 col-lg-9 mx-auto"> -->
+            <div class="card radius-10">
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table mb-0 table-striped table-bordered table-sm table-hover" id="myDataTable">
+                            <thead class="table-light">
+                            <tr>
+                                <th class="text-md-center" style="width: 10%"><%= __("User Code") %></th>
+                                <th class="text-md-center" style="width: 10%"><%= __("User Role") %></th>
+                                <th class="text-md-center" style="width: 10%"><%= __("Login ID") %></th>
+                                <th class="text-md-center" style="width: 22%"><%= __("Name") %></th>
+
+                                <th class="text-md-center" style="width: 10%"><%= __("Last Login") %></th>
+                                <th class="text-md-center" style="width: 10%"><%= __("Create Date") %></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <% let last_login; for(let i = 0; i < return_data.length; i++) { %>
+                                <tr onclick="show_user('<%= return_data[i].UserCode %>')">
+                                    <td class="text-md-center" style="width: 10%"><%= return_data[i].UserCode %></td>
+                                    <td class="text-md-left" style="width: 10%"><%= return_data[i].Role %></td>
+                                    <td class="text-md-left" style="width: 10%"><%= return_data[i].Login %></td>
+                                    <td class="text-md-left" style="width: 19%"><%= return_data[i].Name %></td>
+
+                                    <% if (return_data[i].LastLogin) {
+                                        last_login = new Date(return_data[i].LastLogin).toLocaleDateString('en-CA', {timeZone: 'GMT'})
+                                    } else {
+                                        last_login = "never"
+                                    } %>
+                                    <td class="text-md-center" style="width: 10%"><%= last_login %></td>
+                                    <td class="text-md-center"
+                                        style="width: 10%"><%= new Date(return_data[i].CreateDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) %></td>
+                                </tr>
+                            <% } %>
+                            </tbody>
+                        </table>
+                        <a class="btn bg-primary btn-sm  text-white" onclick="add_new()"
+                           id="btn_adduser"><%= __("Add New User") %></a>
+                    </div>
+                </div>
+
+            </div>
+            <!-- </div> -->
+
+            <%- include('./copyright.ejs') %>
+        </div>
+    </div>
+    <!--end page wrapper -->
+
+    <!-- user create modal -->
+    <div class="modal fade" id="user_Modal" role="dialog">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="card">
+                        <div class="card-body p-4 border-rounded">
+
+                            <form id="UserProfile">
+
+                                <div class="col-12 col-lg-9 mx-auto">
+                                    <!-- <div class="card radius-10"> -->
+                                    <div class="card-body">
+                                        <div class="row mb-3">
+                                            <div class="col-sm-3">
+                                                <h6 class="my-1"><%= __("User Code") %></h6>
+                                            </div>
+                                            <div class="col-sm-9 text-secondary">
+                                                <input type="hidden" id="user_code" name="user_code" >
+                                                <input type='text' class="form-control" id="user_code_v"
+                                                       placeholder="<%= __("** System Generate **") %>" 
+                                                       autocomplete="off" readonly >
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <div class="col-sm-3">
+                                                <h6 class="mb-0"><%= __("Login Id") %></h6>
+                                            </div>
+                                            <div class="col-sm-9 text-secondary">
+                                                <input type="text" class="form-control" id="login" name="login"
+                                                       onkeyup="spaceCheck('login')" autocomplete="off" readonly onchange="checkdup()"
+                                                       >
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-sm-3">
+                                                <h6 class="my-1"><%= __("Password") %></h6>
+                                            </div>
+                                            <div class="col-sm-9 text-secondary">
+                                                <input type="text" class="form-control" id="password"
+                                                       name="password" autocomplete="off">
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-sm-3">
+                                                <h6 class="my-1"><%= __("Name") %></h6>
+                                            </div>
+                                            <div class="col-sm-9 text-secondary">
+                                                <input type="text" class="form-control" id="name" name="name"
+                                                       autocomplete="off">
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3" id="emailInput">
+                                            <div class="col-sm-3">
+                                                <h6 class="my-1"><%= __("Email") %></h6>
+                                            </div>
+                                            <div class="col-sm-9 text-secondary">
+                                                <input type="text" class="form-control" id="email" name="email"
+                                                       autocomplete="off">
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-sm-3">
+                                                <h6 class="my-1"><%= __("Mobile") %></h6>
+                                            </div>
+                                            <div class="col-sm-9 text-secondary">
+                                                <input type="text" class="form-control" id="mobile" name="mobile"
+                                                       onkeyup="intCheck('mobile')" autocomplete="off">
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-sm-3">
+                                                <h6 class="my-1"><%= __("Branch Code") %></h6>
+                                            </div>
+                                            <div class="col-sm-9 text-secondary" id='branchcodepanel' onclick="get_branchcode()">
+                                                <input type="text" class="form-control" id="branchcode"
+                                                       name="branchcode" autocomplete="off">
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-sm-3">
+                                                <h6 class="my-1"><%= __("User Role") %></h6>
+                                            </div>
+                                            <div class="col-sm-9 text-secondary">
+                                                <input type="radio" id="user_role1" name="user_role"
+                                                       class="form-check-input" value="Admin"> <%= __("Admin") %> &nbsp;
+                                                <input type="radio" id="user_role2" name="user_role"
+                                                       class="form-check-input" value="Teacher"> <%= __("Teacher") %>
+                                                &nbsp;
+                                                <input type="radio" id="user_role3" name="user_role"
+                                                       class="form-check-input" value="Staff"> <%= __("Staff") %> &nbsp;
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-sm-3">
+                                                <h6 class="my-1"><%= __("Additional Roles") %></h6>
+                                            </div>
+                                            <div class="col-sm-9 text-secondary">
+                                                <table id="features">
+                                                    <tr>
+                                                        <td>
+                                                            <input type="checkbox" id="usermanager" name="usermanager"
+                                                                   class="form-check-input"
+                                                                   value="UserAdmin=1"> <%= __("User Manager") %>
+                                                        </td>
+                                                        <td>
+                                                            <input type="checkbox" id="productmanager"
+                                                                   name="productmanager" class="form-check-input"
+                                                                   value="ProductManager=1"> <%= __("Product Manager") %>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <input type="checkbox" id="leaveapprover"
+                                                                   name="leaveapprover" class="form-check-input"
+                                                                   value="LeaveApprover=1"> <%= __("Leaves Approver") %>
+                                                        </td>
+                                                        <td>
+                                                            <input type="checkbox" id="claimapprover"
+                                                                   name="claimapprover" class="form-check-input"
+                                                                   value="ClaimApprover=1"> <%= __("Claims Approver") %>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <div class="col-sm-3">
+                                                <h6 class="my-1"><%= __("Approver (Leaves)") %></h6>
+                                            </div>
+                                            <div class="col-sm-9 text-secondary" id='approverlistleavemodal' onclick="get_approver_list_leave()">
+                                                <input type="hidden" id="approver_code_leave" name="approver_code_leave">
+                                                <input type="text" class="form-control" id="approver_name_leave" name="approver_name_leave">
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <div class="col-sm-3">
+                                                <h6 class="my-1"><%= __("Approver (Claims)") %></h6>
+                                            </div>
+                                            <div class="col-sm-9 text-secondary" id='approverlistclaimmodal' onclick="get_approver_list_claim()">
+                                                <input type="hidden" id="approver_code_claim" name="approver_code_claim">
+                                                <input type="text" class="form-control" id="approver_name_claim" name="approver_name_claim">
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <div class="col-sm-3">
+                                                <h6 class="my-1"><%= __("Employed Date") %></h6>
+                                            </div>
+                                            <div class="col-sm-9 text-secondary">
+                                                <input type="text" class="form-control" id="employed_date"
+                                                       name="employed_date" autocomplete="off">
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-sm-3">
+                                                <h6 class="my-1"><%= __("Employment Type") %></h6>
+                                            </div>
+                                            <div class="col-sm-9 text-secondary">
+                                                <input type="text" class="form-control" id="employed_type"
+                                                       name="employed_type" autocomplete="off">
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <div class="col-sm-3">
+                                                <h6 class="my-1"><%= __("Monthly Salary") %></h6>
+                                            </div>
+                                            <div class="col-sm-9 text-secondary">
+                                                <input type="text" class="form-control" id="m_salary" name="m_salary"
+                                                       onkeyup="decimalCheck('m_salary')" autocomplete="off">
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-sm-3">
+                                                <h6 class="my-1"><%= __("MPF Employee") %> (%)</h6>
+                                            </div>
+                                            <div class="col-sm-9 text-secondary">
+                                                <input type="text" class="form-control" id="mpf_employee"
+                                                       name="mpf_employee" onkeyup="decimalCheck('mpf_employee')"
+                                                       autocomplete="off">
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-sm-3">
+                                                <h6 class="my-1"><%= __("MPF Employer") %> (%)</h6>
+                                            </div>
+                                            <div class="col-sm-9 text-secondary">
+                                                <input type="text" class="form-control" id="mpf_employer"
+                                                       name="mpf_employer" onkeyup="decimalCheck('mpf_employee')"
+                                                       autocomplete="off">
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-sm-3">
+                                                <h6 class="my-1"><%= __("Comission") %></h6>
+                                            </div>
+                                            <div class="col-sm-9 text-secondary">
+                                                <table class="table">
+                                                    <tr>
+                                                        <td style="width:25%"></td>
+                                                        <td class="text-center">com#1</td>
+                                                        <td class="text-center">com#2</td>
+                                                        <td class="text-center">com#3</td>
+                                                        <td class="text-center">com#4</td>
+                                                        <td class="text-center">com#5</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="width:25%">min. student</td>
+                                                        <td><input type="text" class="form-control" id="com_min1"
+                                                                   name="com_min1" size="5" style="text-align: right;"
+                                                                   onkeyup="intCheck('com_min1')" autocomplete="off">
+                                                        </td>
+                                                        <td><input type="text" class="form-control" id="com_min2"
+                                                                   name="com_min2" size="5" style="text-align: right;"
+                                                                   onkeyup="intCheck('com_min2')" autocomplete="off">
+                                                        </td>
+                                                        <td><input type="text" class="form-control" id="com_min3"
+                                                                   name="com_min3" size="5" style="text-align: right;"
+                                                                   onkeyup="intCheck('com_min3')" autocomplete="off">
+                                                        </td>
+                                                        <td><input type="text" class="form-control" id="com_min4"
+                                                                   name="com_min4" size="5" style="text-align: right;"
+                                                                   onkeyup="intCheck('com_min4')" autocomplete="off">
+                                                        </td>
+                                                        <td><input type="text" class="form-control" id="com_min5"
+                                                                   name="com_min5" size="5" style="text-align: right;"
+                                                                   onkeyup="intCheck('com_min5')" autocomplete="off">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="width:25%">max. student</td>
+                                                        <td><input type="text" class="form-control" id="com_max1"
+                                                                   name="com_max1" size="5" style="text-align: right;"
+                                                                   onkeyup="intCheck('com_max1')" autocomplete="off">
+                                                        </td>
+                                                        <td><input type="text" class="form-control" id="com_max2"
+                                                                   name="com_max2" size="5" style="text-align: right;"
+                                                                   onkeyup="intCheck('com_max2')" autocomplete="off">
+                                                        </td>
+                                                        <td><input type="text" class="form-control" id="com_max3"
+                                                                   name="com_max3" size="5" style="text-align: right;"
+                                                                   onkeyup="intCheck('com_max3')" autocomplete="off">
+                                                        </td>
+                                                        <td><input type="text" class="form-control" id="com_max4"
+                                                                   name="com_max4" size="5" style="text-align: right;"
+                                                                   onkeyup="intCheck('com_max4')" autocomplete="off">
+                                                        </td>
+                                                        <td><input type="text" class="form-control" id="com_max5"
+                                                                   name="com_max5" size="5" style="text-align: right;"
+                                                                   onkeyup="intCheck('com_max5')" autocomplete="off">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="width:25%">basic</td>
+                                                        <td><input type="text" class="form-control" id="com_base1"
+                                                                   name="com_base1" size="5" style="text-align: right;"
+                                                                   onkeyup="decimalCheck('com_base1')"
+                                                                   autocomplete="off"></td>
+                                                        <td><input type="text" class="form-control" id="com_base2"
+                                                                   name="com_base2" size="5" style="text-align: right;"
+                                                                   onkeyup="decimalCheck('com_base2')"
+                                                                   autocomplete="off"></td>
+                                                        <td><input type="text" class="form-control" id="com_base3"
+                                                                   name="com_base3" size="5" style="text-align: right;"
+                                                                   onkeyup="decimalCheck('com_base3')"
+                                                                   autocomplete="off"></td>
+                                                        <td><input type="text" class="form-control" id="com_base4"
+                                                                   name="com_base4" size="5" style="text-align: right;"
+                                                                   onkeyup="decimalCheck('com_base4')"
+                                                                   autocomplete="off"></td>
+                                                        <td><input type="text" class="form-control" id="com_base5"
+                                                                   name="com_base5" size="5" style="text-align: right;"
+                                                                   onkeyup="decimalCheck('com_base5')"
+                                                                   autocomplete="off"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="width:25%">comission</td>
+                                                        <td><input type="text" class="form-control" id="com_rate1"
+                                                                   name="com_rate1" size="5" style="text-align: right;"
+                                                                   onkeyup="intCheck('com_rate1')" autocomplete="off">
+                                                        </td>
+                                                        <td><input type="text" class="form-control" id="com_rate2"
+                                                                   name="com_rate2" size="5" style="text-align: right;"
+                                                                   onkeyup="intCheck('com_rate2')" autocomplete="off">
+                                                        </td>
+                                                        <td><input type="text" class="form-control" id="com_rate3"
+                                                                   name="com_rate3" size="5" style="text-align: right;"
+                                                                   onkeyup="intCheck('com_rate3')" autocomplete="off">
+                                                        </td>
+                                                        <td><input type="text" class="form-control" id="com_rate4"
+                                                                   name="com_rate4" size="5" style="text-align: right;"
+                                                                   onkeyup="intCheck('com_rate4')" autocomplete="off">
+                                                        </td>
+                                                        <td><input type="text" class="form-control" id="com_rate5"
+                                                                   name="com_rate5" size="5" style="text-align: right;"
+                                                                   onkeyup="intCheck('com_rate5')" autocomplete="off">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="width:25%">bonus</td>
+                                                        <td><input type="text" class="form-control" id="com_bonus1"
+                                                                   name="com_bonus1" size="5" style="text-align: right;"
+                                                                   onkeyup="decimalCheck('com_bonus1')"
+                                                                   autocomplete="off"></td>
+                                                        <td><input type="text" class="form-control" id="com_bonus2"
+                                                                   name="com_bonus2" size="5" style="text-align: right;"
+                                                                   onkeyup="decimalCheck('com_bonus2')"
+                                                                   autocomplete="off"></td>
+                                                        <td><input type="text" class="form-control" id="com_bonus3"
+                                                                   name="com_bonus3" size="5" style="text-align: right;"
+                                                                   onkeyup="decimalCheck('com_bonus3')"
+                                                                   autocomplete="off"></td>
+                                                        <td><input type="text" class="form-control" id="com_bonus4"
+                                                                   name="com_bonus4" size="5" style="text-align: right;"
+                                                                   onkeyup="decimalCheck('com_bonus4')"
+                                                                   autocomplete="off"></td>
+                                                        <td><input type="text" class="form-control" id="com_bonus5"
+                                                                   name="com_bonus5" size="5" style="text-align: right;"
+                                                                   onkeyup="decimalCheck('com_bonus5')"
+                                                                   autocomplete="off"></td>
+                                                    </tr>
+                                                </table>
+
+                                            </div>
+
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-sm-3"></div>
+                                            <div class="col-sm-9 text-secondary">
+                                                <span id="confirmation" class="text-center text-primary font-18"></span>
+                                                <div id="edit_button_container">
+                                                    <input type="button" id="btn_edit_user"
+                                                           class="btn btn-danger px-4 float-end"
+                                                           onclick="open_edit_user()"
+                                                           value="<%= __("Edit") %>"/>
+                                                </div>
+                                                <div id="del_button_container" style="display: none">
+                                                    <input type="button" id="btn_del_user"
+                                                           class="btn btn-danger px-4 float-end"
+                                                           onclick="delete_user()"
+                                                           value="<%= __("Delete") %>"/>
+                                                </div>
+                                                <div id="save_button_container" style="display: none">
+                                                    <input type="button" id="btn_saveChange"
+                                                           class="btn btn-primary px-4" onclick="save_user()"
+                                                           value="<%= __("Save") %>"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- </div> -->
+
+
+                            </form>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- user create modal ended -->
+
+    <!-- Get branch code modal -->
+    <div class="modal fade" id="branchcode_Modal" role="dialog">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table class="table mb-0 table-striped table-bordered table-sm" id="product_list_sm"
+                                   data-paging="false">
+                                <thead class="table-light">
+                                <tr>
+                                    <th class="text-md-center" style="width: 20%"></th>
+                                    <th class="text-md-center" style="width: 80%"><%= __("Branch Code") %></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                                <tfoot>
+                                <tr>
+                                    <td class="text-left">
+                                        <a class="btn btn-primary btn-sm radius-30 px-4" data-bs-dismiss="modal"
+                                           onclick="use_this_branchcode()"><%= __("Apply") %></a>
+                                    </td>
+                                    <td class="text-end">
+                                        <a class="btn btn-secondary btn-sm radius-30 px-4"
+                                           data-bs-dismiss="modal"><%= __("Cancel") %></a>
+                                    </td>
+                                </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- get branch code modal ended -->
+
+    <!-- select approver modal -->
+    <div class="modal fade" id="selectapprover_Modal" role="dialog">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><%= __("Select Approver") %></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table class="table mb-0 table-striped table-bordered table-hover" id="selection_table_search3" data-info="false" data-ordering="false" data-searching="false">
+                                <thead class="table-light">
+                                <tr>
+                                    <th class="text-md-center" style="width: 70%"><%= __("User") %></th>
+                                    <th style="width: 30%"> </th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- select approver modal ended-->
+
+    <!-- delete confirmation modal -->
+    <div class="modal fade" id="delete_Modal" role="dialog">
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form id="delete_user_form">
+                        <div class="text-md-center">
+                            <input type="hidden" id="del_usercode">
+                            <span class="text-secondary font-16"><%= __("Delete User") %> # </span>
+                            <span class="text-primary font-16" id="del_user_v"></span>
+                        </div>
+                        <hr>
+                        <div class="text-md-center">
+                            <a class="btn btn-sm bg-secondary text-white" data-bs-dismiss="modal"
+                               id="btn_del_cancel"><%= __("Cancel") %></a> &nbsp;&nbsp;
+                            <a class="btn btn-sm bg-danger text-white"
+                               id="btn_del_confirm"
+                               onclick="del_confirm()"><%= __("Confirm") %></a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- delete confirmation modal ended -->
+
+</div>
+
+
+<%- include('./footer.ejs') %>
+
+</div>
+<!--wrapper ended-->
+
+<script type="text/javascript">
+
+    function open_edit_user() {
+        $("#UserProfile").find(':input:disabled').prop('disabled', false)
+        $('#user_code_v').prop('disabled', true)
+        $('#login').prop('disabled', true)
+        //$('#password').prop('disabled', true)
+        $('#edit_button_container').hide();
+        $('#save_button_container').show();
+        $('#del_button_container').show();
+        $('#branchcodepanel').attr('onclick','get_branchcode()')
+        $('#approverlistleavemodal').attr('onclick','get_approver_list_leave()')
+        $('#approverlistclaimmodal').attr('onclick','get_approver_list_claim()')
+    }
+
+    function add_new() {
+        $("#UserProfile").trigger('reset');
+        $("#UserProfile").find(':input:disabled').prop('disabled', false)
+        $('#login').prop('disabled', false);
+        $('#edit_button_container').hide();
+        $('#save_button_container').show();
+		$('#user_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#user_Modal').modal('show');
+        $('#login').focus().removeAttr('readonly');
+        $('#emailInput').hide()
+    }
+
+    function decimalCheck(e) {
+        let dec = $('#' + e).val();
+        // console.log(dec);
+        $('#' + e).val(dec.replace(/[^0-9.,-]/g, ''));
+        if (dec.includes(".")) {
+            let res = dec.substring(dec.indexOf(".") + 1);
+            let kl = res.split("");
+            if (kl.length > 1) {
+                $('#' + e).val((parseInt(dec * 100) / 100).toFixed(2));
+            }
+        }
+    }
+
+    function intCheck(e) {
+        let dec = $('#' + e).val();
+        $('#' + e).val(dec.replace(/[^0-9]/g, ''));
+    }
+
+    function spaceCheck(e) {
+        let s = $('#' + e).val();
+        $('#' + e).val(s.replace(/\s/g, ''));
+    }
+
+    function save_user() {
+        let action;
+        let y = $('#UserProfile').find('input[type=checkbox]:checked');
+        let addf ='';
+        if(y) {
+            $.each(y, function (i) {
+                if (i > 0) {
+                    addf = addf + ',' + y[i].value;
+                } else {
+                    addf = y[i].value;
+                }
+            });
+        }
+        if($('#user_code').val()==='') {
+            action="add_new";
+        } else {
+            action="update";
+        }
+        if (checkdup() && checkrequired()) {
+            $('#del_button_container').hide();
+            $('#save_button_container').hide();
+            let form = $('#UserProfile');
+            $.ajax({
+                async: false,
+                type: 'post',
+                url: '/system/users',
+                data: { action: action, form: form.serialize(), additional_features: addf},
+                success: function (return_data) {
+                    if (action==='add_new') {
+                        $('#user_code').val(return_data[0].UserCode)
+                        $('#confirmation').text('User Saved');
+                    }
+                }
+            });
+            // refresh user list
+            refresh_user_list();
+            setTimeout(resume_normal, 3000)
+        }
+    }
+
+    function refresh_user_list() {
+        $('#myDataTable').DataTable().data().clear();
+        $.ajax({
+            type: 'post',
+            url: '/system/users',
+            data: { action: 'refresh_users'},
+            success: function (return_data) {
+                const userBranchCodes = $('#mydiv').data('userbranch').split(',');
+                let filteredData = return_data.filter(item=>{
+                    if (item.BranchCode !== null) {
+                const userBranch = item.BranchCode.split(",");
+                if (
+                  userBranch.some((branch) => userBranchCodes.includes(branch))
+                )
+                  return item;
+              }
+                })
+                $.each(filteredData, function (i) {
+                    this_row = `<tr onclick="show_user('` + filteredData[i].UserCode + `')">`;
+                    this_row += `<td class="text-md-center" style="width: 10%">` + filteredData[i].UserCode + `</td>`;
+                    this_row += `<td class="text-md-left" style="width: 10%">` + filteredData[i].Role + `</td>`;
+                    this_row += `<td class="text-md-left" style="width: 10%">` + filteredData[i].Login + `</td>`;
+                    this_row += `<td class="text-md-left" style="width: 22%">` + filteredData[i].Name + `</td>`;
+                    // this_row += `<td class="text-md-email" style="width: 22%">` + filteredData[i].Email + `</td>`;
+                    if (filteredData[i].LastLogin) {
+                        last_login = new Date(filteredData[i].LastLogin).toLocaleDateString('en-CA', {timeZone: 'GMT'})
+                    } else {
+                        last_login = "never"
+                    }
+                    this_row += `<td class="text-md-center" style="width: 10%">` + last_login + `</td>`;
+                    this_row += `<td class="text-md-center" style="width: 10%">` + new Date(filteredData[i].CreateDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) + `</td>`;
+                    this_row += `</tr>`;
+                    // console.log(this_row);
+                    $('#myDataTable').DataTable().row.add($(this_row)).draw(false);
+                });
+            }
+        });
+    }
+
+    function resume_normal() {
+        $('#user_code').val('');
+        $('#user_Modal').modal('hide');
+        $('#saveChange').attr('onclick', 'save_student()');
+        $('#confirmation').text('');
+        $("#UserProfile").trigger('reset');
+    }
+
+    function checkdup() {
+        // console.log('--------function checkdup triggered--------')
+        // console.log($('#login').val())
+        let count;
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/system/users',
+            data: {action: 'checkdup', login: $('#login').val()},
+            success: function (return_data) {
+                console.log(return_data)
+                count = return_data.length;
+            }
+        });
+        if ($('#user_code').val()!=='') {
+            // edit mode no need to check
+            return true;
+        }
+        if (count < 1) {
+            $('#login').removeClass("border-danger-input_alert")
+            //alert('return true '+count);
+            return true;
+        } else {
+            $('#promptMSG').text('<%= __("Login ID already exists!") %>');
+            $('#msgModal').modal('show');
+            $('#login').addClass("border-danger-input_alert")
+            // alert('return false '+count);
+            return false;
+        }
+    }
+
+    function checkrequired() {
+        if ($('#login').val() === '') {
+            // no schedule yet
+            $('#promptMSG').text('<%= __("Please provide Login ID") %>');
+            $('#msgModal').modal('show');
+            $('#login').addClass("border-danger-input_alert");
+            return false;
+        } else {
+            $('#login').removeClass("border-danger-input_alert");
+        }
+        if ($('#password').val() === '') {
+            // no schedule yet
+            $('#promptMSG').text('<%= __("Please provide login password") %>');
+            $('#msgModal').modal('show');
+            $('#password').addClass("border-danger-input_alert");
+            return false;
+        } else {
+            $('#password').removeClass("border-danger-input_alert");
+        }
+        if ($('#name').val() === '') {
+            // no schedule yet
+            $('#promptMSG').text('<%= __("Please provide user name") %>');
+            $('#msgModal').modal('show');
+            $('#name').addClass("border-danger-input_alert");
+            return false;
+        } else {
+            $('#name').removeClass("border-danger-input_alert");
+        }
+        //Set email default
+        // if ($('#email').val() === '') {
+        //     // no schedule yet
+        //     $('#promptMSG').text('Please provide email address") %>');
+        //     $('#msgModal').modal('show');
+        //     $('#email').addClass("border-danger-input_alert");
+        //     return false;
+        // } else {
+        //     $('#email').removeClass("border-danger-input_alert");
+        // }
+        if ($('#branchcode').val() === '') {
+            // no schedule yet
+            $('#promptMSG').text('<%= __("Please choose branch code") %>');
+            $('#msgModal').modal('show');
+            $('#branchcode').addClass("border-danger-input_alert");
+            return false;
+        } else {
+            $('#branchcode').removeClass("border-danger-input_alert");
+        }
+        // if ($('#email').val() !== '') {
+        //     let validRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g;
+        //     if (!$('#email').val().match(validRegex)) {
+        //         $('#promptMSG').text(' __("Invalid email address") %>');
+        //         $('#msgModal').modal('show');
+        //         $('#email').addClass("border-danger-input_alert");
+        //         return false;
+        //     } else {
+        //         $('#email').removeClass("border-danger-input_alert");
+        //     }
+        // }
+        let e = $('input[name="user_role"]:checked').val();
+        if (e === undefined) {
+            $('#promptMSG').text('<%= __("Please select user role") %>');
+            $('#msgModal').modal('show');
+            $('#user_role1').addClass("border-danger-input_alert");
+            $('#user_role2').addClass("border-danger-input_alert");
+            $('#user_role3').addClass("border-danger-input_alert");
+            return;
+        } else {
+            $('#user_role1').removeClass("border-danger-input_alert");
+            $('#user_role2').removeClass("border-danger-input_alert");
+            $('#user_role3').removeClass("border-danger-input_alert");
+        }
+        if ($('#mobile').val() === '') {
+            // no schedule yet    
+            $('#promptMSG').text('<%= __("Please provide contact number") %>');
+            $('#msgModal').modal('show');
+            $('#mobile').addClass("border-danger-input_alert");
+            return false;
+        } else {
+            $('#mobile').removeClass("border-danger-input_alert");
+            return true;
+        }
+    }
+
+    function show_user(c) {
+        $("#UserProfile").trigger('reset');
+        $('#emailInput').hide();
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/system/users',
+            data: {action: 'get_user_info', code: c},
+            success: function (return_data) {
+                if (return_data[0].UserCode) {
+                    $('#user_code').val(return_data[0].UserCode)
+                    $('#user_code_v').val(return_data[0].UserCode)
+                    $('#name').val(return_data[0].Name);
+                    $('#login').val(return_data[0].Login);
+                    $('#password').val('null');
+                    // $('#email').val(return_data[0].Email);
+                    $('#mobile').val(return_data[0].Phone);
+                    $('#name').val(return_data[0].Name);
+                    $('#approver_code_claim').val(return_data[0].Approver_id_claim);
+                    $('#approver_name_claim').val(return_data[0].Approver_name_claim);
+                    $('#approver_code_leave').val(return_data[0].Approver_id_leave);
+                    $('#approver_name_leave').val(return_data[0].Approver_name_leave);
+                    $("input[name=user_role][value=" + return_data[0].Role + "]").prop('checked', true);
+                    $('#branchcode').val(return_data[0].BranchCode);
+                    $('#employed_date').val(new Date(return_data[0].Employed_Date).toLocaleDateString('en-CA', {timeZone: 'GMT'}));
+                    $('#employed_type').val(return_data[0].Type);
+                    $('#m_salary').val(return_data[0].Monthly);
+                    $('#com_min1').val(return_data[0].com_min1);
+                    $('#com_max1').val(return_data[0].com_max1);
+                    $('#com_base1').val(return_data[0].com_base1);
+                    $('#com_rate1').val(return_data[0].com_rate1);
+                    $('#com_bonus1').val(return_data[0].com_bonus1);
+                    $('#com_min2').val(return_data[0].com_min2);
+                    $('#com_max2').val(return_data[0].com_max2);
+                    $('#com_base2').val(return_data[0].com_base2);
+                    $('#com_rate2').val(return_data[0].com_rate2);
+                    $('#com_bonus2').val(return_data[0].com_bonus2);
+                    $('#com_min3').val(return_data[0].com_min3);
+                    $('#com_max3').val(return_data[0].com_max3);
+                    $('#com_base3').val(return_data[0].com_base3);
+                    $('#com_rate3').val(return_data[0].com_rate3);
+                    $('#com_bonus3').val(return_data[0].com_bonus3);
+                    $('#com_min4').val(return_data[0].com_min4);
+                    $('#com_max4').val(return_data[0].com_base4);
+                    $('#com_base4').val(return_data[0].com_base4);
+                    $('#com_rate4').val(return_data[0].com_rate4);
+                    $('#com_bonus4').val(return_data[0].com_bonus4);
+                    $('#com_min5').val(return_data[0].com_min5);
+                    $('#com_max5').val(return_data[0].com_max5);
+                    $('#com_base5').val(return_data[0].com_base5);
+                    $('#com_rate5').val(return_data[0].com_rate5);
+                    $('#com_bonus5').val(return_data[0].com_bonus5);
+                    $('#mpf_employee').val(return_data[0].MPF_Employee);
+                    $('#mpf_employer').val(return_data[0].MPF_Employer);
+                    if (return_data[0].Features) {
+                        for (x of return_data[0].Features.split(",")) {
+                            $("input:checkbox[name=usermanager][value='" + x + "']").prop('checked', true);
+                            $("input:checkbox[name=productmanager][value='" + x + "']").prop('checked', true);
+                            $("input:checkbox[name=leaveapprover][value='" + x + "']").prop('checked', true);
+                            $("input:checkbox[name=claimapprover][value='" + x + "']").prop('checked', true);
+                        }
+                    }
+                }
+            }
+        });
+        $('#login').prop('disabled', true);
+        $('#user_code').prop('disabled', true);
+        $("#UserProfile").find(':input:not(:disabled)').prop('disabled', true);
+        $('#edit_button_container').show();
+        $('#del_button_container').hide();
+        $('#btn_edit_user').removeAttr('disabled');
+		$('#user_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#user_Modal').modal('show');
+        $('#branchcodepanel').removeAttr('onclick');
+        $('#approverlistleavemodal').removeAttr('onclick');
+        $('#approverlistclaimmodal').removeAttr('onclick');
+    }
+
+    function get_branchcode() {
+        $('#product_list_sm').DataTable().data().clear();
+        $.ajax({
+            type: 'post',
+            async: false,
+            url: '/system/users',
+            data: {action: 'get_branchcode'},
+            success: function (return_data) {
+                $.each(return_data, function (i) {
+                    this_row = `<tr>`;
+                    this_row += `<td class="text-md-center" style="width: 20%"><input type="checkbox" value="` + return_data[i].BranchCode + `"></td>`;
+                    this_row += `<td class="text-md-center" style="width: 80%">` + return_data[i].BranchCode + `</td>`;
+                    this_row += `</tr>`;
+                    $('#product_list_sm').DataTable().row.add($(this_row)).draw(false);
+                });
+            }
+        });
+		$('#branchcode_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#branchcode_Modal').modal('show');
+    }
+
+    function use_this_branchcode() {
+        $('#branchcode_Modal').modal('hide');
+        let x = $('#product_list_sm').DataTable().$('input[type=checkbox]:checked');
+        $.each(x, function (i) {
+            if (i > 0) {
+                $('#branchcode').val($('#branchcode').val() + ',' + x[i].value);
+            } else {
+                $('#branchcode').val(x[i].value);
+            }
+        });
+    }
+
+    function get_approver_list_leave() {
+        $('#selection_table_search3').DataTable().data().clear().draw();
+        $.ajax({
+            type: 'post',
+            async: false,
+            url: '/system/users',
+            data: {action: 'get_approver_list_leave'},
+            success: function (return_data) {
+                $.each(return_data, function (i) {
+                    chk_img = '/assets/images/avatars/' + return_data[i].UserCode + '.jpg'
+                    let img = new Image();
+                    img.src = 'http://' + window.location.hostname + chk_img;
+                    if (img.complete) {
+                        img_use = chk_img;
+                    } else {
+                        img_use = '/assets/images/avatars/default.png';
+                    }
+                    this_row = `<tr onclick="use_this_approver_leave('` + return_data[i].UserCode + `','` + return_data[i].Name + `')">`;
+                    this_row += `<td class="text-md-center" style="width: 15%"><img src="` + img_use + `" class="rounded-circle" width="30" height="30"></td>`;
+                    this_row += `<td class="text-md-left" style="width: 85%">` + return_data[i].Name + `</td>`;
+                    this_row += `</tr>`;
+                    $('#selection_table_search3').DataTable().row.add($(this_row)).draw();
+                });
+            }
+        });
+		$('#selectapprover_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#selectapprover_Modal').modal('show');
+    }
+
+    function get_approver_list_claim() {
+        $('#selection_table_search3').DataTable().data().clear().draw();
+        $.ajax({
+            type: 'post',
+            async: false,
+            url: '/system/users',
+            data: {action: 'get_approver_list_claim'},
+            success: function (return_data) {
+                $.each(return_data, function (i) {
+                    chk_img = '/assets/images/avatars/' + return_data[i].UserCode + '.jpg'
+                    let img = new Image();
+                    img.src = 'http://' + window.location.hostname + chk_img;
+                    if (img.complete) {
+                        img_use = chk_img;
+                    } else {
+                        img_use = '/assets/images/avatars/default.png';
+                    }
+                    this_row = `<tr onclick="use_this_approver_claim('` + return_data[i].UserCode + `','` + return_data[i].Name + `')">`;
+                    this_row += `<td class="text-md-center" style="width: 15%"><img src="` + img_use + `" class="rounded-circle" width="30" height="30"></td>`;
+                    this_row += `<td class="text-md-left" style="width: 85%">` + return_data[i].Name + `</td>`;
+                    this_row += `</tr>`;
+                    $('#selection_table_search3').DataTable().row.add($(this_row)).draw();
+                });
+            }
+        });
+		$('#selectapprover_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#selectapprover_Modal').modal('show');
+    }
+
+    function use_this_approver_leave(c, n) {
+        $('#selectapprover_Modal').modal('hide');
+        $('#approver_code_leave').val(c);
+        $('#approver_name_leave').val(n);
+    }
+
+    function use_this_approver_claim(c, n) {
+        $('#selectapprover_Modal').modal('hide');
+        $('#approver_code_claim').val(c);
+        $('#approver_name_claim').val(n);
+    }
+
+    function delete_user() {
+        $('#del_user_v').text($('#user_code').val() + ' - ' +  $('#name').val())
+        $('#del_usercode').val($('#user_code').val())
+        $('#del_button_container').hide();
+        // $('#save_button_container').hide();
+		$('#delete_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#delete_Modal').modal('show')
+    }
+
+    function del_confirm() {
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/system/users',
+            data: {action: 'delete_user', ucode: $('#del_usercode').val()}
+        });
+        $('#delete_user_form').trigger('reset');
+        $('#delete_Modal').modal('hide');
+        refresh_user_list()
+        setTimeout(resume_normal, 2000)
+    }
+
+    $(document).ready(function () {
+        $('#student_Modal').on('hidden.bs.modal', function () {
+            resume_normal();
+        })
+        $('#employed_date').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            format: "yyyy-mm-dd",
+            <% if(req.session.lang === 'zh-HK') { %>
+            language: "zh-TW",
+            <% } else if(req.session.lang === 'zh-CN') { %>
+            language: "zh-CN",
+            <% } else { %>
+            language: "en-CA",
+            <% } %>
+        });
+    })
+</script>
+
+</body>
+
+</html>

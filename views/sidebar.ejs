@@ -1,0 +1,167 @@
+<!--sidebar wrapper -->
+
+<% let allow_leave = false; let allow_claim = false; let allow_usrmgr = false; let allow_prodmgr = false; if (req.session.allow) { for (x of
+req.session.allow.split(",")) { if(x.search('LeaveApprover')===0) { if(s = x.split('LeaveApprover=')[1]==='1') { allow_leave= true } else {
+allow_leave=false }} if(x.search('ClaimApprover')===0) { if(s = x.split('ClaimApprover=')[1]==='1') { allow_claim= true } else {
+allow_claim=false }} if(x.search('UserAdmin')===0) { if(s = x.split('UserAdmin=')[1]==='1') { allow_usrmgr= true } else { allow_usrmgr=false
+}} if(x.search('ProductManager')===0) { if(s = x.split('ProductManager=')[1]==='1') { allow_prodmgr= true } else { allow_prodmgr = false }}
+} } %>
+
+<div class="sidebar-wrapper" data-simplebar="true">
+  <div class="sidebar-header">
+    <div>
+      <a href="/home"><img src="/assets/logo/<%=config.logo%>" width="60" /></a>
+    </div>
+    <div>
+      <a href="/home"><h4 class="logo-text"><%=config.title%></h4></a><br />
+      <div id="ClockDisplay" class="clock logo-text" style="display: none"></div>
+    </div>
+    <div class="toggle-icon ms-auto"><i class="bx bx-menu"></i></div>
+  </div>
+  <!--navigation-->
+  <ul class="metismenu" id="menu">
+    <li>
+      <a class="has-arrow" style="cursor: default">
+        <div class="parent-icon"><i class="bx bx-category-alt"></i></div>
+        <div class="menu-title"><%= __("Operations") %></div>
+      </a>
+      <ul>
+        <li>
+          <a href="/course/list"><i class="bx bx-minus-circle"></i><%= __("Course Enrollment") %></a>
+        </li>
+        <li>
+          <a href="/course/query"><i class="bx bx-minus-circle"></i><%= __("Schedules (List)") %></a>
+        </li>
+        <li>
+          <a href="/oper/resources"><i class="bx bx-minus-circle"></i><%= __("Schedules (Cal)") %></a>
+        </li>
+        <li>
+          <a href="/oper/today"><i class="bx bx-minus-circle"></i><%= __("Operations") %></a>
+        </li>
+        <li>
+          <a href="/invoice/invoice"><i class="bx bx-minus-circle"></i><%= __("Sales Invoice") %></a>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <a class="has-arrow" style="cursor: default">
+        <div class="parent-icon"><i class="bx bx-glasses"></i></div>
+        <div class="menu-title"><%= __("Teachers") %></div>
+      </a>
+      <ul>
+        <li>
+          <a href="/teachers/contacts"><i class="bx bx-minus-circle"></i><%= __("Contacts") %></a>
+        </li>
+        <!--
+                    <li><a href="/teachers/attendances"><i class="bx bx-minus-circle"></i><%= __("Attendances") %></a></li>
+                    <li><a href="/teachers/payrolls"><i class="bx bx-minus-circle"></i><%= __("Payrolls") %></a></li>
+                    <li><a href="/teachers/reports"><i class="bx bx-minus-circle"></i><%= __("Reports") %></a></li>
+                    -->
+      </ul>
+    </li>
+    <% if(req.session.userrole === "Admin") { %>
+    <li>
+      <a class="has-arrow" style="cursor: default">
+        <div class="parent-icon"><i class="bx bx-user"></i></div>
+        <div class="menu-title"><%= __("Students") %></div>
+      </a>
+      <ul>
+        <li>
+          <a href="/students/contacts"><i class="bx bx-minus-circle"></i><%= __("Contacts") %></a>
+        </li>
+        <li>
+          <a href="/students/registration"><i class="bx bx-minus-circle"></i><%= __("Registration") %></a>
+        </li>
+      </ul>
+    </li>
+    <% } %>
+    <hr />
+    <li>
+      <% if(req.session.userrole === "Admin" || allow_leave || allow_claim) { %>
+      <a class="has-arrow" style="cursor: default">
+        <div class="parent-icon"><i class="bx bx-terminal"></i></div>
+        <div class="menu-title"><%= __("Managements") %></div>
+      </a>
+      <ul>
+        <% if (allow_leave || req.session.userrole==='Admin') { %>
+        <li>
+          <a href="/applications/leaves"><i class="bx bx-minus-circle"></i><%= __("Leaves Management") %></a>
+        </li>
+        <% } %> <% if (allow_claim || req.session.userrole==='Admin') { %>
+        <li>
+          <a href="/applications/claims"><i class="bx bx-minus-circle"></i><%= __("Claims Management") %></a>
+        </li>
+        <% } %>
+      </ul>
+      <% } %>
+    </li>
+    <% if(req.session.userrole === "Admin" || allow_prodmgr) { %>
+    <li>
+      <a class="has-arrow" style="cursor: default">
+        <div class="parent-icon"><i class="bx bx-cart-alt"></i></div>
+        <div class="menu-title"><%= __("Materials/Courses") %></div>
+      </a>
+      <ul>
+        <li>
+          <a href="/prod/create_courses_and_items"><i class="bx bx-minus-circle"></i><%= __("Create") %> </a>
+        </li>
+        <li>
+          <a href="/prod/list_courses_and_items"><i class="bx bx-minus-circle"></i><%= __("List/Edit") %> </a>
+        </li>
+        <li>
+          <a href="/system/vouchers"><i class="bx bx-minus-circle"></i><%= __("Vouchers") %></a>
+        </li>
+        <!--
+                <li>
+                    <a  class="has-arrow">
+                        <div class="parent-icon"><i class="bx bx-cart-alt"></i>
+                        </div>
+                        <div class="menu-title"><%= __("Packages") %></div>
+                    </a>
+                    <ul>
+                        <li><a href="/prod/create_packages"><i class="bx bx-minus-circle"></i><%= __("Create") %></a>
+                        </li>
+                        <li><a href="/prod/list_packages"><i class="bx bx-minus-circle"></i><%= __("List/Edit") %></a>
+                        </li>
+                    </ul>
+                </li>
+                -->
+      </ul>
+    </li>
+    <% } %> <% if (req.session.userrole === "Admin" || allow_usrmgr) { %>
+
+    <li>
+      <a class="has-arrow" style="cursor: default">
+        <div class="parent-icon"><i class="bx bx-server"></i></div>
+        <div class="menu-title"><%= __("System") %></div>
+      </a>
+      <ul>
+        <li>
+          <a href="/system/users"><i class="bx bx-minus-circle"></i><%= __("Users Management") %></a>
+        </li>
+
+        <% if (req.session.userrole === "Admin") { %>
+        <li>
+          <a href="/applications/payrolls"><i class="bx bx-minus-circle"></i><%= __("Payrolls Report") %></a>
+        </li>
+        <% } %> <% if (req.session.userrole === "Admin") { %>
+        <li>
+          <a href="/system/holidays"><i class="bx bx-minus-circle"></i><%= __("Holiday Table") %></a>
+        </li>
+        <li>
+          <a href="/system/mastertb"><i class="bx bx-minus-circle"></i><%= __("Master Tables") %></a>
+        </li>
+        <% } %>
+        <!--
+                    <li><a href="/system/rooms"><i class="bx bx-minus-circle"></i><%= __("Room Management") %></a></li>
+                    <li><a href="/system/assets"><i class="bx bx-minus-circle"></i><%= __("Asset Management") %></a></li>
+                    <li><a href="/system/templates"><i class="bx bx-minus-circle"></i><%= __("Templates Management") %></a></li>
+                    -->
+      </ul>
+    </li>
+
+    <% } %>
+  </ul>
+  <!--end navigation-->
+</div>
+<!-- end sidebar wrapper -->

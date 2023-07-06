@@ -1,0 +1,238 @@
+<%- include('./header.ejs') %>
+<style>
+
+    #calendar {
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 0 10px;
+    }
+    .popover {
+        border: 2px ridge #fe0015;
+    }
+
+    .popover-title {
+        background-color: #73AD21;
+        color: #FFFFFF;
+        font-size: 28px;
+        text-align:center;
+    }
+    .popover-content {
+        background-color: #e3d51d;
+        color: #006efe;
+        padding: 25px;
+    }
+</style>
+
+<body onload="get_badge()">
+
+<!--wrapper-->
+<div class="wrapper">
+
+<%- include('./sidebar.ejs') %>
+<%- include('./topbar.ejs') %>
+
+<!--start page wrapper -->
+<div class="page-wrapper">
+    <div class="page-content">
+
+        <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+            <div class="ps-3">
+                <span class="font-30"><i class="bx bx-happy-alt"></i></span>
+                <span class="font-24"><%= __("Teachers") %></span>
+            </div>
+        </div>
+
+        <!-- <div class="col-12 col-lg-9 mx-auto"> -->
+
+            <div class="card radius-10">
+                <div class="card-body">
+                    <div class="table-responsive lead-table">
+
+                        <table class="table mb-0 align-middle" id="teacherTable">
+                            <thead class="table-light">
+                            <tr>
+                                <th><span class="font-18"><%= __("Teacher") %></span></th>
+                                <th><span class="font-18"><%= __("Name") %></span></th>
+                                <th><span class="font-18"><%= __("Phone") %></span></th>
+                                <th><span class="font-18"><%= __("Email") %></span></th>
+                                <th><span class="font-18"><%= __("Branch") %></span></th>
+                                <th><span class="font-18"><%= __("Schedule") %></span></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            <% for(let i = 0; i < teacher_pf.length; i++) { %>
+                                <tr id="contactrow<%=i%>">
+                                    <td><img src="/assets/images/avatars/<%= teacher_pf[i].UserCode %>.jpg"
+                                             onerror="javascript:this.src='/assets/images/avatars/default.png'"
+                                             class="rounded-circle p-1 border" width="90" height="90">
+                                    </td>
+                                    <td><span class="font-18"><%= teacher_pf[i].Name %></span></td>
+                                    <td><span class="font-18"><%= teacher_pf[i].Phone %></span></td>
+                                    <td><span class="font-18"><a
+                                                    href="mailto: <%= teacher_pf[i].Email %>"><%= teacher_pf[i].Email %></a></span>
+                                    </td>
+                                    <td><span class="font-18"><%= teacher_pf[i].BranchCode %></span></td>
+                                    <td class="text-md-center"><button type="button" class="btn  btn-outline-primary ms-2" onclick="showCal('<%=teacher_pf[i].UserCode%>','<%=i%>')"><i class="bx bx-calendar me-0"></i></button></td>
+                                </tr>
+                                <tr id="calrow<%=i%>" hidden>
+                                    <td colspan="6"> <div id="calendar<%=i%>"></div> </td>
+                                    <td style="display: none;"><%= teacher_pf[i].Name %></td>
+                                    <td style="display: none;"><%= teacher_pf[i].Phone %></td>
+                                    <td style="display: none;"><%= teacher_pf[i].Email %></td>
+                                    <td style="display: none;"><%= teacher_pf[i].BranchCode %></td>
+                                    <td style="display: none;"></td>
+                                </tr>
+                            <% } %>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+
+        <!-- </div> -->
+
+        <%- include('./copyright.ejs') %>
+    </div>
+</div>
+
+<!--end page wrapper -->
+
+<%- include('./footer.ejs') %>
+
+</div>
+<!--wrapper ended-->
+
+<script src="/assets/plugins/fullcalendar/js/main.min.js"></script>
+<script src="/assets/plugins/fullcalendar/js/locales-all.min.js"></script>
+<script src="/assets/plugins/fullcalendar/js/moment.min.js"></script>
+
+<script type="application/javascript">
+
+    var showing_row;
+
+    function showCal(u,id) {
+
+
+        if (showing_row===undefined) {
+            // first time
+            //console.log('case new')
+            //console.log('id = '+id)
+            //console.log('showing = '+showing_row)
+            showing_row=id;
+            $('#calrow' + id).removeAttr('hidden')
+        } else if (showing_row===id) {
+            // should be toggle, just close it
+            //console.log('case 2')
+            //console.log('id = '+id)
+            //console.log('showing = '+showing_row)
+            showing_row='';
+            $('#calrow'+id).attr('hidden','hidden')
+        } else {
+            // close prev
+            //console.log('case else')
+            //console.log('id = '+id)
+            //console.log('showing = '+showing_row)
+            $('#calrow'+showing_row).attr('hidden','hidden')
+            // then open new
+            showing_row=id;
+            $('#calrow'+id).removeAttr('hidden')
+        }
+
+        <% if(req.session.lang === 'zh-HK') { %>
+        let initialLocaleCode = "zh-tw";
+        <% } else if(req.session.lang === 'zh-CN') { %>
+        let initialLocaleCode = "zh-cn";
+        <% } else { %>
+        let initialLocaleCode = "en";
+        <% } %>
+
+        let roster = get_roster(u);
+        let events = [];
+        let desc
+        let t;
+        let c;
+        $.each(roster, function (i) {
+            if (roster[i].ClassCode !== '') {
+                t = '';
+                c = '#33ab90';
+                dt = 'block';
+                desc = roster[i].ClassCode;
+            } else {
+                t = '';
+                c = '#f5ae51';
+                dt = 'item-list';
+                desc = '';
+            }
+            events.push({
+                id: roster[i].ClassCode,
+                title: t,
+                start: roster[i].TimeFrom,
+                end: roster[i].TimeTo,
+                description: desc,
+                display: dt,
+                color: c,
+                extendedProps: {
+                    ClassCode: roster[i].ClassCode,
+                    VenueCode: roster[i].VenueCode,
+                    Subject: roster[i].Subject
+                },
+            });
+        });
+
+        let calendarEl = document.getElementById('calendar'+id);
+        let calendar = new FullCalendar.Calendar(calendarEl, {
+            schedulerLicenseKey: '0136077518-fcs-1656054867',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,listMonth'
+            },
+            eventTimeFormat: {
+                hour: 'numeric',
+                minute: '2-digit'
+            },
+            initialView: 'dayGridMonth',
+            initialDate: new Date(),
+            timeZone: 'UTC',
+            locale: initialLocaleCode,
+            contentHeight: 550,
+            displayEventEnd: true,
+            eventDidMount: function(info) {
+                $(info.el).popover({
+                    placement: 'top',
+                    html: true,
+                    animation: true,
+                    delay: 100,
+                    content: info.event.extendedProps.ClassCode + '<br>' + info.event.extendedProps.Subject,
+                    trigger: 'hover',
+                });
+            },
+            events: events
+        });
+        calendar.render();
+        // $('#showCal_Modal').modal('show')
+
+
+    }
+
+    function get_roster(u) {
+        let roster;
+        let ucode = u;
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/user/schedule',
+            data: {action: 'get_roster', ucode: ucode},
+            success: function (return_data) {
+                roster = return_data
+            }
+        })
+        return roster;
+    }
+</script>
+
+</body>
+
+</html>

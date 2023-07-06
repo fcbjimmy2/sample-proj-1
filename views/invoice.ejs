@@ -1,0 +1,1265 @@
+<%- include('./header.ejs') %>
+
+<body onload="get_badge()">
+
+<!--wrapper-->
+<div class="wrapper">
+
+    <%- include('./sidebar.ejs') %>
+    <%- include('./topbar.ejs') %>
+
+    <!--start page wrapper -->
+    <div class="page-wrapper">
+        <div class="page-content">
+
+            <!--breadcrumb-->
+
+            <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+                <div class="ps-3">
+                    <span class="font-30"><i class="bx bx-collection"></i></span>
+                    <span class="font-24"><%= __("Invoices") %></span>
+                </div>
+            </div>
+
+            <!--end breadcrumb-->
+            <div id="mydiv" data-userbranches=<%= req.session.branchcode %>></div>
+            <div class="card radius-10">
+                <div class="card-body">
+                    <ul class="nav nav-tabs nav-secordary" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#primaryPending" role="tab"
+                               aria-selected="true">
+                                <div class="d-flex align-items-center">
+                                    <div class="tab-icon"><i class='bx bx-home font-18 me-1'></i>
+                                    </div>
+                                    <div class="tab-title"><%= __("Pending") %></div>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" data-bs-toggle="tab" href="#primaryCompleted" role="tab"
+                               aria-selected="false">
+                                <div class="d-flex align-items-center">
+                                    <div class="tab-icon"><i class='bx bx-user-pin font-18 me-1'></i>
+                                    </div>
+                                    <div class="tab-title"><%= __("Completed") %></div>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" data-bs-toggle="tab" href="#primaryVoid" role="tab"
+                               aria-selected="false">
+                                <div class="d-flex align-items-center">
+                                    <div class="tab-icon"><i class='bx bx-user-pin font-18 me-1'></i>
+                                    </div>
+                                    <div class="tab-title"><%= __("Void") %></div>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" data-bs-toggle="tab" href="#primaryReport" role="tab"
+                               aria-selected="false">
+                                <div class="d-flex align-items-center">
+                                    <div class="tab-icon"><i class='bx bx-user-pin font-18 me-1'></i>
+                                    </div>
+                                    <div class="tab-title"><%= __("Report") %></div>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content py-3">
+                        <div class="tab-pane fade show active" id="primaryPending" role="tabpanel">
+                            <div class="table-responsive">
+                                <table class="table mb-0 table-striped table-bordered" id="myDataTable2">
+                                    <thead class="table-light">
+                                    <tr>
+                                        <th class="text-md-center"><%= __("Invoice No") %></th>
+                                        <th class="text-md-center"><%= __("Invoice Date") %></th>
+                                        <th class="text-md-center"><%= __("Branch Code") %></th>
+                                        <th class="text-md-center"><%= __("Student") %></th>
+                                        <th class="text-md-center"><%= __("Total") %></th>
+                                        <th class="text-md-center"><%= __("Status") %></th>
+                                        <th class="text-md-center"><%= __("Received By") %></th>
+                                        <th class="text-md-center"><%= __("Received Date") %></th>
+                                        <th class="text-md-center"><%= __("Payment Method") %></th>
+                                        <th class="text-md-center"></th>
+                                        <th class="text-md-center"><%= __("REPRINT") %></th>
+                                        <th class="text-md-center"></th>
+                                    </tr>
+                                    </thead>
+                                    <% const userbranch=req.session.branchcode.split(',') %>  
+                                    <tbody>
+                                    <% for(let i = 0; i < return_data.length; i++) { %>
+                                        <% if (return_data[i].Status === 'Pending' && userbranch.includes(return_data[i].BranchCode)) { %>
+                                            <%= console.log('here') %>
+                                            <tr>
+                                                <td class="text-md-center"><%= return_data[i].InvoiceNo %></td>
+                                                <td class="text-md-center"><%= new Date(return_data[i].InvoiceDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) %></td>
+                                                <td class="text-md-center"><%= return_data[i].BranchCode %></td>
+                                                <td class="text-md-left"><%= return_data[i].StudentCode + ' ' + return_data[i].StudentName %></td>
+                                                <td class="text-md-end"><%= return_data[i].TotalAmount %></td>
+                                                <td class="text-md-center"><%= return_data[i].Status %></td>
+                                                <td class="text-md-center"><%= return_data[i].ReceivedByName %></td>
+                                                <td class="text-md-center"><%= new Date(return_data[i].ReceivedDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) %></td>
+                                                <td class="text-md-center"><%= return_data[i].PaymentMethod %></td>
+                                                <td class="text-md-center"><a class="btn btn-sm bg-primary text-white"
+                                                                              id="btn_rec_print"
+                                                                              onclick="paid('<%= return_data[i].InvoiceNo %>')"><%= __("PAID") %></a>
+                                                </td>
+                                                <td class="text-md-center"><a class="btn btn-sm bg-primary text-white"
+                                                                              id="btn_inv_print"
+                                                                              onclick="show_inv('<%= return_data[i].InvoiceNo %>')"><%= __("Invoice") %></a>
+                                                </td>
+                                                <td class="text-md-center"><a class="btn btn-sm bg-danger text-white"
+                                                                              id="btn_void_inv"
+                                                                              onclick="void_inv('<%= return_data[i].InvoiceNo %>','<%= return_data[i].BranchCode %>')"><%= __("Void") %></a>
+                                                </td>
+                                            </tr>
+                                        <% } %>
+                                    <% } %>
+                                    </tbody>
+                                </table>
+                                <a class="btn bg-primary text-white" onclick="new_inv()" id="btn_create"><%= __("Create Invoice") %></a>
+                            </div>
+
+                        </div>
+
+                        <div class="tab-pane fade" id="primaryCompleted" role="tabpanel">
+                            <div class="table-responsive">
+                                <table class="table mb-0 table-striped table-bordered" id="myDataTable3">
+                                    <thead class="table-light">
+                                    <tr>
+                                        <th class="text-md-center"><%= __("Invoice No") %></th>
+                                        <th class="text-md-center"><%= __("Invoice Date") %></th>
+                                        <th class="text-md-center"><%= __("Branch Code") %></th>
+                                        <th class="text-md-center"><%= __("Student") %></th>
+                                        <th class="text-md-center"><%= __("Total") %></th>
+                                        <th class="text-md-center"><%= __("Status") %></th>
+                                        <th class="text-md-center"><%= __("Received Date") %></th>
+                                        <th class="text-md-center"><%= __("Payment") %></th>
+                                        <th class="text-md-center"></th>
+                                        <th class="text-md-center"><%= __("REPRINT") %></th>
+                                        <th class="text-md-center"></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <% for(let i = 0; i < return_data.length; i++) { %>
+                                        <% if (return_data[i].Status === 'Completed' && userbranch.includes(return_data[i].BranchCode)) { %>
+                                           
+                                            <tr>
+                                                <td class="text-md-center"><%= return_data[i].InvoiceNo %></td>
+                                                <td class="text-md-center"><%= new Date(return_data[i].InvoiceDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) %></td>
+                                                <td class="text-md-center"><%= return_data[i].BranchCode %></td>
+                                                <td class="text-md-left"><%= return_data[i].StudentCode %><br><%= return_data[i].StudentName %></td>
+                                                <td class="text-md-end"><%= return_data[i].TotalAmount %></td>
+                                                <td class="text-md-center"><%= return_data[i].Status %></td>
+                                                <td class="text-md-center"><%= new Date(return_data[i].ReceivedDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) %><br><%= return_data[i].ReceivedByName %></td>
+                                                <td class="text-md-center"><%= return_data[i].PaymentMethod %></td>
+                                                <td class="text-md-center"><a class="btn btn-sm bg-primary text-white" id="btn_rec_print"
+                                                                              onclick="show_receipt('<%= return_data[i].InvoiceNo %>')"><%=__("Receipt") %></a>
+                                                </td>
+                                                <td class="text-md-center"><a class="btn btn-sm bg-primary text-white" id="btn_inv_print"
+                                                                              onclick="show_inv('<%= return_data[i].InvoiceNo %>')"><%=__("Invoice") %></a>
+                                                </td>
+                                                <td class="text-md-center"><a class="btn btn-sm bg-danger text-white"
+                                                                              id="btn_void_inv"
+                                                                              onclick="void_inv('<%= return_data[i].InvoiceNo %>','<%= return_data[i].BranchCode %>')"><%= __("Void") %></a>
+                                                </td>
+                                             </tr>
+                                            <% } %>
+                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+
+                        <div class="tab-pane fade" id="primaryVoid" role="tabpanel">
+                            <div class="table-responsive">
+                                <table class="table mb-0 table-striped table-bordered" id="myDataTable">
+                                    <thead class="table-light">
+                                    <tr>
+                                        <th class="text-md-center"><%= __("Invoice No") %></th>
+                                        <th class="text-md-center"><%= __("Invoice Date") %></th>
+                                        <th class="text-md-center"><%= __("Branch Code") %></th>
+                                        <th class="text-md-center"><%= __("Student") %></th>
+                                        <th class="text-md-center"><%= __("Total") %></th>
+                                        <th class="text-md-center"><%= __("Status") %></th>
+                                        <th class="text-md-center"><%= __("Remarks") %></th>
+                                        <th class="text-md-center"><%= __("REPRINT") %></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <% for(let i = 0; i < return_data.length; i++) { %>
+                                        <% if (return_data[i].Status === 'Void' && userbranch.includes(return_data[i].BranchCode)) { %>
+                                           
+                                            <tr>
+                                                <td class="text-md-center"><%= return_data[i].InvoiceNo %></td>
+                                                <td class="text-md-center"><%= new Date(return_data[i].InvoiceDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) %></td>
+                                                <td class="text-md-center"><%= return_data[i].BranchCode %></td>
+                                                <td class="text-md-left"><%= return_data[i].StudentCode %><br><%= return_data[i].StudentName %></td>
+                                                <td class="text-md-end"><%= return_data[i].TotalAmount %></td>
+                                                <td class="text-md-center"><%= return_data[i].Status %></td>
+                                                <td class="text-md-center"><%= return_data[i].Remarks %></td>
+                                                <td class="text-md-center"><a class="btn btn-sm bg-primary text-white" id="btn_inv_print"
+                                                                              onclick="show_inv('<%= return_data[i].InvoiceNo %>')"><%=__("Invoice") %></a>
+                                                </td>
+                                            </tr>
+                                        <% } %>
+                                    <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="primaryReport" role="tabpanel">
+                            <div class="card">
+
+                                <div class="row mb-3">
+                                    <div class="col-sm-3">
+                                        <h6 class="my-1"><%= __("Branch Code") %></h6>
+                                    </div>
+                                    <div class="col-sm-9 text-secondary" onclick="get_branchcode()">
+                                        <input type="text" class="form-control" id="rpt_branchcode"
+                                               name="rpt_branchcode">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-sm-3">
+                                        <h6 class="mb-0"><%= __("Start Date") %></h6>
+                                    </div>
+                                    <div class="col-sm-9 text-secondary">
+                                        <input type="text" class="form-control timepicker" id="rpt_start_date" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-sm-3">
+                                        <h6 class="mb-0"><%= __("End Date") %></h6>
+                                    </div>
+                                    <div class="col-sm-9 text-secondary">
+                                        <input type="text" class="form-control timepicker" id="rpt_end_date" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-sm-3">
+                                        <h6 class="mb-0"> </h6>
+                                    </div>
+                                    <div class="col-sm-9 text-secondary">
+                                        <a class="btn btn-primary btn-sm radius-30 px-4" id="btn_apply" onclick="get_report()"><%= __("Get Report") %></a>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+            </div>
+
+            <%- include('./copyright.ejs') %>
+        </div>
+    </div>
+    <!--end page wrapper -->
+
+    <!-- payment method modal -->
+    <div class="modal fade" id="paymethod_Modal" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form id="pmethod">
+                        <input type="hidden" id="inv">
+                        <div class="col-11 text-secondary">
+                            <table class="table mb-0 table-striped table-bordered" id="pm" data-ordering="false"
+                                   data-searching="false" data-paging="false"
+                                   data-info="false">
+                                <thead class="table-light">
+                                <tr>
+                                    <th> &nbsp;</th>
+                                    <th class="text-md-center"><%= __("Payment Method") %></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td></td>
+                                    <td><input type="radio" name="inv_payment_method" value="CASH"> <%= __("CASH") %></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td><input type="radio" name="inv_payment_method" value="VISA/MASTER"> <%=
+                                        __("VISA/MASTER") %></td>
+                                </tr>&nbsp;
+                                <tr>
+                                    <td></td>
+                                    <td><input type="radio" name="inv_payment_method" value="ALIPAY"> <%=
+                                        __("ALIPAY") %></td>
+                                </tr>&nbsp;
+                                <tr>
+                                    <td></td>
+                                    <td><input type="radio" name="inv_payment_method" value="EPS"> <%= __("EPS") %></td>
+                                </tr>&nbsp;
+                                <tr>
+                                    <td></td>
+                                    <td><input type="radio" name="inv_payment_method" value="PAYME"> <%= __("PAYME") %></td>
+                                </tr>&nbsp;
+                                <tr>
+                                    <td></td>
+                                    <td><input type="radio" name="inv_payment_method" value="FPS"> <%= __("FPS") %></td>
+                                </tr>&nbsp;
+                                <tr>
+                                    <td></td>
+                                    <td><input type="radio" name="inv_payment_method" value="OCTOPUS"> <%= __("OCTOPUS") %>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td><input type="radio" name="inv_payment_method" value="CHEQUE"> <%= __("CHEQUE") %>
+                                    </td>
+                                </tr>&nbsp;
+                                <tr>
+                                    <td></td>
+                                    <td><input type="radio" name="inv_payment_method" value="BANK TRANSFER"> <%= __("BANK TRANSFER") %></td>
+                                </tr>&nbsp;
+                                </tbody>
+
+                            </table>
+                            <hr>
+                            <a class="btn btn-secondary btn-sm radius-30 px-4" id="btn_use_method"
+                               onclick="use_method()"><%= __("Apply") %></a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- payment method modal ended -->
+
+    <!-- void confirmation modal -->
+    <div class="modal fade" id="void_Modal" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form id="void">
+                        <div class="text-md-center">
+                            <input type="hidden" id="void_inv">
+                            <input type="hidden" id="branchcode">
+                            <span class="text-secondary font-16"><%= __("Void invoice") %> # </span>
+                            <span class="text-primary font-16" id="void_inv_v"></span>
+                        </div>
+                        <div class="text-md-center">
+                         <textarea type="text" class="form-control" id="void_reason"
+                                   placeholder=" <%= __("Reason") %>" name="void_reason" rows="4" required
+                                   autocomplete="off"></textarea>
+                        </div>
+                        <hr>
+                        <div class="text-md-center">
+                            <a class="btn btn-sm bg-secondary text-white" data-bs-dismiss="modal"
+                               id="btn_void_cancel"><%= __("Cancel") %></a> &nbsp;&nbsp;
+                            <a class="btn btn-sm bg-danger text-white"
+                               id="btn_void_confirm"
+                               onclick="void_confirm()"><%= __("Confirm") %></a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- void confirmation modal ended -->
+
+    <!-- invoice modal -->
+    <div class="modal fade" id="invoice_Modal" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="card">
+                        <div class="card-body p-4 border-rounded">
+                            <form id="invoice_form">
+                                <input type="hidden" id="inv_cartid" name="inv_cartid">
+                                <input type="hidden" id="inv_branchcode" name="inv_branchcode">
+                                <input type="hidden" id="inv_grand_total" name="inv_grand_total">
+                                <div class="invoice overflow-auto">
+                                    <div>
+                                        <header>
+                                            <div class="row">
+
+                                            </div>
+                                        </header>
+                                        <main>
+                                            <div class="row contacts">
+                                                <div class="col invoice-to">
+                                                    <div class="text-gray-light"><%= __("INVOICE TO:") %></div>
+                                                    <div onclick="get_student_list()">
+                                                        <input type="hidden" id="student_code">
+                                                        <input type="text" class="form-control" id="student_code_v"  disabled><br>
+                                                        <input type="text" class="form-control" id="student_name_v"  disabled>
+                                                    </div>
+                                                </div>
+                                                <div class="col invoice-details">
+                                                    <h1 class="invoice-id"><span id="inv_no"></span> <%= __("INVOICE") %>
+                                                    </h1>
+                                                    <div class="date"><h6>Date of
+                                                            Invoice: <%= new Date().toLocaleDateString('en-CA', {timeZone: 'GMT'}) %></h6>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <table id="invoice_details">
+                                                <thead>
+                                                <tr>
+                                                    <!-- <th class="text-center" style="width: 5%;">#</th> -->
+                                                    <th class="text-center"
+                                                        style="width: 63%;"><%= __("Description") %></th>
+                                                    <th class="text-end" style="width: 5%;"><%= __("Qty") %></th>
+                                                    <th class="text-end" style="width: 14%;"><%= __("Price") %></th>
+                                                    <th class="text-end" style="width: 16%;"><%= __("Total") %></th>
+                                                    <th class="text-center" style="width: 2%;"></th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                </tbody>
+                                                <tfoot>
+                                                <tr>
+                                                    <td colspan="3" class="text-end"
+                                                        style="width: 82%;"><%= __("GRAND TOTAL") %></td>
+                                                    <td class="text-end" style="width: 18%;"><span
+                                                                id="inv_grand_total_"></span></td>
+                                                    <td class="text-end" style="width: 2%;"></td>
+                                                </tr>
+                                                </tfoot>
+                                            </table>
+                                            <div class="row">
+                                                <div class="col-sm-3" id="add_item">
+                                                    <a class="btn btn-secondary btn-sm radius-30 px-4" id="btn_add_item"
+                                                       onclick="search_prod()" type="submit"><%= __("Add Item") %></a><br>&nbsp;
+                                                </div>
+                                                <div class="col-11 text-secondary">
+                                                    <%= __("Payment Method") %>: &nbsp;
+                                                    <input type="radio" name="inv_payment_method" value="CASH"
+                                                           checked> <%= __("CASH") %> </input> &nbsp;
+                                                    <input type="radio" name="inv_payment_method"
+                                                           value="VISA/MASTER"> <%= __("VISA/MASTER") %> </input> &nbsp;
+                                                           <input type="radio" name="inv_payment_method"
+                                                           value="ALIPAY"> <%= __("ALIPAY") %> </input> &nbsp;
+                                                    <input type="radio" name="inv_payment_method"
+                                                           value="EPS"> <%= __("EPS") %> </input> &nbsp;
+                                                    <input type="radio" name="inv_payment_method"
+                                                           value="PAYME"> <%= __("PAYME") %> </input> &nbsp;
+                                                    <input type="radio" name="inv_payment_method"
+                                                           value="FPS"> <%= __("FPS") %> </input> &nbsp;
+                                                    <input type="radio" name="inv_payment_method"
+                                                           value="OCTOPUS"> <%= __("OCTOPUS") %> </input> &nbsp;
+                                                    <input type="radio" name="inv_payment_method"
+                                                           value="CHEQUE"> <%= __("CHEQUE") %> </input> &nbsp;
+                                                    <input type="radio" name="inv_payment_method"
+                                                           value="BANK TRANSFER"> <%= __("BANK TRANSFER") %> </input> &nbsp;
+                                                </div>
+                                            </div>
+                                            <hr>
+                                            <div class="notices">
+                                                <div>Remarks:</div>
+                                                <div class="notice" style="position: relative;">
+                                                <textarea type="text" class="form-control"
+                                                          style="background-color: #FBF3D5;" id="inv_remarks" onchange="update_Remark()"
+                                                          name="inv_remarks" rows="4" disabled></textarea>
+                                                <div ondblclick="edit_Remark()" id="cover"></div>
+                                                </div>
+                                            </div>
+                                        </main>
+                                        <footer></footer>
+                                        <div id="inv_button_container">
+                                            <div class="p-4 float-lg-end" id="inv_button">
+                                                <a class="btn bg-primary text-white" id="btn_inv_confirm"
+                                                   onclick="confirm_invoice()"
+                                                   type="submit"><%= __("Confirm Invoice") %></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--DO NOT DELETE THIS div. IT is responsible for showing footer always at the bottom-->
+                                    <div></div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                 </div>
+            </div>
+        </div>
+    </div>
+    <!-- Invoice modal ended -->
+
+    <!-- Item Add modal -->
+    <div class="modal fade" id="additem_Modal" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table class="table mb-0 table-striped table-bordered table-hover" id="product_list_sm">
+                                <thead class="table-light">
+                                <tr>
+                                    <th class="text-md-center"><%= __("Code") %></th>
+                                    <th class="text-md-center"><%= __("Product") %></th>
+                                    <th class="text-md-center"><%= __("Price") %></th>
+                                    <th class="text-md-center"><%= __("QTY") %></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- Item Add modal ended -->
+
+    <!-- Get students modal -->
+    <div class="modal fade" id="getstudent_Modal" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-body">
+                  <div class="modal-header">
+                        <h5 class="modal-title"><%= __("Students") %></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table class="table mb-0 table-striped table-bordered table-hover" id="selection_table_search6">
+                                <thead class="table-light">
+                                <tr>
+                                    <th class="text-md-center" style="width: 15%"><%= __("Code") %></th>
+                                    <th class="text-md-center" style="width: 30%"><%= __("Name") %></th>
+                                    <th class="text-md-center" style="width: 20%"><%= __("Email") %></th>
+                                    <th class="text-md-center" style="width: 15%"><%= __("Mobile") %></th>
+                                    <th class="text-md-center" style="width: 20%"><%= __("School") %></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                                <tfoot>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Get students modal ended-->
+
+    <!-- Get branch code modal -->
+    <div class="modal fade" id="branchcode_Modal" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table class="table mb-0 table-striped table-bordered table-sm table-hover" id="invoice_details2"
+                                   data-paging="false">
+                                <thead class="table-light">
+                                <tr>
+                                    <th class="text-md-center" style="width: 80%"><%= __("Branch Code") %></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- get branch code modal ended -->
+
+    <%- include('./footer.ejs') %>
+
+</div>
+<!--wrapper ended-->
+
+
+<script type="application/javascript">
+    var temp_unitprice;
+    var temp_qty;
+    var inv_submitted = false;
+
+    function new_inv() {
+        $('#inv_cartid').val(get_tempid());
+		$('#invoice_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#invoice_Modal').modal('show');
+    }
+
+    function create_inv() {
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/invoice/invoice',
+            data: {action: 'create_inv',student_code: $('#student_code').val(), cartid: $('#inv_cartid').val(), remarks: $('#inv_remarks').val() }
+        });
+    }
+
+    function check_student_select() {
+        $('#student_code').val();
+        if ($('#student_code').val()==='') {
+            $('#promptMSG').text('<%= __("Please select a student") %>');
+            $('#msgModal').modal('show');
+            $('#student_code_v').addClass("border-danger-input_alert");
+            return false;
+        } else {
+            $('#student_code_v').removeClass("border-danger-input_alert");
+            return true;
+        }
+    }
+
+    function confirm_invoice() {
+        // alert('confirm button');
+        if (check_student_select()) {
+            // first create invoice header
+            $("#inv_button_container").empty();
+            if (!(inv_submitted)) {
+                inv_submitted = true;
+                let cartid = $('#inv_cartid').val();
+                let p_method = $('input[name=inv_payment_method]:checked', '#invoice_form').val()
+                $.ajax({
+                    type: 'post',
+                    url: '/invoice/invoice',
+                    data: {action: 'confirm_invoice', cartid: cartid},
+                    success: function (return_data) {
+                        $('#inv_no').text('#(' + return_data[0].InvoiceNo + ')');
+                        newHTML = ``;
+                        newHTML += `<div class="p-4 float-lg-end" id="print_button">`;
+                        newHTML += `	<a class="btn bg-primary text-white" id="btn_inv_print" onclick="show_inv('` + return_data[0].InvoiceNo + `')" type="submit"><%= __("Print") %></a>`;
+                        newHTML += `</div>`;
+                        newHTML += `<div class="p-4 float-lg-end" id="rec_button" style="display: none">`;
+                        newHTML += `	<a class="btn bg-primary text-white" id="btn_rec_print" onclick="show_receipt_inv('` + return_data[0].InvoiceNo + `')" type="submit"><%= __("PAID") %></a>`;
+                        newHTML += `</div>`;
+                        newHTML += `<div class="p-4 float-lg-end" id="close_button">`;
+                        newHTML += `	<button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><%= __("Close") %></button>`;
+                        newHTML += `</div>`;
+                        let dummy = document.createElement("div");
+                        dummy.innerHTML = newHTML;
+                        let newButtons = $.parseHTML(newHTML);
+
+                        $("#inv_button_container").append(newButtons);
+                    }
+                });
+            }
+        }
+    }
+
+    function show_inv(e) {
+        let f_url = '<embed src="/fup/inv-view?id=' + e + ' " frameborder="0" width="100%" height="600px">';
+        $('#file_url').html(f_url);
+		$('#showFile_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#showFile_Modal').modal('show');
+        $('#rec_button').show();
+    }
+
+    function show_receipt_inv(e) {
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/course/booking',
+            data: {action: 'confirm_payment', invoice: e, p_method: $('input[name=inv_payment_method]:checked', '#invoice_form').val()},
+        });
+        let f_url = '<embed src="/fup/receipt-view?id=' + e + ' " frameborder="0" width="100%" height="600px">';
+        $('#file_url').html(f_url);
+		$('#showFile_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#showFile_Modal').modal('show');
+    }
+
+    function decimalCheck(e) {
+        let dec = $('#' + e).val();
+        // console.log(dec);
+        $('#' + e).val(dec.replace(/[^0-9.,-]/g, ''));
+        if (dec.includes(".")) {
+            let res = dec.substring(dec.indexOf(".") + 1);
+            let kl = res.split("");
+            if (kl.length > 1) {
+                $('#' + e).val((parseInt(dec * 100) / 100).toFixed(2));
+            }
+        }
+    }
+
+    function intCheck(e) {
+        let dec = $('#' + e).val();
+        //console.log('check int for '+ dec);
+        //console.log('row id = '+ e);
+        //console.log('replace with : ' + dec.replace(/[^0-9]/g, ''));
+        $('#' + e).val(dec.replace(/[^0-9]/g, ''));
+    }
+
+    function edit_unitprice(id) {
+        if (!(inv_submitted)) {
+            let e = 'inv_unitprice-' + id;
+            let q = 'inv_qty-' + id;
+            temp_qty = $('#' + q).val();
+            temp_unitprice = $('#' + e).val();
+            $('#' + e).prop('disabled', false);
+            $('#' + e).focus();
+        }
+    }
+
+    function edit_qty(id) {
+        if (!(inv_submitted)) {
+            let e = 'inv_unitprice-' + id;
+            let q = 'inv_qty-' + id;
+            temp_qty = $('#' + q).val();
+            temp_unitprice = $('#' + e).val();
+            $('#' + q).prop('disabled', false);
+            $('#' + q).focus();
+        }
+    }
+
+    function update_unitprice(id) {
+        if (!(inv_submitted)) {
+            let e = 'inv_unitprice-' + id;
+            let q = 'inv_qty-' + id;
+            let qty = $('#' + q).val();
+            let price = $('#' + e).val();
+            let newprice = (price * qty);
+            //console.log($('#'+e).val());
+            //console.log($('#'+q).val());
+            //console.log('update new price ' + newprice)
+            let current_grand_total = $('#inv_grand_total').val();
+            let new_grand_total = current_grand_total - (temp_unitprice * temp_qty); // take out the old price
+            new_grand_total += Number(newprice); // then add new price back
+            // set new grand total
+            $('#inv_grand_total_').text(new_grand_total);
+            $('#inv_grand_total').val(new_grand_total);
+            $('#inv_unittotal-' + id).text(newprice);
+            // then update database
+            update_inv_details(id, newprice, qty)
+            update_inv_grandtotal(id, new_grand_total);
+            // re-disable input field
+            $('#' + e).prop('disabled', true);
+            $('#' + q).prop('disabled', true);
+        }
+    }
+
+    function del_inv_item(id) {
+        if (!(inv_submitted)) {
+            let e = 'inv_unitprice-' + id;
+            let q = 'inv_qty-' + id;
+            let del_item_price = $('#' + e).val();
+            let del_item_qty = $('#' + q).val();
+            let current_grand_total = $('#inv_grand_total').val();
+            let new_grand_total = Number(current_grand_total - (del_item_price * del_item_qty)); // take out item
+            // set new grand total
+            $('#inv_grand_total_').text(new_grand_total);
+            $('#inv_grand_total').val(new_grand_total);
+            // then update database
+            remove_inv_item(id);
+            update_inv_grandtotal(id, new_grand_total);
+            // remove the row
+            console.log('removing + #inv_table-row-' + id)
+            $('#invoice_details').DataTable().rows($('#inv_table-row-' + id)).remove();
+            $('#invoice_details').DataTable().draw(false);
+        }
+    }
+
+    function edit_Remark() {
+        if(check_student_select()) {
+            if (!(inv_submitted)) {
+                $('#cover').hide();
+                $('#inv_remarks').prop('disabled', false);
+                $('#inv_remarks').focus();
+            }
+        }
+    }
+
+    function update_Remark() {
+        if(check_student_select()) {
+            if (!(inv_submitted)) {
+                // console.log($('#inv_cartid').val());
+                form = $('#invoice_form');
+                $.ajax({
+                    type: 'post',
+                    url: '/invoice/invoice',
+                    data: {action: 'upd_inv_remarks', form: form.serialize()},
+                    success: function (return_data) {
+                        return true;
+                    }
+                });
+                $('#cover').show();
+                $('#inv_remarks').prop('disabled', true);
+            }
+        }
+    }
+
+    function search_prod() {
+        if(check_student_select()) {
+            if (!(inv_submitted)) {
+                // alert('add-item');
+                $('#product_list_sm').DataTable().data().clear();
+				$('#additem_Modal').modal({backdrop: 'static', keyboard: false})
+                $('#additem_Modal').modal('show');
+                $.ajax({
+                    type: 'post',
+                    url: '/invoice/invoice',
+                    data: {action: 'get_product_list', branchcode: $('#inv_branchcode').val()},
+                    success: function (return_data) {
+                        console.log(return_data);
+                        $.each(return_data, function (i) {
+                            // console.log(return_data[i].Qty) //if quantity is 0 do not allow to add item
+                            this_row = `<tr ${return_data[i].Qty===0 || return_data[i].Qty=== null ? "" : `onclick="add_inv_item('` + return_data[i].ProductCode + `','` + return_data[i].ProductDescription + `')"`}>`;
+                            this_row += `<td class="text-md-center">` + return_data[i].ProductCode + `</td>`;
+                            this_row += `<td class="text-md-center">` + return_data[i].ProductName + `</td>`;
+                            this_row += `<td class="text-md-center">` + return_data[i].ProductPrice + `</td>`;
+                            this_row += `<td class="text-md-center">` + return_data[i].Qty + `</td>`;
+                            this_row += `</tr>`;
+        
+                            $('#product_list_sm').DataTable().row.add($(this_row)).draw(false);
+                        });
+                    }
+                });
+            }
+        }
+    }
+
+    function add_inv_item(pcode, pdesc) {
+        if(check_student_select()) {
+            if (!(inv_submitted)) {
+                let id;
+                let grand_total = Number($('#inv_grand_total').val());
+                $.ajax({
+                    type: 'post',
+                    url: '/course/booking',
+                    data: {action: 'add_inv_item', cartid: $('#inv_cartid').val(), pcode: pcode},
+                    success: function (return_data) {
+                        // alert(return_data);
+                        // add item to invoice
+                        id = return_data[0].Idx;
+                        grand_total += (return_data[0].UnitPrice * return_data[0].Qty);
+                        // console.log(grand_total);
+                        this_row = ``;
+                        this_row += `<tr id="inv_table-row-` + return_data[0].Idx + `">`;
+                        this_row += `	<td class="text-left" style="width: 63%;">`;
+                        this_row += `		<h3>` + return_data[0].Item1 + `</h3>`;
+                        this_row += `	</td>`;
+                        this_row += `	<td class="qty text-end" style="width: 5%;" ondblclick="edit_qty(` + return_data[0].Idx + `)">`;
+                        this_row += `    <input onchange="intCheck('inv_qty-` + return_data[0].Idx + `');update_unitprice(` + return_data[0].Idx + `)" type="text" id="inv_qty-` + return_data[0].Idx + `" name="inv_qty-` + return_data[0].Idx + `" `;
+                        this_row += `     onkeyup="intCheck('inv_qty-` + return_data[0].Idx + `')" style="text-align: right;width: 50px; background-color: #FBF3D5;" value="` + return_data[0].Qty + `" disabled>`;
+                        this_row += `   </td>`;
+                        this_row += `	<td class="total text-end"  style="width: 14%;" ondblclick="edit_unitprice(` + return_data[0].Idx + `)">`;
+                        this_row += `    <input onchange="decimalCheck('inv_unitprice-` + return_data[0].Idx + `');update_unitprice(` + return_data[0].Idx + `)" type="text" id="inv_unitprice-` + return_data[0].Idx + `" name="inv_unitprice-` + return_data[0].Idx + `" `;
+                        this_row += `     onkeyup="decimalCheck('inv_unitprice-` + return_data[0].Idx + `')" style="text-align: right;width: 100px; background-color: #FBF3D5;" value="` + return_data[0].UnitPrice + `" disabled>`;
+                        this_row += `   </td>`;
+                        this_row += `	<td class="total text-end"  style="width: 16%;">`;
+                        this_row += `     <span id="inv_unittotal-` + return_data[0].Idx + `" name="inv_unittotal-` + return_data[0].Idx + `" class="text-end">` + (return_data[0].UnitPrice * return_data[0].Qty) + `</span>`;
+                        this_row += `   </td>`;
+                        this_row += `	<td class="total text-end"  style="width: 2%;">`;
+                        this_row += `   	<button type="button" class="btn-close" onclick="del_inv_item(` + return_data[0].Idx + `)"></button>`;
+                        this_row += `   </td>`;
+                        this_row += `</tr>`;
+                        $('#invoice_details').DataTable().row.add($(this_row)).draw(false);
+                        $('#inv_grand_total_').text(grand_total);
+                        $('#inv_grand_total').val(grand_total);
+                        update_inv_grandtotal(id, grand_total);
+                    }
+                });
+                $('#additem_Modal').modal('hide');
+            }
+        }
+    }
+
+    function remove_inv_item(idx) {
+        if (!(inv_submitted)) {
+            $.ajax({
+                type: 'post',
+                url: '/course/booking',
+                data: {action: 'remove_inv_item', idx: idx},
+                success: function (return_data) {
+                    return true;
+                }
+            });
+        }
+    }
+
+    function update_inv_grandtotal() {
+        if (!(inv_submitted)) {
+            // console.log($('#inv_cartid').val());
+            form = $('#invoice_form');
+            $.ajax({
+                type: 'post',
+                url: '/course/booking',
+                data: {action: 'upd_inv_grandtotal', form: form.serialize()},
+                success: function (return_data) {
+                    return true;
+                }
+            });
+        }
+    }
+
+    function update_inv_details(idx, price, qty, cartid) {
+        if (!(inv_submitted)) {
+            // console.log(cartid);
+            $.ajax({
+                type: 'post',
+                url: '/course/booking',
+                data: {
+                    action: 'upd_inv_price',
+                    idx: idx,
+                    price: price,
+                    qty: qty,
+                    cartid: cartid
+                },
+                success: function (return_data) {
+                    return true;
+                }
+            });
+        }
+    }
+
+    function void_inv(e, b) {
+        //alert(e)
+        $('#void_inv').val(e);
+        $('#branchcode').val(b);
+        $('#void_inv_v').text(e);
+		$('#void_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#void_Modal').modal('show');
+    }
+
+    function void_confirm() {
+        let inv = $('#void_inv').val();
+        let reason = $('#void_reason').val();
+        let branchcode = $('#branchcode').val();
+        if ($('#void_reason').val()==='') {
+            $('#promptMSG').text('<%= __("Please provide reason") %>');
+            $('#msgModal').modal('show');
+            $('#void_reason').addClass("border-danger-input_alert");
+            return;
+        } else {
+            $('#void_reason').removeClass("border-danger-input_alert");
+        }
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/invoice/invoice',
+            data: {action: 'void_inv', invoice: inv, reason: reason, branchcode: branchcode}
+        });
+        $('#void_Modal').modal('hide');
+        $('#void').trigger('reset');
+        update_list();
+    }
+
+    function update_list() {
+        $('#myDataTable2').DataTable().data().clear();
+        $('#myDataTable3').DataTable().data().clear();
+        $('#myDataTable').DataTable().data().clear();
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/invoice/invoice',
+            data: {action: 'full_list'},
+            success: function (return_data) {
+                let with_pending = false;
+                let with_completed = false;
+                let with_void = false;
+                // console.log('--------------------------------------branchcode!--------------------------------------');
+                // console.log(userbranch,'here')
+                $.each(return_data, function (i) {
+                    // console.log(return_data)
+                    const userBranchCodes = $('#mydiv').data('userbranches').split(',');
+                    if (return_data[i].Status === 'Pending' && userBranchCodes.includes(return_data[i].BranchCode)) {
+                        this_row = `<tr>`;
+                        this_row += `    <td class="text-md-center">` + return_data[i].InvoiceNo + ` </td>`;
+                        this_row += `    <td class="text-md-center">` + new Date(return_data[i].InvoiceDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) + ` </td>`;
+                        this_row += `    <td class="text-md-center">` + return_data[i].BranchCode + ` </td>`;
+                        this_row += `    <td class="text-md-left">` + return_data[i].StudentCode + ' ' + return_data[i].StudentName + ` </td>`;
+                        this_row += `    <td class="text-md-end">` + return_data[i].TotalAmount + ` </td>`;
+                        this_row += `    <td class="text-md-center">` + return_data[i].Status + ` </td>`;
+                        this_row += `    <td class="text-md-center">` + return_data[i].ReceivedByName + ` </td>`;
+                        this_row += `    <td class="text-md-center">` + new Date(return_data[i].ReceivedDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) + ` </td>`;
+                        this_row += `    <td class="text-md-center">` + return_data[i].PaymentMethod + ` </td>`;
+                        this_row += `    <td class="text-md-center"><a class="btn btn-sm bg-primary text-white"`;
+                        this_row += `                                  id="btn_rec_print"`;
+                        this_row += `                                  onclick="paid('` + return_data[i].InvoiceNo + `')"><%=__("PAID") %></a>`;
+                        this_row += `    </td>`;
+                        this_row += `    <td class="text-md-center"><a class="btn btn-sm bg-primary text-white"`;
+                        this_row += `                                  id="btn_inv_print"`;
+                        this_row += `                                  onclick="show_inv('` + return_data[i].InvoiceNo + `')"><%=__("Invoice") %></a>`;
+                        this_row += `    </td>`;
+                        this_row += `    <td class="text-md-center"><a class="btn btn-sm bg-danger text-white"`;
+                        this_row += `                                  id="btn_void_inv"`;
+                        this_row += `                                  onclick="void_inv('` + return_data[i].InvoiceNo + `','` + return_data[i].BranchCode + ` ')"><%=__("Void") %></a>`;
+                        this_row += `    </td>`;
+                        this_row += `</tr>`;
+                        with_pending = true
+                        $('#myDataTable2').DataTable().row.add($(this_row)).draw();
+                    } else if(return_data[i].Status === 'Completed') {
+                        this_row = `<tr>`;
+                        this_row += `    <td class="text-md-center">` + return_data[i].InvoiceNo + `</td>`;
+                        this_row += `    <td class="text-md-center">` + new Date(return_data[i].InvoiceDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) + `</td>`;
+                        this_row += `    <td class="text-md-center">` + return_data[i].BranchCode + `</td>`;
+                        this_row += `    <td class="text-md-left">` + return_data[i].StudentCode + ` <br> ` + return_data[i].StudentName + `</td>`;
+                        this_row += `    <td class="text-md-end">` + return_data[i].TotalAmount + `</td>`;
+                        this_row += `    <td class="text-md-center">` + return_data[i].Status + `</td>`;
+                        this_row += `    <td class="text-md-center">` + new Date(return_data[i].ReceivedDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) + `<br>` + return_data[i].ReceivedByName + `</td>`;
+                        this_row += `    <td class="text-md-center">` + return_data[i].PaymentMethod + `</td>`;
+                        this_row += `    <td class="text-md-center"><a class="btn btn-sm bg-primary text-white"`;
+                        this_row += `                                  id="btn_rec_print"`;
+                        this_row += `                                  onclick="show_receipt('` + return_data[i].InvoiceNo + `')"><%=__("Receipt") %></a>`;
+                        this_row += `    </td>`;
+                        this_row += `    <td class="text-md-center"><a class="btn btn-sm bg-primary text-white"`;
+                        this_row += `                                  id="btn_inv_print"`;
+                        this_row += `                                  onclick="show_inv('` + return_data[i].InvoiceNo + `')"><%=__("Invoice") %></a>`;
+                        this_row += `    </td>`;
+                        this_row += `    <td class="text-md-center"><a class="btn btn-sm bg-danger text-white"`;
+                        this_row += `                                  id="btn_void_inv"`;
+                        this_row += `                                  onclick="void_inv('` + return_data[i].InvoiceNo + `','` + return_data[i].BranchCode + ` ')"><%=__("Void") %></a>`;
+                        this_row += `    </td>`;
+                        this_row += `</tr>`;
+                        with_completed=true;
+                        $('#myDataTable3').DataTable().row.add($(this_row)).draw();
+                    } else if(return_data[i].Status === 'Void') {
+                        this_row = `<tr>`;
+                        this_row += `    <td class="text-md-center">` + return_data[i].InvoiceNo + `</td>`;
+                        this_row += `    <td class="text-md-center">` + new Date(return_data[i].InvoiceDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) + `</td>`;
+                        this_row += `    <td class="text-md-center">` + return_data[i].BranchCode + `</td>`;
+                        this_row += `    <td class="text-md-left">` + return_data[i].StudentCode + ` <br> ` + return_data[i].StudentName + `</td>`;
+                        this_row += `    <td class="text-md-end">` + return_data[i].TotalAmount + `</td>`;
+                        this_row += `    <td class="text-md-center">` + return_data[i].Status + `</td>`;
+                        this_row += `    <td class="text-md-center">` + return_data[i].Remarks + `</td>`;
+                        this_row += `    <td class="text-md-center"><a class="btn btn-sm bg-primary text-white"`;
+                        this_row += `                                  id="btn_inv_print"`;
+                        this_row += `                                  onclick="show_inv('` + return_data[i].InvoiceNo + `')"><%=__("Invoice") %></a>`;
+                        this_row += `    </td>`;
+                        this_row += `</tr>`;
+                        with_void=true;
+                        $('#myDataTable').DataTable().row.add($(this_row)).draw();
+                    }
+                    if(!with_pending) {
+                        $('#myDataTable2').DataTable().data().clear().draw();
+                    }
+                    if(!with_completed) {
+                        $('#myDataTable3').DataTable().data().clear().draw();
+                    }
+                    if(!with_void) {
+                        $('#myDataTable').DataTable().data().clear().draw();
+                    }
+                });
+            }
+        });
+    }
+
+    function show_inv(e) {
+        let f_url = '<embed src="/fup/inv-view?id=' + e + ' " frameborder="0" width="100%" height="600px">';
+        $('#file_url').html(f_url);
+		$('#showFile_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#showFile_Modal').modal('show');
+        $('#rec_button').show();
+    }
+
+    function show_receipt(e) {
+        let f_url = '<embed src="/fup/receipt-view?id=' + e + ' " frameborder="0" width="100%" height="600px">';
+        $('#file_url').html(f_url);
+		$('#showFile_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#showFile_Modal').modal('show');
+    }
+
+    function do_paid(e) {
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/course/booking',
+            data: {action: 'confirm_payment', invoice: e, p_method: p_method},
+        });
+        let f_url = '<embed src="/fup/receipt-view?id=' + e + ' " frameborder="0" width="100%" height="600px">';
+        $('#file_url').html(f_url);
+		$('#showFile_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#showFile_Modal').modal('show');
+        $('#paymethod_Modal').modal('hide');
+        $('input[name="inv_payment_method"]:checked').removeAttr("checked");
+        update_list();
+    }
+
+    function get_student_list() {
+        let ccode = '*';
+        $('#selection_table_search6').DataTable().data().clear();
+        $.ajax({
+            type: 'post',
+            url: '/course/booking',
+            data: {action: 'get_student', ccode: ccode},
+            success: function (return_data) {
+                console.log('---------------------here---------------------')
+                console.log(return_data)
+                $.each(return_data, function (i) {
+                    this_row = `<tr onclick="this_student('` + return_data[i].StudentCode + `','` + return_data[i].FirstName
+                        + ` - ` + return_data[i].LastName + ` - ` + return_data[i].Mobile + `')">`;
+                    this_row += `<td class="text-md-left">` + return_data[i].StudentCode + `</td>`;
+                    this_row += `<td class="text-md-left">` + return_data[i].FirstName + ` ` + return_data[i].LastName + `</td>`;
+                    this_row += `<td class="text-md-left">` + return_data[i].Email + `</td>`;
+                    this_row += `<td class="text-md-left">` + return_data[i].Mobile + `</td>`;
+                    this_row += `<td class="text-md-left">` + return_data[i].SchoolName + `</td>`;
+                    this_row += `</tr>`;
+                    $('#selection_table_search6').DataTable().row.add($(this_row)).draw();
+                });
+            }
+        });
+		$('#getstudent_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#getstudent_Modal').modal('show');
+    }
+
+    function this_student(c, d) {
+        $('#getstudent_Modal').modal('hide');
+        $('#student_code').val(c);
+        $('#student_code_v').val(c);
+        $('#student_name_v').val(d);
+        create_inv();
+    }
+
+    function use_method() {
+        $('#paymethod_Modal').modal('hide');
+        let p_method = $('input[name="inv_payment_method"]:checked').val();
+        if (p_method === undefined || p_method === '') {
+            $('#promptMSG').text('<%= __("Please select payment method") %>');
+            $('#msgModal').modal('show');
+        } else {
+            // alert('update: ' + $('#inv').val());
+            // alert('method: ' + p_method);
+            $.ajax({
+                async: false,
+                type: 'post',
+                url: '/course/booking',
+                data: {action: 'confirm_payment', invoice: $('#inv').val(), p_method: p_method},
+            });
+            let f_url = '<embed src="/fup/receipt-view?id=' + $('#inv').val() + ' " frameborder="0" width="100%" height="600px">';
+            $('#file_url').html(f_url);
+			$('#showFile_Modal').modal({backdrop: 'static', keyboard: false})
+            $('#showFile_Modal').modal('show');
+            $('#pmethod').trigger('reset');
+        }
+    }
+
+    function paid(e) {
+        $('#inv').val(e);
+		$('#paymethod_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#paymethod_Modal').modal('show');
+    }
+
+    function get_tempid() {
+        var e='';
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/prod/prod_create',
+            data: {action: 'get_tempid'},
+            success: function(return_data) {
+                e = return_data[0].UID;
+            }
+        });
+        return e;
+    }
+
+    function get_report() {
+        $.ajax({
+            type: 'post',
+            async: false,
+            url: '/invoice/invoice',
+            data: {action: 'get_report',
+                branchcode: $('#rpt_branchcode').val(),
+                start_date: $('#rpt_start_date').val(),
+                end_date: $('#rpt_end_date').val()
+            },
+            success: function (return_data) {
+                let csv = Papa.unparse(return_data)
+                let hiddenElement = document.createElement('a');
+                hiddenElement.href = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURI(csv);
+                hiddenElement.target = '_blank';
+
+                hiddenElement.download = 'Report.csv';
+                hiddenElement.click();
+            }
+        });
+    }
+
+    function use_this_branchcode(e) {
+        $('#branchcode_Modal').modal('hide')
+        $('#rpt_branchcode').val(e)
+    }
+
+    function get_branchcode() {
+        $('#invoice_details2').DataTable().data().clear();
+        $.ajax({
+            type: 'post',
+            async: false,
+            url: '/system/users',
+            data: {action: 'get_branchcode'},
+            success: function (return_data) {
+                $.each(return_data, function (i) {
+                    this_row = `<tr onclick="use_this_branchcode('`+ return_data[i].BranchCode +`')">`;
+                    this_row += `<td class="text-md-center">` + return_data[i].BranchCode + `</td>`;
+                    this_row += `</tr>`;
+                    $('#invoice_details2').DataTable().row.add($(this_row)).draw(false);
+                });
+            }
+        });
+		$('#branchcode_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#branchcode_Modal').modal('show');
+    }
+
+    $(document).ready(function () {
+        $('#showFile_Modal').on('hidden.bs.modal', function () {
+            update_list();
+            // document.location.reload();
+        })
+        $('#invoice_Modal').on('hidden.bs.modal', function () {
+            update_list();
+            $('#invoice_form').trigger('reset');
+        })
+        $('#rpt_start_date').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            format: "yyyy-mm-dd",
+            <% if(req.session.lang === 'zh-HK') { %>
+            language: "zh-TW",
+            <% } else if(req.session.lang === 'zh-CN') { %>
+            language: "zh-CN",
+            <% } else { %>
+            language: "en-CA",
+            <% } %>
+        });
+        $('#rpt_end_date').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            format: "yyyy-mm-dd",
+            <% if(req.session.lang === 'zh-HK') { %>
+            language: "zh-TW",
+            <% } else if(req.session.lang === 'zh-CN') { %>
+            language: "zh-CN",
+            <% } else { %>
+            language: "en-CA",
+            <% } %>
+        });
+    });
+</script>
+
+</body>
+
+</html>

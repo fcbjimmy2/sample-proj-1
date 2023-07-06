@@ -1,0 +1,1302 @@
+<%- include('./header.ejs') %>
+
+<body onload="get_badge();get_course_list();">
+
+<!--wrapper-->
+<div class="wrapper">
+
+    <%- include('./sidebar.ejs') %>
+    <%- include('./topbar.ejs') %>
+
+    <!--start page wrapper -->
+    <div class="page-wrapper">
+        <div class="page-content">
+            <!--breadcrumb-->
+
+            <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+                <div class="ps-3">
+                    <span class="font-30"><i class="bx bx-book-open"></i></span>
+                    <span class="font-24"><%= __("Course Info") %></span>
+                </div>
+            </div>
+            <!--end breadcrumb-->
+            <div id="mydiv" data-userbranch=<%= req.session.branchcode %>></div>
+            <!-- <div class="col-12 col-lg-9 mx-auto"> -->
+            <div class="card radius-10">
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table mb-0 table-striped table-bordered table-sm table-hover" id="myDataTable">
+                            <thead class="table-light">
+                            <tr>
+                                <th class="text-md-center"><%= __("Course Master Code") %></th>
+                                <th class="text-md-center"><%= __("Title") %></th>
+                                <th class="text-md-center"><%= __("Teacher") %></th>
+                                <th class="text-md-center sorting_asc_disabled sorting_desc_disabled"><%= __("Status") %></th>
+                                <th class="text-md-center"><%= __("Branch Code") %></th>
+                                <th class="text-md-center"><%= __("Course Start Date") %></th>
+                                <th class="text-md-center"><%= __("Enrollment End Date") %></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- </div> -->
+
+            <%- include('./copyright.ejs') %>
+        </div>
+    </div>
+    <!--end page wrapper -->
+
+    <!-- product details modal -->
+    <div class="modal fade" id="prod_details_Modal" role="dialog" data-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><%= __("Course Detail") %></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form id="product_details_edit">
+                        <div class="card">
+                            <div class="card-body p-4 border-rounded">
+                                <div class="row">
+                                    <div class="col-md-2 py-3">
+                                        <label for="f_cmcode" class="form-label"><%= __("Course Master Code") %></label>
+                                        <input type="text" class="form-control" id="f_cmcode" required disabled>
+                                    </div>
+                                    <div class="col-md-2 py-3">
+                                        <label for="f_ccode" class="form-label"><%= __("Course Code") %></label>
+                                        <input type="text" class="form-control" id="f_ccode" required disabled>
+                                    </div>
+                                    <div class="col-md-2 py-3">
+                                        <label for="f_ctype" class="form-label"><%= __("Course Type") %></label>
+                                        <input type="text" class="form-control" id="f_ctype" required disabled>
+                                    </div>
+                                    <div class="col-md-6 py-3">
+                                        <label for="f_ctitle" class="form-label"><%= __("Course Title") %></label>
+                                        <input type="text" class="form-control" id="f_ctitle" required disabled>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 py-3">
+                                        <label for="f_cdesc" class="form-label"><%= __("Course Description") %></label>
+                                        <textarea type="text" class="form-control" id="f_cdesc" rows="4" required
+                                                  disabled></textarea>
+                                    </div>
+                                    <div class="col-md-6 py-3">
+                                        <label for="f_cremark" class="form-label"><%= __("Course Remark") %></label>
+                                        <textarea type="text" class="form-control" id="f_cremark" rows="4" required
+                                                  disabled></textarea>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3 py-3">
+                                        <label for="f_cteachername" class="form-label"><%= __("Teacher") %></label>
+                                        <input type="text" class="form-control" id="f_cteachername" required disabled>
+                                    </div>
+                                    <div class="col-md-3 py-3">
+                                        <label for="f_cvenue" class="form-label"><%= __("Venue") %></label>
+                                        <input type="text" class="form-control float-left" id="f_cvenue" required
+                                               disabled>
+                                    </div>
+                                    <div class="col-md-6 py-3">
+                                        <label for="f_ctime" class="form-label"><%= __("Time") %></label>
+                                        <textarea type="text" class="form-control" id="f_ctime" rows="3" required
+                                                  disabled></textarea>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3 py-3">
+                                        <label for="f_cstart" class="form-label"><%= __("Course Start Date") %></label>
+                                        <input type="text" class="form-control bg-light-primary" id="f_cstart" required
+                                               disabled>
+                                    </div>
+                                    <div class="col-md-3 py-3">
+                                        <label for="f_cend" class="form-label"><%= __("Course End Date") %></label>
+                                        <input type="text" class="form-control bg-light-primary" id="f_cend" required
+                                               disabled>
+                                    </div>
+                                    <div class="col-md-3 py-3">
+                                        <label for="f_cactivedate"
+                                               class="form-label"><%= __("Enrollment Start") %></label>
+                                        <input type="text" class="form-control bg-light-success" id="f_cactivedate"
+                                               required
+                                               disabled>
+                                    </div>
+                                    <div class="col-md-3 py-3">
+                                        <label for="f_cdeactivedate"
+                                               class="form-label"><%= __("Enrollment End") %></label>
+                                        <input type="text" class="form-control bg-light-success" id="f_cdeactivedate"
+                                               required disabled>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 py-3">
+                                        <label for="f_ciremark" class="form-label"><%= __("Private Remark") %></label>
+                                        <textarea type="text" class="form-control" id="f_ciremark" rows="4" required
+                                                  disabled></textarea>
+                                    </div>
+                                    <div class="col-md-6 py-3">
+                                        <label for="f_cpaymethod" class="form-label"><%= __("Payment Method") %></label>
+                                        <textarea type="text" class="form-control" id="f_cpaymethod" rows="4" required
+                                                  disabled></textarea>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3 py-3">
+                                        <label for="f_cprice" class="form-label"><%= __("Price") %></label>
+                                        <input type="text" class="form-control" id="f_cprice" required disabled>
+                                    </div>
+                                    <div class="col-md-3 py-3">
+                                        <label for="f_csts" class="form-label"><%= __("Status") %></label>
+                                        <input type="text" class="form-control" id="f_csts" required disabled>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12 text-secondary">
+                                        <div class="p-4 float-end">
+                                            <input type="hidden" id="sTemp">
+                                            <a class="btn" id="btn_booking" onclick="bookcourse_step1()"
+                                               type="submit"><%= __("Enroll") %></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- product details modal ended -->
+
+    <!-- booking modal -->
+    <div class="modal fade" id="booking_Modal" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><%= __("Course Enrollment") %></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form id="booking_step1">
+                        <div class="card">
+                            <div class="card-body p-4 border-rounded">
+                                <div>
+                                    <div class="input-group" onclick="get_student_list()">
+                                        <button type="button" class="btn btn-outline-primary ms-2"><i
+                                                    class='bx bx-search me-0'></i></button>
+                                        <input type="hidden" id="student_id" name="student_id">
+                                        <input class="result form-control border-primary" type="text"
+                                               id="student_Select"
+                                               placeholder="<%= __("Select a Student") %>" required autocomplete="off">
+                                    </div>
+                                </div>
+                                <hr/>
+                                <div>
+                                    <table class="table mb-0 table-striped table-bordered" id="myDataTable2">
+                                        <thead class="table-light">
+                                        <tr>
+                                            <th class="text-md-center"><input type="checkbox" id="tick_all"
+                                                                              class="form-check-input"
+                                                                              onclick="tickall()"></th>
+                                            <th class="text-md-center"><%= __("Week Day") %></th>
+                                            <th class="text-md-center"><%= __("Date") %></th>
+                                            <th class="text-md-center"><%= __("Class Start Time") %></th>
+                                            <th class="text-md-center"><%= __("Class End Time") %></th>
+                                            <th class="text-md-center"><%= __("Availability") %></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div>
+                                    <div class="p-4 float-lg-end">
+                                        <a class="btn bg-primary text-white" id="btn_booking_step2"
+                                           onclick="bookcourse_step3()" type="submit"><%= __("Create Invoice") %></a>
+                                    </div>
+                                </div>
+                                <div class="row row-cols-2">
+                                    <div id="voucher_container"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="form_course_code" name="form_course_code">
+                        <input type="hidden" id="form_class_code" name="form_class_code">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- booking modal ended -->
+
+    <!-- invoice modal -->
+    <div class="modal fade" id="invoice_Modal" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><%= __("Course Enrollment") %></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="card">
+                        <div class="card-body p-4 border-rounded">
+                            <form id="invoice_form">
+                                <input type="hidden" id="inv_cartid" name="inv_cartid">
+                                <input type="hidden" id="inv_branchcode" name="inv_branchcode">
+                                <input type="hidden" id="inv_grand_total" name="inv_grand_total">
+                                <div class="invoice overflow-auto">
+                                    <div>
+                                        <header>
+                                            <div class="row">
+
+                                            </div>
+                                        </header>
+                                        <main>
+                                            <div class="row contacts">
+                                                <div class="col invoice-to">
+                                                    <div class="text-gray-light"><%= __("INVOICE TO:") %></div>
+                                                    <h3 class="to"><span id="bill-to"></span></h3>
+                                                    <div class="tel"><h6>T: <span id="bill-to-tel"></span></h6></div>
+                                                </div>
+                                                <div class="col invoice-details">
+                                                    <h1 class="invoice-id"><span
+                                                                id="inv_no"></span> <%= __("INVOICE") %>
+                                                    </h1>
+                                                    <div class="date"><h6>Date of
+                                                            Invoice: <%= new Date().toLocaleDateString('en-CA', {timeZone: 'GMT'}) %></h6>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <table id="invoice_details">
+                                                <thead>
+                                                <tr>
+                                                    <!-- <th class="text-center" style="width: 5%;">#</th> -->
+                                                    <th class="text-center"
+                                                        style="width: 63%;"><%= __("Description") %></th>
+                                                    <th class="text-end" style="width: 5%;"><%= __("Qty") %></th>
+                                                    <th class="text-end" style="width: 14%;"><%= __("Price") %></th>
+                                                    <th class="text-end" style="width: 16%;"><%= __("Total") %></th>
+                                                    <th class="text-center" style="width: 2%;"></th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                </tbody>
+                                                <tfoot>
+                                                <tr>
+                                                    <td colspan="3" class="text-end"
+                                                        style="width: 82%;"><%= __("GRAND TOTAL") %></td>
+                                                    <td class="text-end" style="width: 18%;"><span
+                                                                id="inv_grand_total_"></span></td>
+                                                    <td class="text-end" style="width: 2%;"></td>
+                                                </tr>
+                                                </tfoot>
+                                            </table>
+                                            <div class="row">
+                                                <div class="col-sm-3" id="add_item">
+                                                    <a class="btn btn-secondary btn-sm radius-30 px-4" id="btn_add_item"
+                                                       onclick="search_prod()"
+                                                       type="submit"><%= __("Add Item") %></a><br>&nbsp;
+                                                </div>
+                                                <div class="col-11 text-secondary">
+                                                    <%= __("Payment Method") %>: &nbsp;
+                                                    <input type="radio" name="inv_payment_method" value="CASH"
+                                                           checked> <%= __("CASH") %> </input> &nbsp;
+                                                    <input type="radio" name="inv_payment_method"
+                                                           value="VISA/MASTER"> <%= __("VISA/MASTER") %> </input> &nbsp;
+                                                    <input type="radio" name="inv_payment_method"
+                                                           value="EPS"> <%= __("EPS") %> </input> &nbsp;
+                                                    <input type="radio" name="inv_payment_method"
+                                                           value="PAYME"> <%= __("PAYME") %> </input> &nbsp;
+                                                    <input type="radio" name="inv_payment_method"
+                                                           value="FPS"> <%= __("FPS") %> </input> &nbsp;
+                                                    <input type="radio" name="inv_payment_method"
+                                                           value="OCTOPUS"> <%= __("OCTOPUS") %> </input> &nbsp;
+                                                    <input type="radio" name="inv_payment_method"
+                                                           value="CHEQUE"> <%= __("CHEQUE") %> </input> &nbsp;
+                                                    <input type="radio" name="inv_payment_method"
+                                                           value="BANK TRANSFER"> <%= __("BANK TRANSFER") %> </input>
+                                                    &nbsp;
+                                                </div>
+                                            </div>
+                                            <hr>
+                                            <div class="notices">
+                                                <div>Remarks:</div>
+                                                <div class="notice" style="display: block; position: relative;">
+                                                <textarea type="text" class="form-control"
+                                                          style="background-color: #FBF3D5;" id="inv_remarks"
+                                                          name="inv_remarks" rows="4" disabled
+                                                          onchange="update_Remark()"></textarea>
+                                                <div ondblclick="edit_Remark()" id="cover"></div>
+                                                </div>
+                                            </div>
+                                        </main>
+                                        <footer></footer>
+                                        <div id="inv_button_container">
+                                            <div class="p-4 float-lg-end" id="inv_button">
+                                                <a class="btn bg-primary text-white" id="btn_inv_confirm"
+                                                   onclick="confirm_invoice()"
+                                                   type="submit"><%= __("Confirm Invoice") %></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--DO NOT DELETE THIS div. IT is responsible for showing footer always at the bottom-->
+                                    <div></div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <form id="booking_step3">
+                        <input type="hidden" id="inv_student_code" name="inv_student_code"></input>
+                        <input type="hidden" id="inv_course_code" name="inv_course_code"></input>
+                        <input type="hidden" id="inv_class_code" name="inv_class_code"></input>
+                        <input type="hidden" id="inv_voucher" name="inv_voucher"></input>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Invoice modal ended -->
+
+    <!-- Item Add modal -->
+    <div class="modal fade" id="additem_Modal" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table class="table mb-0 table-striped table-bordered table-hover" id="product_list_sm">
+                                <thead class="table-light">
+                                <tr>
+                                    <th class="text-md-center"><%= __("Code") %></th>
+                                    <th class="text-md-center"><%= __("Product") %></th>
+                                    <th class="text-md-center"><%= __("Price") %></th>
+                                    <th class="text-md-center"><%= __("QTY") %></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- Item Add modal ended -->
+
+    <!-- Get students modal -->
+    <div class="modal fade" id="getstudent_Modal" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-body bg-light-success">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><%= __("Students") %></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="reset_tbls()"></button>
+                    </div>
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table class="table mb-0 table-striped table-bordered table-hover" id="myDataTable3">
+                                <thead class="table-light">
+                                <tr>
+                                    <th class="text-md-center" style="width: 15%"><%= __("Code") %></th>
+                                    <th class="text-md-center" style="width: 30%"><%= __("Name") %></th>
+                                    <th class="text-md-center" style="width: 20%"><%= __("Email") %></th>
+                                    <th class="text-md-center" style="width: 15%"><%= __("Mobile") %></th>
+                                    <th class="text-md-center" style="width: 20%"><%= __("School") %></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                                <tfoot>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Get students modal ended-->
+
+    <%- include('./footer.ejs') %>
+
+</div>
+<!--wrapper ended-->
+
+<script type="text/javascript">
+    var temp_unitprice;
+    var temp_qty;
+    var inv_submitted = false;
+
+    function confirm_invoice() {
+        // alert('confirm button');
+        $("#inv_button_container").empty();
+        if (!(inv_submitted)) {
+            inv_submitted = true;
+            let cartid = $('#inv_cartid').val();
+            let p_method = $('input[name=inv_payment_method]:checked', '#invoice_form').val()
+            $.ajax({
+                async: false,
+                type: 'post',
+                url: '/course/booking',
+                data: {action: 'confirm_invoice', p_method: p_method, cartid: cartid},
+                success: function (return_data) {
+                    $('#inv_no').text('#(' + return_data[0].InvoiceNo + ')');
+                    newHTML = ``;
+                    newHTML += `<div class="p-4 float-lg-end" id="print_button">`;
+                    newHTML += `	<a class="btn bg-primary text-white" id="btn_inv_print" onclick="show_inv('` + return_data[0].InvoiceNo + `')" type="submit"><%= __("Print") %></a>`;
+                    newHTML += `</div>`;
+                    newHTML += `<div class="p-4 float-lg-end" id="rec_button" style="display: none">`;
+                    newHTML += `	<a class="btn bg-primary text-white" id="btn_rec_print" onclick="show_receipt('` + return_data[0].InvoiceNo + `')" type="submit"><%= __("PAID") %></a>`;
+                    newHTML += `</div>`;
+                    newHTML += `<div class="p-4 float-lg-end" id="close_button">`;
+                    newHTML += `	<button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><%= __("Close") %></button>`;
+                    newHTML += `</div>`;
+                    let dummy = document.createElement("div");
+                    dummy.innerHTML = newHTML;
+                    let newButtons = $.parseHTML(newHTML);
+
+                    $("#inv_button_container").append(newButtons);
+                }
+            });
+        }
+    }
+
+    function show_inv(e) {
+        let f_url = '<embed src="/fup/inv-view?id=' + e + ' " frameborder="0" width="100%" height="600px">';
+        $('#file_url').html(f_url);
+        $('#showFile_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#showFile_Modal').modal('show');
+        $('#rec_button').show();
+    }
+
+    function show_receipt(e) {
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/course/booking',
+            data: {
+                action: 'confirm_payment',
+                invoice: e,
+                p_method: $('input[name=inv_payment_method]:checked', '#invoice_form').val()
+            },
+        });
+        let f_url = '<embed src="/fup/receipt-view?id=' + e + ' " frameborder="0" width="100%" height="600px">';
+        $('#file_url').html(f_url);
+        $('#showFile_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#showFile_Modal').modal('show');
+    }
+
+    function decimalCheck(e) {
+        let dec = $('#' + e).val();
+        // console.log(dec);
+        $('#' + e).val(dec.replace(/[^0-9.,-]/g, ''));
+        if (dec.includes(".")) {
+            let res = dec.substring(dec.indexOf(".") + 1);
+            let kl = res.split("");
+            if (kl.length > 1) {
+                $('#' + e).val((parseInt(dec * 100) / 100).toFixed(2));
+            }
+        }
+    }
+
+    function intCheck(e) {
+        let dec = $('#' + e).val();
+        //console.log('check int for '+ dec);
+        //console.log('row id = '+ e);
+        //console.log('replace with : ' + dec.replace(/[^0-9]/g, ''));
+        $('#' + e).val(dec.replace(/[^0-9]/g, ''));
+    }
+
+    function edit_unitprice(id) {
+        if (!(inv_submitted)) {
+            let e = 'inv_unitprice-' + id;
+            let q = 'inv_qty-' + id;
+            temp_qty = $('#' + q).val();
+            temp_unitprice = $('#' + e).val();
+            $('#' + e).prop('disabled', false);
+            $('#' + e).focus();
+        }
+    }
+
+    function edit_qty(id) {
+        if (!(inv_submitted)) {
+            let e = 'inv_unitprice-' + id;
+            let q = 'inv_qty-' + id;
+            temp_qty = $('#' + q).val();
+            temp_unitprice = $('#' + e).val();
+            $('#' + q).prop('disabled', false);
+            $('#' + q).focus();
+        }
+    }
+
+    function update_unitprice(id) {
+        if (!(inv_submitted)) {
+            let e = 'inv_unitprice-' + id;
+            let q = 'inv_qty-' + id;
+            let qty = $('#' + q).val();
+            let price = $('#' + e).val();
+            let newprice = (price * qty);
+            //console.log($('#'+e).val());
+            //console.log($('#'+q).val());
+            //console.log('update new price ' + newprice)
+            let current_grand_total = $('#inv_grand_total').val();
+            let new_grand_total = current_grand_total - (temp_unitprice * temp_qty); // take out the old price
+            new_grand_total += Number(newprice); // then add new price back
+            // set new grand total
+            $('#inv_grand_total_').text(new_grand_total);
+            $('#inv_grand_total').val(new_grand_total);
+            $('#inv_unittotal-' + id).text(newprice);
+            // then update database
+            update_inv_details(id, price, qty)
+            update_inv_grandtotal(id, new_grand_total);
+            // re-disable input field
+            $('#' + e).prop('disabled', true);
+            $('#' + q).prop('disabled', true);
+        }
+    }
+
+    function del_inv_item(id) {
+        if (!(inv_submitted)) {
+            let e = 'inv_unitprice-' + id;
+            let q = 'inv_qty-' + id;
+            let del_item_price = $('#' + e).val();
+            let del_item_qty = $('#' + q).val();
+            let current_grand_total = $('#inv_grand_total').val();
+            let new_grand_total = Number(current_grand_total - (del_item_price * del_item_qty)); // take out item
+            // set new grand total
+            $('#inv_grand_total_').text(new_grand_total);
+            $('#inv_grand_total').val(new_grand_total);
+            // then update database
+            remove_inv_item(id);
+            update_inv_grandtotal(id, new_grand_total);
+            // remove the row
+            // console.log('removing + #inv_table-row-' + id)
+            $('#invoice_details').DataTable().rows($('#inv_table-row-' + id)).remove();
+            $('#invoice_details').DataTable().draw(false);
+        }
+    }
+
+    function edit_Remark() {
+        console.log('------------------------------clicked------------------------------')
+        if (!(inv_submitted)) {
+            $('#cover').hide();
+            $('#inv_remarks').prop('disabled', false);
+            $('#inv_remarks').focus();
+        }
+    }
+
+    function update_Remark() {
+        if (!(inv_submitted)) {
+            // console.log($('#inv_cartid').val());
+            form = $('#invoice_form');
+            $.ajax({
+                type: 'post',
+                url: '/course/booking',
+                data: {action: 'upd_inv_remarks', form: form.serialize()},
+                success: function (return_data) {
+                    return true;
+                }
+            });
+            $('#cover').show();
+            $('#inv_remarks').prop('disabled', true);
+        }
+    }
+
+    function search_prod() {
+        if (!(inv_submitted)) {
+            // alert('add-item');
+            $('#product_list_sm').DataTable().data().clear();
+            $('#additem_Modal').modal({backdrop: 'static', keyboard: false})
+            $('#additem_Modal').modal('show');
+            $.ajax({
+                type: 'post',
+                url: '/course/booking',
+                data: {action: 'get_product_list', branchcode: $('#inv_branchcode').val()},
+                success: function (return_data) {
+                    $.each(return_data, function (i) {
+                        this_row = `<tr onclick="add_inv_item('` + return_data[i].ProductCode + `','` + return_data[i].ProductDescription + `')">`;
+                        this_row += `<td class="text-md-center">` + return_data[i].ProductCode + `</td>`;
+                        this_row += `<td class="text-md-center">` + return_data[i].ProductName + `</td>`;
+                        this_row += `<td class="text-md-center">` + return_data[i].ProductPrice + `</td>`;
+                        this_row += `<td class="text-md-center">` + return_data[i].Qty + `</td>`;
+                        this_row += `</tr>`;
+                        $('#product_list_sm').DataTable().row.add($(this_row)).draw(false);
+                    });
+                }
+            });
+        }
+    }
+
+    function add_inv_item(pcode, pdesc) {
+        if (!(inv_submitted)) {
+            let id;
+            let grand_total = Number($('#inv_grand_total').val());
+            $.ajax({
+                type: 'post',
+                url: '/course/booking',
+                data: {action: 'add_inv_item', cartid: $('#inv_cartid').val(), pcode: pcode},
+                success: function (return_data) {
+                    // alert(return_data);
+                    // add item to invoice
+                    id = return_data[0].Idx;
+                    grand_total += (return_data[0].UnitPrice * return_data[0].Qty);
+                    // console.log(grand_total);
+                    this_row = ``;
+                    this_row += `<tr id="inv_table-row-` + return_data[0].Idx + `">`;
+                    this_row += `	<td class="text-left" style="width: 63%;">`;
+                    this_row += `		<h3>` + return_data[0].Item1 + `</h3>`;
+                    this_row += `	</td>`;
+                    this_row += `	<td class="qty text-end" style="width: 5%;" ondblclick="edit_qty(` + return_data[0].Idx + `)">`;
+                    this_row += `    <input onchange="intCheck('inv_qty-` + return_data[0].Idx + `');update_unitprice(` + return_data[0].Idx + `)" type="text" id="inv_qty-` + return_data[0].Idx + `" name="inv_qty-` + return_data[0].Idx + `" `;
+                    this_row += `     onkeyup="intCheck('inv_qty-` + return_data[0].Idx + `')" style="text-align: right;width: 50px; background-color: #FBF3D5;" value="` + return_data[0].Qty + `" disabled>`;
+                    this_row += `   </td>`;
+                    this_row += `	<td class="total text-end"  style="width: 14%;" ondblclick="edit_unitprice(` + return_data[0].Idx + `)">`;
+                    this_row += `    <input onchange="decimalCheck('inv_unitprice-` + return_data[0].Idx + `');update_unitprice(` + return_data[0].Idx + `)" type="text" id="inv_unitprice-` + return_data[0].Idx + `" name="inv_unitprice-` + return_data[0].Idx + `" `;
+                    this_row += `     onkeyup="decimalCheck('inv_unitprice-` + return_data[0].Idx + `')" style="text-align: right;width: 100px; background-color: #FBF3D5;" value="` + return_data[0].UnitPrice + `" disabled>`;
+                    this_row += `   </td>`;
+                    this_row += `	<td class="total text-end"  style="width: 16%;">`;
+                    this_row += `     <span id="inv_unittotal-` + return_data[0].Idx + `" name="inv_unittotal-` + return_data[0].Idx + `" class="text-end">` + (return_data[0].UnitPrice * return_data[0].Qty) + `</span>`;
+                    this_row += `   </td>`;
+                    this_row += `	<td class="total text-end"  style="width: 2%;">`;
+                    this_row += `   	<button type="button" class="btn-close" onclick="del_inv_item(` + return_data[0].Idx + `)"></button>`;
+                    this_row += `   </td>`;
+                    this_row += `</tr>`;
+                    $('#invoice_details').DataTable().row.add($(this_row)).draw(false);
+                    $('#inv_grand_total_').text(grand_total);
+                    $('#inv_grand_total').val(grand_total);
+                    update_inv_grandtotal(id, grand_total);
+                }
+            });
+            $('#additem_Modal').modal('hide');
+        }
+    }
+
+    function remove_inv_item(idx) {
+        if (!(inv_submitted)) {
+            $.ajax({
+                type: 'post',
+                url: '/course/booking',
+                data: {action: 'remove_inv_item', idx: idx},
+                success: function (return_data) {
+                    return true;
+                }
+            });
+        }
+    }
+
+    function update_inv_grandtotal() {
+        if (!(inv_submitted)) {
+            // console.log($('#inv_cartid').val());
+            form = $('#invoice_form');
+            $.ajax({
+                type: 'post',
+                url: '/course/booking',
+                data: {action: 'upd_inv_grandtotal', form: form.serialize()}
+            });
+        }
+    }
+
+    function update_inv_details(idx, price, qty, cartid) {
+        if (!(inv_submitted)) {
+            // console.log(cartid);
+            $.ajax({
+                type: 'post',
+                url: '/course/booking',
+                data: {
+                    action: 'upd_inv_price',
+                    idx: idx,
+                    price: price,
+                    qty: qty,
+                    cartid: cartid
+                },
+                success: function (return_data) {
+                    return true;
+                }
+            });
+        }
+    }
+
+    function tickall() {
+        if (check_student_select()) {
+            let table = $('#myDataTable2').DataTable();
+            let cells = table.cells().nodes();
+            if ($('#tick_all').is(':checked')) {
+                // then tick all
+                $('input[type="checkbox"]', cells).prop('checked', true);
+            } else {
+                // untick all
+                $('input[type="checkbox"]', cells).prop('checked', false);
+            }
+            bookcourse_step2()
+        }
+    }
+
+    function check_all_classes() {
+        let table = $('#myDataTable2').DataTable();
+        let cells = table.cells().nodes();
+        $(cells).find(':checkbox').prop('checked', $(this).is(':checked'));
+    }
+
+    function check_student_select() {
+        $('#student_id').val();
+        if ($('#student_id').val() === '') {
+            $('#promptMSG').text('<%= __("Please select a student") %>');
+            $('#msgModal').modal('show');
+            $('#student_Select').addClass("border-danger-input_alert");
+            return false;
+        } else {
+            $('#student_Select').removeClass("border-danger-input_alert");
+            return true;
+        }
+    }
+
+    function check_class_select() {
+        let x = $('#myDataTable2').DataTable().$('input[type=checkbox]:checked');
+        // console.log(x);
+        if (x.length < 1) {
+            $('#promptMSG').text('<%= __("Please select at least one class") %>');
+            $('#msgModal').modal('show');
+            let vouchers = document.getElementById("voucher_container");
+            while (vouchers.hasChildNodes()) {
+                vouchers.removeChild(vouchers.firstChild);
+            }
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    function bookcourse_step3() {
+        if (check_student_select() && check_class_select()) {
+            // alert('create invoice');
+            $('#form_course_code').val($('#sTemp').val());
+            // get all voucher code
+            let x = $("input:checkbox[name=voucher]:checked");
+            $.each(x, function (i) {
+                if (i > 0) {
+                    $('#inv_voucher').val($('#inv_voucher').val() + '~' + x[i].value);
+                } else {
+                    $('#inv_voucher').val(x[i].value);
+                }
+            });
+            $('#inv_course_code').val($('#form_course_code').val());
+            $('#inv_class_code').val($('#form_class_code').val());
+            $('#inv_student_code').val($('#student_id').val());
+            $('#inv_cartid').val('_New_cartID');
+            // clear any invoice data
+            $('#invoice_details').DataTable().data().clear();
+            let form = $('#booking_step3');
+            let this_UnitPrice;
+            let grand_total = 0;
+            $.ajax({
+                type: 'post',
+                url: '/course/booking',
+                data: {action: 'pre_invoice', form: form.serialize()},
+                success: function (return_data) {
+                    // console.log(return_data);
+                    $('#inv_cartid').val(return_data[0].CartID);
+                    $('#inv_branchcode').val(return_data[0].BranchCode);
+                    $('#bill-to').text(return_data[0].StudentName);
+                    $('#bill-to-addr').text(return_data[0].Address);
+                    $('#bill-to-tel').text(return_data[0].Tel);
+
+                    $.each(return_data, function (i) {
+                        this_row = ``;
+                        this_row += `<tr id="inv_table-row-` + return_data[i].Idx + `">`;
+                        this_row += `	<td class="text-left" style="width: 63%;">`;
+                        this_UnitPrice = return_data[i].UnitPrice;
+                        grand_total += (this_UnitPrice * return_data[i].Qty);
+                        if (return_data[i].CourseCode !== '') {
+                            this_row += `		<h3>` + return_data[i].CourseCode + `</h3>`;
+                            this_row += `		` + return_data[i].Item1 + ``;
+                        }
+                        if (return_data[i].PromotionCode !== '') {
+                            this_row += `		<h3>` + return_data[i].PromotionCode + ` - ` + return_data[i].Item1 + `</h3>`;
+                        }
+                        this_row += `	</td>`;
+                        if (return_data[i].CourseCode !== '') {
+                            // QTY not allow edit for course
+                            this_row += `	<td class="qty text-end" style="width: 5%;">`;
+                            this_row += `    <input onchange="intCheck('inv_qty-` + return_data[i].Idx + `');update_unitprice(` + return_data[i].Idx + `)" type="text" id="inv_qty-` + return_data[i].Idx + `" name="inv_qty-` + return_data[i].Idx + `" `;
+                            this_row += `     style="text-align: right;width: 50px;" value="` + return_data[i].Qty + `" disabled>`;
+                            this_row += `   </td>`;
+                        } else {
+                            // OK if not
+                            this_row += `	<td class="qty text-end" style="width: 5%;" ondblclick="edit_qty(` + return_data[i].Idx + `)">`;
+                            this_row += `    <input onchange="intCheck('inv_qty-` + return_data[i].Idx + `');update_unitprice(` + return_data[i].Idx + `)" type="text" id="inv_qty-` + return_data[i].Idx + `" name="inv_qty-` + return_data[i].Idx + `" `;
+                            this_row += `     onkeyup="intCheck('inv_qty-` + return_data[i].Idx + `')" style="text-align: right;width: 50px; background-color: #FBF3D5;" value="` + return_data[i].Qty + `" disabled>`;
+                            this_row += `   </td>`;
+                        }
+                        this_row += `	<td class="total float-left"  style="width: 14%;" ondblclick="edit_unitprice(` + return_data[i].Idx + `)">`;
+                        this_row += `    <input onchange="decimalCheck('inv_unitprice-` + return_data[i].Idx + `');update_unitprice(` + return_data[i].Idx + `)" type="text" id="inv_unitprice-` + return_data[i].Idx + `" name="inv_unitprice-` + return_data[i].Idx + `" `;
+                        this_row += `     onkeyup="decimalCheck('inv_unitprice-` + return_data[i].Idx + `')" style="text-align: right;width: 100px; background-color: #FBF3D5;" value="` + this_UnitPrice + `" disabled>`;
+                        this_row += `   </td>`;
+                        this_row += `	<td class="total text-end"  style="width: 16%;">`;
+                        this_row += `     <span id="inv_unittotal-` + return_data[i].Idx + `" name="inv_unittotal-` + return_data[i].Idx + `" class="text-end">` + (return_data[i].UnitPrice * return_data[i].Qty) + `</span>`;
+                        this_row += `   </td>`;
+                        if (return_data[i].CourseCode !== '') {
+                            // delete not allowed for a course
+                            this_row += `	<td class="total text-end"  style="width: 2%;"> </td>`;
+                        } else {
+                            this_row += `	<td class="total text-end"  style="width: 2%;">`;
+                            this_row += `     <button type="button" class="btn-close" onclick="del_inv_item(` + return_data[i].Idx + `)"></button>`;
+                            this_row += `   </td>`;
+                        }
+                        this_row += `</tr>`;
+                        $('#invoice_details').DataTable().row.add($(this_row)).draw(false);
+                    });
+                    $('#inv_grand_total_').text(grand_total);
+                    $('#inv_grand_total').val(grand_total);
+                }
+            });
+            // show invoice modal and hide booking modal
+            $('#booking_Modal').modal('hide');
+            $('#invoice_Modal').modal({backdrop: 'static', keyboard: false})
+            $('#invoice_Modal').modal('show');
+        }
+    }
+
+    function bookcourse_step2() {
+        if (check_student_select() && check_class_select()) {
+            $('#form_course_code').val($('#sTemp').val());
+            // a bit tricky but fit backend easier
+            let vouchers = document.getElementById("voucher_container");
+            while (vouchers.hasChildNodes()) {
+                vouchers.removeChild(vouchers.firstChild);
+            }
+            // get all checked classes
+            let x = $('#myDataTable2').DataTable().$('input[type=checkbox]:checked');
+            $.each(x, function (i) {
+                if (i > 0) {
+                    $('#form_class_code').val($('#form_class_code').val() + '~' + x[i].value);
+                } else {
+                    $('#form_class_code').val(x[i].value);
+                }
+            });
+            let form = $('#booking_step1');
+
+            $.ajax({
+                type: 'post',
+                url: '/course/booking',
+                data: {action: 'get_voucher', form: form.serialize()},
+                success: function (return_data) {
+                    if (return_data.length > 0) {
+                        $.each(return_data, function (i) {
+                            newHTML = ``;
+                            newHTML += `<div class="card radius-10" style="width: 330px;">`;
+                            newHTML += `	<div class="card-body" style="background-color: rgba(248,252,7,0.45);">`;
+                            newHTML += `		<div class="d-flex align-items-center">`;
+                            newHTML += `			<div>`;
+                            newHTML += `				<h4 class="my-1">` + return_data[i].VoucherName + `</h4>`;
+                            if (new Date(return_data[i].VoucherEnd) > new Date('2900-01-01')) {
+                                newHTML += `				<p class="mb-0"><%= __("Never Expired") %></p>`;
+                            } else {
+                                newHTML += `				<p class="mb-0"><%= __("Expiry") %>: ` + new Date(return_data[i].VoucherEnd).toLocaleDateString('en-CA', {timeZone: 'GMT'}) + `</p>`;
+                            }
+
+                            newHTML += `			</div>`;
+                            // newHTML += `			<div class="widgets-icons bg-light-danger text-danger ms-auto">`;
+                            newHTML += `			<div class="ms-auto">`;
+                            //newHTML += `				<img src="/assets/images/icons/people.png" width="36" height="36" alt="">`;
+                            newHTML += `				<p class="mb-0 float-end"><%= __("USE") %> <input type="checkbox" id="voucher" name="voucher" value="` + return_data[i].VoucherCode + `"></p>`;
+                            newHTML += `			</div>`;
+                            newHTML += `		</div>`;
+                            newHTML += `	</div>`;
+                            newHTML += `</div>`;
+
+                            let dummy = document.createElement("div");
+                            dummy.innerHTML = newHTML;
+                            let newVoucher = $.parseHTML(newHTML);
+                            $("#voucher_container").append(newVoucher);
+                        });
+                    } else {
+                        newHTML = ``;
+                        newHTML += `<div class="card radius-10" style="width: 330px;">`;
+                        newHTML += `	<div class="card-body">`;
+                        newHTML += `		<div class="d-flex align-items-center">`;
+                        newHTML += `			<div>`;
+                        newHTML += `				<p class="mb-0 text-center"><%= __("No available voucher at the moment") %></p>`;
+                        newHTML += `			</div>`;
+                        newHTML += `		</div>`;
+                        newHTML += `	</div>`;
+                        newHTML += `</div>`;
+
+                        let dummy = document.createElement("div");
+                        dummy.innerHTML = newHTML;
+                        let newVoucher = $.parseHTML(newHTML);
+                        $("#voucher_container").append(newVoucher);
+                    }
+                }
+            });
+        }
+    }
+
+    function get_student_list() {
+        let ccode = $('#sTemp').val();
+        $('#myDataTable3').DataTable().data().clear();
+        $.ajax({
+            type: 'post',
+            url: '/course/booking',
+            data: {action: 'get_student', ccode: ccode},
+            success: function (return_data) {
+                $.each(return_data, function (i) {
+                    this_row = `<tr onclick="this_student('` + return_data[i].StudentCode + `','` + return_data[i].FirstName
+                        + ` - ` + return_data[i].LastName + ` - (M:` + return_data[i].Mobile + `) - ` + return_data[i].SchoolName + `')">`;
+                    this_row += `<td class="text-md-left">` + return_data[i].StudentCode + `</td>`;
+                    this_row += `<td class="text-md-left">` + return_data[i].FirstName + ` ` + return_data[i].LastName + `</td>`;
+                    this_row += `<td class="text-md-left">` + return_data[i].Email + `</td>`;
+                    this_row += `<td class="text-md-left">` + return_data[i].Mobile + `</td>`;
+                    this_row += `<td class="text-md-left">` + return_data[i].SchoolName + `</td>`;
+                    this_row += `</tr>`;
+                    $('#myDataTable3').DataTable().row.add($(this_row)).draw();
+                });
+            }
+        });
+        $('#getstudent_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#getstudent_Modal').modal('show');
+    }
+
+    function this_student(c, d) {
+        // console.log(c)
+        // console.log(d)
+        $('#getstudent_Modal').modal('hide');
+        $('#student_id').val(c);
+        $('#student_Select').val(d);
+        refresh_class_list();
+    }
+
+    function refresh_class_list() {
+        let vouchers = document.getElementById("voucher_container");
+        while (vouchers.hasChildNodes()) {
+            vouchers.removeChild(vouchers.firstChild);
+        }
+        let lng = window.location.href.split("lang=")[1];
+        let ccode = $('#sTemp').val();
+        let time_row = '';
+        let s;
+        let s_code = $('#student_id').val();
+        $('#myDataTable2').DataTable().data().clear().draw();
+        // document.getElementById("booking_step1").reset();
+        $.ajax({
+            type: 'post',
+            url: '/course/booking',
+            data: {action: 'get_class', ccode: ccode, student: s_code},
+            success: function (return_data) {
+                $.each(return_data, function (i) {
+                    time_row = '<tr>';
+                    // console.log(return_data[i].ClassCode);
+                    if (return_data[i].Avaliable > 0) {
+                        time_row += '<td class="text-md-center"><input class="form-check-input" type="checkbox" onclick="bookcourse_step2()" value="' + return_data[i].ClassCode + '"></td>';
+                    } else {
+                        time_row += '<td class="text-md-center"></td>';
+                    }
+                    let swDay = return_data[i].WeekDay;
+                    slng = '<%= req.session.lang %>';
+                    if (slng) {
+                        if (slng !== "en") {
+                            switch (return_data[i].WeekDay) {
+                                case "MON":
+                                    swDay = "星期一";
+                                    break;
+                                case "TUE":
+                                    swDay = "星期二";
+                                    break;
+                                case "WED":
+                                    swDay = "星期三";
+                                    break;
+                                case "THU":
+                                    swDay = "星期四";
+                                    break;
+                                case "FRI":
+                                    swDay = "星期五";
+                                    break;
+                                case "SAT":
+                                    swDay = "星期六";
+                                    break;
+                                case "SUN":
+                                    swDay = "星期日";
+                                    break;
+                                case "HOL":
+                                    swDay = "假期";
+                                    break;
+                            }
+                        }
+                    }
+                    time_row += '<td class="text-md-center">' + swDay + '</td>';
+                    time_row += '<td class="text-md-center">' + new Date(return_data[i].ClassDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) + '</td>';
+                    time_row += '<td class="text-md-center">' + new Date(return_data[i].StartTime).toLocaleTimeString('en-CA', {
+                        timeZone: 'GMT',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }) + '</td>';
+                    time_row += '<td class="text-md-center">' + new Date(return_data[i].EndTime).toLocaleTimeString('en-CA', {
+                        timeZone: 'GMT',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }) + '</td>';
+                    time_row += '<td class="text-md-center">' + return_data[i].Avaliable + '</td>';
+                    time_row += '</tr>';
+                    $('#myDataTable2').DataTable().row.add($(time_row)).draw(false);
+                });
+            }
+        });
+    }
+
+    function bookcourse_step1() {
+        let lng = window.location.href.split("lang=")[1];
+        let ccode = $('#sTemp').val();
+        let time_row = '';
+        let s;
+        let s_code = $('#student_id').val();
+        let vouchers = document.getElementById("voucher_container");
+        while (vouchers.hasChildNodes()) {
+            vouchers.removeChild(vouchers.firstChild);
+        }
+        $('#myDataTable2').DataTable().data().clear();
+        document.getElementById("booking_step1").reset();
+        $.ajax({
+            type: 'post',
+            url: '/course/booking',
+            data: {action: 'get_class', ccode: ccode, student: s_code},
+            success: function (return_data) {
+                $.each(return_data, function (i) {
+                    time_row = '<tr>';
+                    // console.log(return_data[i].ClassCode);
+                    if (return_data[i].Avaliable > 0) {
+                        time_row += '<td class="text-md-center"><input class="form-check-input" type="checkbox" onclick="bookcourse_step2()" value="' + return_data[i].ClassCode + '"></td>';
+                    } else {
+                        time_row += '<td class="text-md-center"></td>';
+                    }
+                    let swDay = return_data[i].WeekDay;
+                    slng = '<%= req.session.lang %>';
+                    if (slng) {
+                        if (slng !== "en") {
+                            switch (return_data[i].WeekDay) {
+                                case "MON":
+                                    swDay = "星期一";
+                                    break;
+                                case "TUE":
+                                    swDay = "星期二";
+                                    break;
+                                case "WED":
+                                    swDay = "星期三";
+                                    break;
+                                case "THU":
+                                    swDay = "星期四";
+                                    break;
+                                case "FRI":
+                                    swDay = "星期五";
+                                    break;
+                                case "SAT":
+                                    swDay = "星期六";
+                                    break;
+                                case "SUN":
+                                    swDay = "星期日";
+                                    break;
+                                case "HOL":
+                                    swDay = "假期";
+                                    break;
+                            }
+                        }
+                    }
+                    time_row += '<td class="text-md-center">' + swDay + '</td>';
+                    time_row += '<td class="text-md-center">' + new Date(return_data[i].ClassDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}) + '</td>';
+                    time_row += '<td class="text-md-center">' + new Date(return_data[i].StartTime).toLocaleTimeString('en-CA', {
+                        timeZone: 'GMT',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }) + '</td>';
+                    time_row += '<td class="text-md-center">' + new Date(return_data[i].EndTime).toLocaleTimeString('en-CA', {
+                        timeZone: 'GMT',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }) + '</td>';
+                    time_row += '<td class="text-md-center">' + return_data[i].Avaliable + '</td>';
+                    time_row += '</tr>';
+                    $('#myDataTable2').DataTable().row.add($(time_row)).draw(false);
+                });
+            }
+        });
+        $('#prod_details_Modal').modal('hide');
+        $('#booking_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#booking_Modal').modal('show');
+    }
+
+    function course_details(ccode) {
+        $('#sTemp').val(ccode);
+        let today = new Date();
+        $.ajax({
+            type: 'post',
+            url: '/course/list2',
+            data: {ccode: ccode},
+            success: function (course_info) {
+                console.log(course_info)
+                $('#f_ccode').val(course_info[0].CourseCode);
+                $('#f_cmcode').val(course_info[0].CourseMasterCode);
+                $('#f_ctype').val(course_info[0].CourseType);
+                $('#f_ctitle').val(course_info[0].CourseTitle);
+                $('#f_cdesc').val(course_info[0].CourseDesc);
+                $('#f_cremark').val(course_info[0].CourseRemark);
+                $('#f_ciremark').val(course_info[0].CourseInternalRemark);
+                $('#f_cform').val(course_info[0].Form);
+                $('#f_cteachername').val(course_info[0].Name);
+                $('#f_cvenue').val(course_info[0].VenueName);
+                $('#f_ctime').val(course_info[0].CourseTime);
+                $('#f_cstart').val(new Date(course_info[0].CourseStart).toLocaleDateString('en-CA', {timeZone: 'GMT'}));
+                $('#f_cend').val(new Date(course_info[0].CourseEnd).toLocaleDateString('en-CA', {timeZone: 'GMT'}));
+                $('#f_cactivedate').val(new Date(course_info[0].CourseActiveDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}));
+                $('#f_cdeactivedate').val(new Date(course_info[0].CourseDeactiveDate).toLocaleDateString('en-CA', {timeZone: 'GMT'}));
+                $('#f_csts').val(course_info[0].NumOfStudent + ' / ' + course_info[0].CourseQuota);
+                $('#f_cprice').val(course_info[0].CoursePrice);
+                $('#f_cpaymethod').val(course_info[0].PriceString);
+                if ((course_info[0].NumOfStudent < course_info[0].CourseQuota) && (today >= new Date(course_info[0].CourseActiveDate))) {
+                    // allow booking
+                    $('#btn_booking').removeAttr('disabled');
+                    $('#btn_booking').removeClass("btn-dark");
+                    $('#btn_booking').addClass("btn-primary");
+                    $('#btn_booking').attr('onclick', 'bookcourse_step1()');
+                } else {
+                    $('#btn_booking').prop('disabled', true);
+                    $('#btn_booking').removeClass("btn-primary");
+                    $('#btn_booking').addClass("btn-dark");
+                    $('#btn_booking').removeAttr('onclick');
+                }
+                if (course_info[0].NumOfStudent >= course_info[0].CourseQuota) {
+                    $('#f_csts').addClass("bg-light-danger");
+                } else {
+                    $('#f_csts').removeClass("bg-light-danger");
+                }
+                if (today <= new Date(course_info[0].CourseActiveDate)) {
+                    $('#f_cactivedate').addClass("bg-light-danger");
+                } else {
+                    $('#f_cactivedate').removeClass("bg-light-danger");
+                }
+                $('#prod_details_Modal').modal({backdrop: 'static', keyboard: false})
+                $('#prod_details_Modal').modal('show');
+            }
+        });
+    }
+
+    function refresh_course_list() {
+        $('#myDataTable').DataTable().data().clear();
+        get_course_list();
+    }
+
+    function get_course_list() {
+        let this_row = '';
+        let this_aval_td = '';
+        //$('#myDataTable').DataTable({
+        //	stateSave: true
+        //});
+        let ccode = 'a';
+        $.ajax({
+            type: 'GET',
+            url: '/course/list2',
+            success: function (course_info) {
+                $.each(course_info, function (i) {
+                    //alert(JSON.stringify(course_info));
+                    // let's prepare the row string
+                    const userBranchCodes = $('#mydiv').data('userbranch').split(',');
+                    // console.log(userBranchCodes)
+                    if (!(course_info[i].NumOfStudent >= course_info[i].CourseQuota)) {
+                        let s_date = new Date(course_info[i].CourseStart);
+                        let e_date = new Date(course_info[i].CourseDeactiveDate);
+                        let s_status = course_info[i].NumOfStudent + '/' + course_info[i].CourseQuota;
+                        s_date = s_date.toLocaleDateString('en-CA', {timeZone: 'GMT'});
+                        e_date = e_date.toLocaleDateString('en-CA', {timeZone: 'GMT'});
+                        // handle avaliability effect
+                        if (((course_info[i].NumOfStudent / course_info[i].CourseQuota) * 100) >= 90) {
+                            this_aval_td = '<div class="badge rounded-pill text-warning bg-light-warning p-2 text-uppercase px-3" style="width:100px;border: 1px solid;">';
+                            this_aval_td += '<!-- <i class="bx bxs-circle me-1"></i>-->' + s_status + '</div>';
+                        } else {
+                            this_aval_td = '<div class="badge rounded-pill text-success bg-light-success p-2 text-uppercase px-3" style="width:100px;border: 1px solid;">'
+                            this_aval_td += '<!-- <i class="bx bxs-circle me-1"></i>-->' + s_status + '</div>';
+                        }
+                        if (new Date(course_info[i].CourseDeactiveDate) >= new Date() && userBranchCodes.includes(course_info[i].BranchCode)) {
+                            this_row = `<tr onclick="course_details('` + course_info[i].CourseCode + `')">`;
+                            this_row += `<td>` + course_info[i].CourseMasterCode + `</td>`;
+                            this_row += `<td>` + course_info[i].CourseTitle + `</td>`;
+                            this_row += `<td>` + course_info[i].Name + `</td>`;
+                            this_row += `<td class="text-md-center">` + this_aval_td + `</td>`;
+                            this_row += `<td class="text-md-center">` + course_info[i].BranchCode + `</td>`
+                            this_row += `<td class="text-md-center">` + s_date + `</td>`;
+                            this_row += `<td class="text-md-center">` + e_date + `</td>`;
+                            this_row += `</tr>`;
+                            // alert(this_row);
+                            $('#myDataTable').DataTable().row.add($(this_row)).draw(false);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    function resume_normal() {
+        // clear all forms
+        let inv_con = document.getElementById("inv_button_container");
+        while (inv_con.hasChildNodes()) {
+            inv_con.removeChild(inv_con.firstChild);
+        }
+        newHTML = ``;
+        newHTML += `<div class="p-4 float-lg-end" id="inv_button">
+            <a class="btn bg-primary text-white" id="btn_inv_confirm"
+               onclick="confirm_invoice()"
+               type="submit"><%= __("Confirm Invoice") %></a>
+        </div>`;
+        let dummy = document.createElement("div");
+        dummy.innerHTML = newHTML;
+        let newButtons = $.parseHTML(newHTML);
+        $("#inv_button_container").append(newButtons);
+
+        let vouchers = document.getElementById("voucher_container");
+        while (vouchers.hasChildNodes()) {
+            vouchers.removeChild(vouchers.firstChild);
+        }
+        $('#product_details_edit').trigger('reset');
+        $('#booking_step1').trigger('reset');
+        $('#invoice_form').trigger('reset');
+        $('#booking_step3').trigger('reset');
+        temp_unitprice = '';
+        temp_qty = '';
+        inv_submitted = false;
+        $('#inv_no').text('');
+    }
+
+    function print_preview() {
+        $('#showFile_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#showFile_Modal').modal('show')
+    }
+
+    $(document).ready(function () {
+        setInterval(refresh_course_list, <%= config.db_refresh_tbl %>);
+        $('#invoice_Modal').on('hidden.bs.modal', function () {
+            resume_normal();
+            // document.location.reload();
+        })
+        $('#booking_Modal').on('hidden.bs.modal', function () {
+            resume_normal();
+        })
+        $('#invoice_Modal').on('hidden.bs.modal', function () {
+            resume_normal();
+        })
+    });
+</script>
+
+</body>
+
+</html>

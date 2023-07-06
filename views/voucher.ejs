@@ -1,0 +1,1257 @@
+<%- include('./header.ejs') %>
+
+<body onload="get_badge()">
+
+<!--wrapper-->
+<div class="wrapper">
+
+    <%- include('./sidebar.ejs') %>
+    <%- include('./topbar.ejs') %>
+
+    <!--start page wrapper -->
+    <div class="page-wrapper">
+        <div class="page-content">
+            <!--breadcrumb-->
+            <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+                <div class="ps-3">
+                    <span class="font-30"><i class="bx bx-cool"></i></span>
+                    <span class="font-24"><%= __("Vouchers") %></span>
+                </div>
+            </div>
+            <!--end breadcrumb-->
+
+            <!-- <div class="col-12 col-lg-9 mx-auto"> -->
+            <div class="card radius-10">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table mb-0 table-striped table-bordered table-hover" id="myDataTable2">
+                            <thead class="table-light">
+                            <tr>
+                                <th class="text-md-center" style="width: 10%"><%= __("Code") %></th>
+                                <th class="text-md-center" style="width: 25%"><%= __("Name") %></th>
+                                <th class="text-md-center" style="width: 10%"><%= __("Type") %></th>
+                                <th class="text-md-center" style="width: 5%"><%= __("Qty") %></th>
+                                <th class="text-md-center" style="width: 5%"><%= __("Amount") %></th>
+                                <th class="text-md-center" style="width: 5%"><%= __("Discount") %></th>
+                                <th class="text-md-center" style="width: 5%"><%= __("Validity") %></th>
+                                <th class="text-md-center" style="width: 15%"><%= __("Start Date") %></th>
+                                <th class="text-md-center" style="width: 15%"><%= __("Expiry Date") %></th>
+                                <th class="text-md-center" style="width: 5%"><%= __("Quota") %></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <% for(let i = 0; i < return_data.length; i++) { %>
+                            <tr onclick="voucher_edit('<%= return_data[i].VoucherCode %>',
+                                    '<%= return_data[i].VoucherName.replace(/'/g, "&#39;") %>',
+                                    '<%= return_data[i].VoucherType %>',
+                                    '<%= return_data[i].Amount %>',
+                                    '<%= return_data[i].Discount %>',
+                                    '<%= return_data[i].Validity %>',
+                                    '<%= return_data[i].Qty %>',
+                                    '<%= new Date(return_data[i].VoucherStart).toLocaleDateString('en-CA', {timeZone: 'GMT'}) %>',
+                                    '<%= new Date(return_data[i].VoucherEnd).toLocaleDateString('en-CA', {timeZone: 'GMT'}) %>',
+                                    '<%= return_data[i].Quota %>')">
+                                <td class="text-md-left"
+                                    style="width: 10%"><%= return_data[i].VoucherCode %></td>
+                                <td class="text-md-left"
+                                    style="width: 25%"><%= return_data[i].VoucherName %></td>
+                                <td class="text-md-left"
+                                    style="width: 10%"><%= return_data[i].VoucherType %></td>
+                                <td class="text-md-end" style="width: 5%"><%= return_data[i].Qty %></td>
+                                <td class="text-md-end" style="width: 5%"><%= return_data[i].Amount %></td>
+                                <td class="text-md-end" style="width: 5%"><%= return_data[i].Discount %></td>
+                                <td class="text-md-end" style="width: 5%"><%= return_data[i].Validity %></td>
+                                <td class="text-md-center"
+                                    style="width: 15%"><%= new Date(return_data[i].VoucherStart).toLocaleDateString('en-CA', {timeZone: 'GMT'}) %></td>
+                                <td class="text-md-center"
+                                    style="width: 15%"><%= new Date(return_data[i].VoucherEnd).toLocaleDateString('en-CA', {timeZone: 'GMT'}) %></td>
+                                <td class="text-md-end" style="width: 5%"><%= return_data[i].Quota %></td>
+                            </tr>
+                            <% } %>
+                            </tbody>
+                        </table>
+                        <a class="btn bg-primary btn-sm  text-white" onclick="add_new()"
+                           id="btn_addvoucher"><%= __("Add New Voucher") %></a>
+                    </div>
+                </div>
+            </div>
+            <!-- </div> -->
+
+            <%- include('./copyright.ejs') %>
+        </div>
+    </div>
+    <!--end page wrapper -->
+
+    <!-- voucher description modal -->
+    <div class="modal fade" id="voucherdesc_Modal" role="dialog">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="card">
+
+                        <div class="card-body p-4 border-rounded">
+
+                            <form id="voucherdesc_form">
+
+                                <div id="voucherdesc_container">
+
+                                    <div class="col-12 col-lg-9 mx-auto">
+                                        <!--    <div class="card radius-10"> -->
+                                        <div class="card-body">
+                                            <div class="row mb-3">
+                                                <div class="col-sm-3">
+                                                    <h6 class="my-1"><%= __("Voucher Code") %></h6>
+                                                </div>
+                                                <div class="col-sm-9 text-secondary">
+                                                    <div class="col-md-3 py-3 input-group">
+                                                        <input type="text" class="form-control border-primary"
+                                                               id="voucher_code"
+                                                               name="voucher_code" onchange="checkdup()">
+                                                        <button type="button" class="btn btn-outline-primary ms-2"
+                                                                id="btn_get_vlist"
+                                                                onclick="get_voucher_list()"><i
+                                                                    class='bx bx-search me-0'></i></button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col-sm-3">
+                                                    <h6 class="my-1"><%= __("Voucher Name") %></h6>
+                                                </div>
+                                                <div class="col-sm-9 text-secondary">
+                                                    <input type="text" class="form-control" id="voucher_name"
+                                                           name="voucher_name" autocomplete="off">
+                                                </div>
+                                            </div>
+
+                                            <div class="row mb-3">
+                                                <div class="col-sm-3">
+                                                    <h6 class="my-1"><%= __("Voucher Type") %></h6>
+                                                </div>
+                                                <div class="col-sm-9 text-secondary">
+                                                    <input type="radio" class="form-check-input" id="voucher_type01"
+                                                           name="voucher_type" value="Voucher" onclick="set_field()"
+                                                           autocomplete="off"> <%= __("Voucher") %> &nbsp;</input>
+                                                    <input type="radio" class="form-check-input" id="voucher_type02"
+                                                           name="voucher_type" value="Discount" onclick="set_field()"
+                                                           autocomplete="off"> <%= __("Discount") %> &nbsp;</input>
+                                                    <input type="radio" class="form-check-input" id="voucher_type03"
+                                                           name="voucher_type" value="Credit" onclick="set_field()"
+                                                           autocomplete="off"> <%= __("Credit") %> &nbsp;</input>
+                                                    <input type="radio" class="form-check-input" id="voucher_type04"
+                                                           name="voucher_type" value="Old Price" onclick="set_field()"
+                                                           autocomplete="off"> <%= __("Old Price") %> &nbsp;</input>
+                                                    <input type="radio" class="form-check-input" id="voucher_type05"
+                                                           name="voucher_type" value="Special Price"
+                                                           onclick="set_field()"
+                                                           autocomplete="off"> <%= __("Special Price") %> &nbsp;</input>
+                                                    <input type="radio" class="form-check-input" id="voucher_type06"
+                                                           name="voucher_type" value="Coupon" onclick="set_field()"
+                                                           autocomplete="off"> <%= __("Coupon") %> &nbsp;</input>
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-sm-3">
+                                                    <h6 class="my-1"><%= __("QTY") %></h6>
+                                                </div>
+                                                <div class="col-sm-9 text-secondary">
+                                                    <input type="text" class="form-control" id="qty" name="qty"
+                                                           onkeyup="intCheck('qty')" autocomplete="off">
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-sm-3">
+                                                    <h6 class="my-1"><%= __("Amount") %></h6>
+                                                </div>
+                                                <div class="col-sm-9 text-secondary">
+                                                    <input type="text" class="form-control" id="amount" name="amount"
+                                                           onkeyup="decimalCheck('amount')" autocomplete="off">
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-sm-3">
+                                                    <h6 class="my-1"><%= __("Discount") %> (%)</h6>
+                                                </div>
+                                                <div class="col-sm-9 text-secondary">
+                                                    <input type="text" class="form-control" id="discount"
+                                                           name="discount" onkeyup="intCheck('discount')"
+                                                           autocomplete="off">
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-sm-3">
+                                                    <h6 class="my-1"><%= __("Validity")%> (<%= __("day")%>)</h6>
+                                                </div>
+                                                <div class="col-sm-9 text-secondary">
+                                                    <input type="text" class="form-control" id="validity"
+                                                           name="validity" onkeyup="intCheck('validity')"
+                                                           autocomplete="off">
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-sm-3">
+                                                    <h6 class="my-1"><%= __("Quota") %></h6>
+                                                </div>
+                                                <div class="col-sm-9 text-secondary">
+                                                    <input type="text" class="form-control" id="quota" name="quota"
+                                                           value="999"
+                                                           onkeyup="intCheck('quota')" autocomplete="off">
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-sm-3">
+                                                    <h6 class="my-1"><%= __("Start Date") %></h6>
+                                                </div>
+                                                <div class="col-sm-9 text-secondary">
+                                                    <input type="text" class="form-control" id="start_date"
+                                                           name="start_date" autocomplete="off">
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-sm-3">
+                                                    <h6 class="my-1"><%= __("Expiry Date") %></h6>
+                                                </div>
+                                                <div class="col-sm-9 text-secondary">
+                                                    <input type="text" class="form-control" id="end_date"
+                                                           value="2999-12-31"
+                                                           name="end_date" autocomplete="off">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-sm-3"></div>
+                                                <div class="col-sm-9 text-secondary">
+                                                    <span id="confirmation"
+                                                          class="text-center text-primary font-18"></span>
+                                                    <div id="edit_button_container">
+                                                        <input type="button" id="btn_edit_voucher"
+                                                               class="btn btn-danger px-4 float-end"
+                                                               onclick="open_voucher_edit()"
+                                                               value="<%= __("Edit") %>"/>
+                                                        <input type="button" id="btn_voucher_rules"
+                                                               class="btn btn-primary px-4"
+                                                               onclick="voucher_rules()"
+                                                               value="<%= __("Rules") %>"/>
+                                                    </div>
+                                                    <div id="del_button_container" style="display: none">
+                                                        <input type="button" id="btn_del_voucher"
+                                                               class="btn btn-danger px-4 float-end"
+                                                               onclick="delete_voucher()"
+                                                               value="<%= __("Delete") %>"/>
+                                                    </div>
+                                                    <div id="save_button_container" style="display: none">
+                                                        <input type="button" id="saveChange"
+                                                               class="btn btn-primary px-4" onclick="save_voucher()"
+                                                               value="<%= __("Save") %>"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- </div> -->
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- voucher description modal  ended -->
+
+    <!-- Get existing vouchers modal -->
+    <div class="modal fade" id="voucher_Modal" role="dialog">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table class="table mb-0 table-striped table-bordered table-hover"
+                                   id="selection_table_search5">
+                                <thead class="table-light">
+                                <tr>
+                                    <th class="text-md-center" style="width: 10%"><%= __("Code") %></th>
+                                    <th class="text-md-center" style="width: 75%"><%= __("Description") %></th>
+                                    <th class="text-md-center" style="width: 15%"><%= __("Type") %></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Get existing vouchers modal ended -->
+
+    <!-- delete confirmation modal -->
+    <div class="modal fade" id="delete_Modal" role="dialog">
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form id="delete_voucher_form">
+                        <div class="text-md-center">
+                            <input type="hidden" id="del_vcode">
+                            <span class="text-secondary font-16"><%= __("Delete Voucher") %> # </span>
+                            <span class="text-primary font-16" id="del_vcode_v"></span>
+                            <span class="text-secondary font-16"><%= __(" and it's rule(s)") %></span>
+                        </div>
+                        <hr>
+                        <div class="text-md-center">
+                            <a class="btn btn-sm bg-secondary text-white" data-bs-dismiss="modal"
+                               id="btn_del_cancel"><%= __("Cancel") %></a> &nbsp;&nbsp;
+                            <a class="btn btn-sm bg-danger text-white"
+                               id="btn_del_confirm"
+                               onclick="del_confirm()"><%= __("Confirm") %></a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- delete confirmation modal ended -->
+
+    <!-- voucher rules modal -->
+    <div class="modal fade" id="voucherrules_Modal" role="dialog">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><%= __("Voucher Rules") %> &nbsp;</h5>
+                        <span class="text-primary font-16" id="v_code_v"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form id="rule_form">
+                        <input type="hidden" id="rule_vcode">
+                        <input type="hidden" id="rule_idx">
+                        <div class="card">
+                            <div class="card-body p-4 border-rounded">
+                                <div class="row g-3">
+                                    <div class="col-md-3 py3"><br>
+                                        <label for="rule_description"
+                                               class="form-label"><%= __("Description") %></label>
+                                        <div class="d-none d-md-flex">
+                                            <input type="text" class="form-control" id="rule_description"
+                                                   name="rule_description" required autocomplete="off">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1 py3">
+                                        <label for="rule_qtycond"
+                                               class="form-label"><%= __("Total Class") %></label>
+                                        <input type="text" class="form-control" id="rule_qtycond" name="rule_qtycond"
+                                               required
+                                               autocomplete="off" style="text-align: right;"
+                                               onkeyup="intCheck('rule_qtycond')">
+                                    </div>
+                                    <div class="col-md-1 py3">
+                                        <label for="rule_qtycoursecond"
+                                               class="form-label"><%= __("Total Course") %></label>
+                                        <div class="d-none d-md-flex">
+                                            <input type="text" class="form-control" id="rule_qtycoursecond"
+                                                   name="rule_qtycoursecond" required
+                                                   style="text-align: right;" onkeyup="intCheck('rule_qtycoursecond')">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1 py3">
+                                        <label for="rule_weekqtycond"
+                                               class="form-label"><%= __("Class per Week") %></label>
+                                        <input type="text" class="form-control" id="rule_weekqtycond"
+                                               name="rule_weekqtycond" required
+                                               style="text-align: right;" onkeyup="intCheck('rule_weekqtycond')">
+                                    </div>
+                                    <div class="col-md-1 py3">
+                                        <label for="rule_monthqtycond"
+                                               class="form-label"><%= __("Class per Month") %></label>
+                                        <input type="text" class="form-control" id="rule_monthqtycond"
+                                               name="rule_monthqtycond" required
+                                               autocomplete="off" style="text-align: right;"
+                                               onkeyup="intCheck('rule_monthqtycond')">
+                                    </div>
+                                    <div class="col-md-2"><br>
+                                        <label for="rule_isnewmember_"
+                                               class="form-label"><%= __("New Member Only") %></label><br>
+                                        <input type="radio" id="rule_isnewmember_yes" name="rule_isnewmember"
+                                               class="form-check-input"
+                                               value=true> <%= __("Yes") %>
+                                        <input type="radio" id="rule_isnewmember_no" name="rule_isnewmember"
+                                               class="form-check-input"
+                                               value=false> <%= __("No") %>
+                                    </div>
+                                </div>
+                                <div class="row"><br></div>
+                                <div class="row g-3">
+                                    <div class="col-md-3 py3" onclick="get_exist_coursecode()">
+                                        <label for="rule_coursecode"
+                                               class="form-label"><%= __("Course Code") %></label>
+                                        <input type="text" class="form-control" id="rule_coursecode"
+                                               name="rule_coursecode" required
+                                               autocomplete="off" disabled>
+                                    </div>
+                                    <div class="col-md-3 py3" onclick="get_exist_mastercode()">
+                                        <label for="rule_mastercode"
+                                               class="form-label"><%= __("Master Code") %></label>
+                                        <input type="text" class="form-control" id="rule_mastercode"
+                                               name="rule_mastercode" required
+                                               autocomplete="off" disabled>
+                                    </div>
+                                    <div class="col-md-3 py3" onclick="get_exist_productcode()">
+                                        <label for="rule_productcode"
+                                               class="form-label"><%= __("Product Code") %></label>
+                                        <input type="text" class="form-control" id="rule_productcode"
+                                               name="rule_productcode" required
+                                               autocomplete="off" disabled>
+                                    </div>
+                                    <div class="col-md-3 py3" id="add_btn"><br>
+                                        <div class="p-4 float-end">
+                                            <a class="btn btn-primary" id="btn_add_new_rule" onclick="save_new_rule()"
+                                               type="submit"><%= __("Add") %></a>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 py3" id="update_btn" style="display: none"><br>
+                                        <div class="p-4 float-end">
+                                            <a class="btn btn-primary" id="btn_update_rule" onclick="update_rule()"
+                                               type="submit"><%= __("Update") %></a>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <hr/>
+                                <div>
+                                    <table class="table mb-0 table-striped table-bordered" id="myDataTable">
+                                        <thead class="table-light">
+                                        <tr>
+                                            <th class="text-md-center" style="width: 20%"><%= __("Description") %></th>
+                                            <th class="text-md-center"
+                                                style="width: 7%"><%= __("New Member Only") %></th>
+                                            <th class="text-md-center"><%= __("Total Class") %></th>
+                                            <th class="text-md-center"><%= __("Total Course") %></th>
+                                            <th class="text-md-center"><%= __("Class per Week") %></th>
+                                            <th class="text-md-center"><%= __("Class per Month") %></th>
+                                            <th class="text-md-center"><%= __("By Course Code") %></th>
+                                            <th class="text-md-center"><%= __("By Master Code") %></th>
+                                            <th class="text-md-center"><%= __("By Product Code") %></th>
+                                            <th class="text-md-center"><%= __("Action") %></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- voucher rules modal ended -->
+
+    <!-- Check master code modal -->
+    <div class="modal fade" id="mastercode_Modal" role="dialog">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table class="table mb-0 table-striped table-bordered table-hover"
+                                   id="selection_table_search"
+                                   data-ordering="false" data-searching="false" data-paging="false" data-info="false">
+                                <thead class="table-light">
+                                <tr>
+                                    <th class="text-md-center" style="width: 20%"><%= __("Code") %></th>
+                                    <th class="text-md-center" style="width: 80%"><%= __("Course Title") %></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- Check master code modal ended -->
+
+    <!-- Check course code modal -->
+    <div class="modal fade" id="coursecode_Modal" role="dialog">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table class="table mb-0 table-striped table-bordered table-hover"
+                                   id="selection_table_search2">
+                                <thead class="table-light">
+                                <tr>
+                                    <th class="text-md-center" style="width: 30%"><%= __("Code") %></th>
+                                    <th class="text-md-center" style="width: 70%"><%= __("Course Title") %></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- Check course code modal ended -->
+
+    <!-- Get existing product modal -->
+    <div class="modal fade" id="product_Modal" role="dialog">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="card">
+                        <div class="table-responsive">
+                            <table class="table mb-0 table-striped table-bordered table-hover"
+                                   id="selection_table_search3">
+                                <thead class="table-light">
+                                <tr>
+                                    <th class="text-md-center" style="width: 15%"><%= __("Code") %></th>
+                                    <th class="text-md-center" style="width: 85%"><%= __("Description") %></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Get existing product modal ended -->
+
+    <%- include('./footer.ejs') %>
+
+</div>
+<!--wrapper ended-->
+<script type="text/javascript">
+
+    function add_new() {
+        $("#voucherdesc_form").find(':input:disabled').prop('disabled', false)
+        $('#edit_button_container').hide();
+        $('#del_button_container').hide();
+        $('#save_button_container').show();
+        $('#voucherdesc_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#voucherdesc_Modal').modal('show');
+    }
+
+    function decimalCheck(e) {
+        let dec = $('#' + e).val();
+        // console.log(dec);
+        $('#' + e).val(dec.replace(/[^0-9.,-]/g, ''));
+        if (dec.includes(".")) {
+            let res = dec.substring(dec.indexOf(".") + 1);
+            let kl = res.split("");
+            if (kl.length > 1) {
+                $('#' + e).val((parseInt(dec * 100) / 100).toFixed(2));
+            }
+        }
+    }
+
+    function voucher_rules() {
+        $('#voucherdesc_Modal').modal('hide');
+        $('#voucherrules_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#voucherrules_Modal').modal('show');
+        $('#rule_vcode').val($('#voucher_code').val());
+        $('#v_code_v').text(` (` + $('#rule_vcode').val() + ` - ` + $('#voucher_name').val() + `) `)
+        $('#voucherdesc_form').trigger('reset');
+        get_rule_list($('#rule_vcode').val());
+    }
+
+    function get_rule_list(e) {
+        $('#myDataTable').DataTable().data().clear().draw();
+        $.ajax({
+            type: 'post',
+            async: false,
+            url: '/system/vouchers',
+            data: {action: 'get_rule_list', vcode: e},
+            success: function (return_data) {
+                $.each(return_data, function (i) {
+                    this_row = `<tr>`;
+                    this_row += `<td class="text-md-left" style="width: 20%">` + return_data[i].Description + `</td>`;
+                    this_row += `<td class="text-md-center" style="width: 7%">`;
+                    this_row += `<input class="form-check-input" type="radio" `;
+                    if (return_data[i].isNewMember === true) {
+                        this_row += ` checked `;
+                    }
+                    this_row += `disabled ><%= __("Yes") %></input>&nbsp;`;
+                    this_row += `<input class="form-check-input" type="radio" `;
+                    if (return_data[i].isNewMember === false) {
+                        this_row += ` checked `;
+                    }
+                    this_row += `disabled ><%= __("No") %></input>`;
+                    this_row += `</td>`;
+                    this_row += `<td class="text-md-end">` + return_data[i].QtyCond + `</td>`;
+                    this_row += `<td class="text-md-end">` + return_data[i].CourseQtyCond + `</td>`;
+                    this_row += `<td class="text-md-end">` + return_data[i].WeekQtyCond + `</td>`;
+                    this_row += `<td class="text-md-end">` + return_data[i].MonthQtyCond + `</td>`;
+                    this_row += `<td class="text-md-center">` + return_data[i].CourseCode + `</td>`;
+                    this_row += `<td class="text-md-center">` + return_data[i].CourseMasterCode + `</td>`;
+                    this_row += `<td class="text-md-center" >` + return_data[i].ProductCode + `</td>`;
+                    this_row += `<td class="text-md-center" style="width: 15%">`;
+                    this_row += `<button type="button" class="btn btn-sm btn-outline-primary ms-2" onclick="edit_rule('` + return_data[i].idx + `','` + e + `')"><i class='bx bx-edit me-0'></i></button>`;
+                    this_row += `<button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="delete_rule('` + return_data[i].idx + `','` + e + `')"><i class='bx bx-trash me-0'></i></button>`;
+                    this_row += `</td>`;
+                    this_row += `</tr>`;
+                    $('#myDataTable').DataTable().row.add($(this_row)).draw(false);
+                });
+            }
+        });
+    }
+
+    function checkdup() {
+        let count;
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/system/vouchers',
+            data: {action: 'checkdup', vcode: $('#voucher_code').val()},
+            success: function (return_data) {
+                count = return_data.length;
+            }
+        });
+        if ($('#voucher_code').val() !== '') {
+            // edit mode no need to check
+            return true;
+        }
+        if (count < 1) {
+            $('#voucher_code').removeClass("border-danger-input_alert")
+            //alert('return true '+count);
+            return true;
+        } else {
+            $('#promptMSG').text('<%= __("Voucher code already exists!") %>');
+            $('#msgModal').modal('show');
+            $('#voucher_code').addClass("border-danger-input_alert");
+            // alert('return false '+count);
+            return false;
+        }
+    }
+
+    function intCheck(e) {
+        let dec = $('#' + e).val();
+        $('#' + e).val(dec.replace(/[^0-9]/g, ''));
+    }
+
+    function delete_voucher() {
+        $('#delete_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#delete_Modal').modal('show')
+    }
+
+    function update_voucher() {
+        if (checkrequired()) {
+            let form = $('#voucherdesc_form')
+            $.ajax({
+                async: false,
+                type: 'post',
+                url: '/system/vouchers',
+                data: {action: 'update_voucher', form: form.serialize(), vcode: $('#voucher_code').val()},
+                success: function (return_data) {
+                    count = return_data.length;
+                }
+            });
+        }
+        $('#voucherdesc_Modal').modal('hide')
+        get_voucher_listfull()
+    }
+
+    function del_confirm() {
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/system/vouchers',
+            data: {action: 'delete_voucher', vcode: $('#del_vcode').val()}
+        });
+        $('#delete_voucher_form').trigger('reset');
+        $('#voucherdesc_form').trigger('reset');
+        $('#voucherdesc_Modal').modal('hide');
+        $('#delete_Modal').modal('hide');
+        get_voucher_listfull()
+    }
+
+    function save_voucher() {
+        if (checkrequired() && checkdup()) {
+            let form = $('#voucherdesc_form')
+            $.ajax({
+                async: false,
+                type: 'post',
+                url: '/system/vouchers',
+                data: {action: 'save_new', form: form.serialize()},
+                success: function (return_data) {
+                    count = return_data.length;
+                }
+            });
+        }
+        $('#voucherdesc_Modal').modal('hide')
+        get_voucher_listfull()
+    }
+
+    function checkrequired() {
+        if ($('#voucher_code').val() === '') {
+            // no schedule yet
+            $('#promptMSG').text('<%= __("Please provide Voucher code") %>');
+            $('#msgModal').modal('show');
+            $('#voucher_code').addClass("border-danger-input_alert");
+            return false;
+        } else {
+            $('#voucher_code').removeClass("border-danger-input_alert");
+        }
+
+        if ($('#voucher_name').val() === '') {
+            $('#promptMSG').text('<%= __("Please provide Voucher Name") %>');
+            $('#msgModal').modal('show');
+            $('#voucher_name').addClass("border-danger-input_alert");
+            return false;
+        } else {
+            $('#voucher_name').removeClass("border-danger-input_alert");
+        }
+
+        if ($('input[name="voucher_type"]:checked').val() === undefined) {
+            $('#promptMSG').text('<%= __("Please select Voucher Type") %>');
+            $('#msgModal').modal('show');
+            $('input[name="voucher_type"]').addClass("border-danger-input_alert");
+            return false;
+        } else {
+            $('input[name="voucher_type"]').removeClass("border-danger-input_alert");
+        }
+
+        if ($('#qty').val() === '') {
+            $('#promptMSG').text('<%= __("Please enter qty") %>');
+            $('#msgModal').modal('show');
+            $('#qty').addClass("border-danger-input_alert");
+            return false;
+        } else {
+            $('#qty').removeClass("border-danger-input_alert");
+        }
+
+        if ($('#amount').val() === '' && $('#discount').val() === '') {
+            $('#promptMSG').text('<%= __("Please enter amount or discount") %>');
+            $('#msgModal').modal('show');
+            $('#amount').addClass("border-danger-input_alert");
+            $('#discount').addClass("border-danger-input_alert");
+            return false;
+        } else {
+            $('#amount').removeClass("border-danger-input_alert");
+            $('#discount').removeClass("border-danger-input_alert");
+        }
+
+        if ($('#validity').val() === '') {
+            $('#promptMSG').text('<%= __("Please enter validity") %>');
+            $('#msgModal').modal('show');
+            $('#validity').addClass("border-danger-input_alert");
+            return false;
+        } else {
+            $('#validity').removeClass("border-danger-input_alert");
+        }
+
+        if ($('#quota').val() === '') {
+            $('#promptMSG').text('<%= __("Please enter quota") %>');
+            $('#msgModal').modal('show');
+            $('#quota').addClass("border-danger-input_alert");
+            return false;
+        } else {
+            $('#quota').removeClass("border-danger-input_alert");
+        }
+
+        if ($('#start_date').val() === '') {
+            $('#promptMSG').text('<%= __("Please choose start date") %>');
+            $('#msgModal').modal('show');
+            $('#start_date').addClass("border-danger-input_alert");
+            return false;
+        } else {
+            $('#en_start_date').removeClass("border-danger-input_alert");
+        }
+
+        if ($('#end_date').val() === '') {
+            $('#promptMSG').text('<%= __("Please choose end date") %>');
+            $('#msgModal').modal('show');
+            $('#en_end_date').addClass("border-danger-input_alert");
+            return false;
+        } else {
+            $('#end_date').removeClass("border-danger-input_alert");
+            return true;
+        }
+    }
+
+    function get_voucher_listfull() {
+        $('#myDataTable2').DataTable().data().clear();
+        $.ajax({
+            type: 'post',
+            async: false,
+            url: '/system/vouchers',
+            data: {action: 'get_voucher_list'},
+            success: function (return_data) {
+                $.each(return_data, function (i) {
+                    this_row = `<tr onclick="voucher_edit('` +
+                        return_data[i].VoucherCode + `','` +
+                        return_data[i].VoucherName.replace(/'/g, '&amp;#39;') + `','` +
+                        return_data[i].VoucherType + `','` +
+                        return_data[i].Amount + `','` +
+                        return_data[i].Discount + `','` +
+                        return_data[i].Validity + `','` +
+                        return_data[i].Qty + `','` +
+                        new Date(return_data[i].VoucherStart).toLocaleDateString('en-CA', {timeZone: 'GMT'}) + `','` +
+                        new Date(return_data[i].VoucherEnd).toLocaleDateString('en-CA', {timeZone: 'GMT'}) + `','` +
+                        return_data[i].Quota + `')">`;
+                    this_row += `<td class="text-md-left" style="width: 10%">` + return_data[i].VoucherCode + `</td>
+                                 <td class="text-md-left" style="width: 25%">` + return_data[i].VoucherName + `</td>
+                                 <td class="text-md-left" style="width: 10%">` + return_data[i].VoucherType + `</td>
+                                 <td class="text-md-end" style="width: 5%">` + return_data[i].Qty + `</td>
+                                 <td class="text-md-end" style="width: 5%">` + return_data[i].Amount + `</td>
+                                 <td class="text-md-end" style="width: 5%">` + return_data[i].Discount + `</td>
+                                 <td class="text-md-end" style="width: 5%">` + return_data[i].Validity + `</td>
+                                 <td class="text-md-center" style="width: 15%">` + new Date(return_data[i].VoucherStart).toLocaleDateString('en-CA', {timeZone: 'GMT'}) + `</td>
+                                 <td class="text-md-center" style="width: 15%">` + new Date(return_data[i].VoucherEnd).toLocaleDateString('en-CA', {timeZone: 'GMT'}) + `</td>
+                                 <td class="text-md-end" style="width: 5%">` + return_data[i].Quota + `</td>
+                                 </tr>`;
+                    $('#myDataTable2').DataTable().row.add($(this_row)).draw(false);
+                });
+            }
+        });
+    }
+
+    function edit_rule(idx, e) {
+        $.ajax({
+            type: 'post',
+            async: false,
+            url: '/system/vouchers',
+            data: {action: 'get_rule', idx: idx},
+            success: function (return_data) {
+                $('#rule_idx').val(idx);
+                $('#rule_vcode').val(e);
+                $('#rule_description').val(return_data[0].Description);
+                $('#rule_qtycond').val(return_data[0].QtyCond);
+                $('#rule_qtycoursecond').val(return_data[0].CourseQtyCond);
+                $('#rule_weekqtycond').val(return_data[0].WeekQtyCond);
+                $('#rule_monthqtycond').val(return_data[0].MonthQtyCond);
+                $("input[name=rule_isnewmember][value=" + return_data[0].isNewMember + "]").prop('checked', true);
+                $('#rule_coursecode').val(return_data[0].CourseCode);
+                $('#rule_mastercode').val(return_data[0].CourseMasterCode);
+                $('#rule_productcode').val(return_data[0].ProductCode);
+                $('#add_btn').hide();
+                $('#update_btn').show();
+            }
+        });
+    }
+
+    function get_voucher_list() {
+        $('#selection_table_search5').DataTable().data().clear();
+        $.ajax({
+            type: 'post',
+            async: false,
+            url: '/system/vouchers',
+            data: {action: 'get_voucher_list'},
+            success: function (return_data) {
+                $.each(return_data, function (i) {
+                    this_row = `<tr onclick="use_this_vouchercode('` +
+                        return_data[i].VoucherCode + `','` +
+                        return_data[i].VoucherName + `','` +
+                        return_data[i].VoucherType + `','` +
+                        return_data[i].Amount + `','` +
+                        return_data[i].Discount + `','` +
+                        return_data[i].Validity + `','` +
+                        return_data[i].Qty + `','` +
+                        new Date(return_data[i].VoucherStart).toLocaleDateString('en-CA', {timeZone: 'GMT'}) + `','` +
+                        new Date(return_data[i].VoucherEnd).toLocaleDateString('en-CA', {timeZone: 'GMT'}) + `','` +
+                        return_data[i].Quota + `')">`;
+                    this_row += `<td class="text-md-left" style="width: 10%">` + return_data[i].VoucherCode + `</td>`;
+                    this_row += `<td class="text-md-left" style="width: 75%">` + return_data[i].VoucherName + `</td>`;
+                    this_row += `<td class="text-md-left" style="width: 15%">` + return_data[i].VoucherType + `</td>`;
+                    this_row += `</tr>`;
+                    $('#selection_table_search5').DataTable().row.add($(this_row)).draw(false);
+                });
+            }
+        });
+        $('#voucher_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#voucher_Modal').modal('show');
+    }
+
+    function open_voucher_edit() {
+        $("#voucherdesc_form").find(':input:disabled').prop('disabled', false)
+        set_field()
+        $('#voucher_code').prop('disabled', true)
+        $('#btn_get_vlist').prop('disabled', true)
+        $('#edit_button_container').hide()
+        $('#save_button_container').show()
+        $('#saveChange').attr('onclick', 'update_voucher()')
+        $('#del_button_container').show()
+    }
+
+    function delete_rule(idx, e) {
+        $.ajax({
+            async: false,
+            type: 'post',
+            url: '/system/vouchers',
+            data: {action: 'delete_rule', idx: idx}
+        });
+        get_rule_list(e);
+    }
+
+    function update_rule() {
+        if (check_rulerequired()) {
+            $.ajax({
+                async: false,
+                type: 'post',
+                url: '/system/vouchers',
+                data: {
+                    action: 'update_rule',
+                    rule_vcode: $('#rule_vcode').val(),
+                    rule_description: $('#rule_description').val(),
+                    rule_qtycond: $('#rule_qtycond').val(),
+                    rule_qtycoursecond: $('#rule_qtycoursecond').val(),
+                    rule_weekqtycond: $('#rule_weekqtycond').val(),
+                    rule_monthqtycond: $('#rule_monthqtycond').val(),
+                    rule_isnewmember: $('input[name="rule_isnewmember"]:checked').val(),
+                    rule_coursecode: $('#rule_coursecode').val(),
+                    rule_mastercode: $('#rule_mastercode').val(),
+                    rule_productcode: $('#rule_productcode').val(),
+                    idx: $('#rule_idx').val()
+                }
+            });
+        }
+        get_rule_list($('#rule_vcode').val());
+        $('#add_btn').show();
+        $('#update_btn').hide();
+        $('#rule_form').trigger('reset')
+    }
+
+    function save_new_rule() {
+        if (check_rulerequired()) {
+            $.ajax({
+                async: false,
+                type: 'post',
+                url: '/system/vouchers',
+                data: {
+                    action: 'save_new_rule',
+                    rule_vcode: $('#rule_vcode').val(),
+                    rule_description: $('#rule_description').val(),
+                    rule_qtycond: $('#rule_qtycond').val(),
+                    rule_qtycoursecond: $('#rule_qtycoursecond').val(),
+                    rule_weekqtycond: $('#rule_weekqtycond').val(),
+                    rule_monthqtycond: $('#rule_monthqtycond').val(),
+                    rule_isnewmember: $('input[name="rule_isnewmember"]:checked').val(),
+                    rule_coursecode: $('#rule_coursecode').val(),
+                    rule_mastercode: $('#rule_mastercode').val(),
+                    rule_productcode: $('#rule_productcode').val()
+                }
+            });
+        }
+        get_rule_list($('#rule_vcode').val());
+        $('#rule_form').trigger('reset')
+    }
+
+    function check_rulerequired() {
+        if ($('#rule_description').val() === '') {
+            // no schedule yet
+            $('#promptMSG').text('<%= __("Please provide rule description") %>');
+            $('#msgModal').modal('show');
+            $('#rule_description').addClass("border-danger-input_alert");
+            return false;
+        } else {
+            $('#rule_description').removeClass("border-danger-input_alert");
+        }
+
+        if ($('#rule_qtycond').val() === '') {
+            // no schedule yet
+            $('#promptMSG').text('<%= __("Please provide Order count") %>');
+            $('#msgModal').modal('show');
+            $('#rule_qtycond').addClass("border-danger-input_alert");
+            return false;
+        } else {
+            $('#rule_qtycond').removeClass("border-danger-input_alert");
+        }
+
+        if ($('#rule_qtycoursecond').val() === '') {
+            // no schedule yet
+            $('#promptMSG').text('<%= __("Please provide Count by course") %>');
+            $('#msgModal').modal('show');
+            $('#rule_qtycoursecond').addClass("border-danger-input_alert");
+            return false;
+        } else {
+            $('#rule_qtycoursecond').removeClass("border-danger-input_alert");
+        }
+
+        if ($('#rule_weekqtycond').val() === '') {
+            // no schedule yet
+            $('#promptMSG').text('<%= __("Please provide Count by week") %>');
+            $('#msgModal').modal('show');
+            $('#rule_weekqtycond').addClass("border-danger-input_alert");
+            return false;
+        } else {
+            $('#rule_weekqtycond').removeClass("border-danger-input_alert");
+        }
+
+        if ($('#rule_monthqtycond').val() === '') {
+            // no schedule yet
+            $('#promptMSG').text('<%= __("Please provide Count by month") %>');
+            $('#msgModal').modal('show');
+            $('#rule_monthqtycond').addClass("border-danger-input_alert");
+            return false;
+        } else {
+            $('#rule_monthqtycond').removeClass("border-danger-input_alert");
+        }
+
+        if ($('input[name="rule_isnewmember"]:checked').val() === undefined) {
+            $('#promptMSG').text('<%= __("Please choose for new member or not") %>');
+            $('#msgModal').modal('show');
+            $('#rule_isnewmember_yes').addClass("border-danger-input_alert");
+            $('#rule_isnewmember_no').addClass("border-danger-input_alert");
+            return false;
+        } else {
+            $('#rule_isnewmember_yes').removeClass("border-danger-input_alert");
+            $('#rule_isnewmember_no').removeClass("border-danger-input_alert");
+        }
+
+        if ($('#rule_coursecode').val() === '') {
+            // no schedule yet
+            $('#promptMSG').text('<%= __("Please provide Course Code") %>');
+            $('#msgModal').modal('show');
+            $('#rule_coursecode').addClass("border-danger-input_alert");
+            return false;
+        } else {
+            $('#rule_coursecode').removeClass("border-danger-input_alert");
+        }
+
+        if ($('#rule_mastercode').val() === '') {
+            // no schedule yet
+            $('#promptMSG').text('<%= __("Please provide Master Code") %>');
+            $('#msgModal').modal('show');
+            $('#rule_mastercode').addClass("border-danger-input_alert");
+            return false;
+        } else {
+            $('#rule_mastercode').removeClass("border-danger-input_alert");
+        }
+
+        if ($('#rule_productcode').val() === '') {
+            // no schedule yet
+            $('#promptMSG').text('<%= __("Please provide Product Code") %>');
+            $('#msgModal').modal('show');
+            $('#rule_productcode').addClass("border-danger-input_alert");
+            return false;
+        } else {
+            $('#rule_productcode').removeClass("border-danger-input_alert");
+            return true;
+        }
+    }
+
+    function voucher_edit(co, na, t, amt, dis, v, qty, str, end, qu) {
+        $('#voucherdesc_form').trigger('reset')
+        $('#voucher_code').val(co)
+        $('#voucher_name').val(na.replace(/&#39;/g, "'"))
+        $("input[name=voucher_type][value='" + t + "']").prop('checked', true);
+        $('#qty').val(qty)
+        $('#amount').val(amt)
+        $('#discount').val(dis)
+        $('#validity').val(v)
+        $('#quota').val(qu)
+        $('#start_date').val(str)
+        $('#end_date').val(end)
+        $('#del_vcode').val(co)
+        $('#del_vcode_v').text(co)
+        $("#voucherdesc_form :input").prop("disabled", true)
+        $('#voucherdesc_Modal').modal('show')
+        $('#btn_edit_voucher').prop('disabled', false)
+        $('#btn_voucher_rules').prop('disabled', false)
+        $('#edit_button_container').show();
+        $('#save_button_container').hide();
+        $('#del_button_container').hide()
+    }
+
+    function use_this_vouchercode(co, na, t, amt, dis, v, qty, str, end, qu) {
+        $('#voucher_Modal').modal('hide');
+        $('#voucher_code').val(co)
+        $('#voucher_name').val(na)
+        $("input[name=voucher_type][value='" + t + "']").prop('checked', true);
+        $('#qty').val(qty)
+        $('#amount').val(amt)
+        $('#discount').val(dis)
+        $('#validity').val(v)
+        $('#quota').val(qu)
+        $('#start_date').val(str)
+        $('#end_date').val(end)
+        set_field()
+    }
+
+    function set_field() {
+        if ($('input[name="voucher_type"]:checked').val() === 'Discount') {
+            $('#amount').val('')
+            $('#amount').attr('disabled', 'disabled')
+            $('#discount').removeAttr('disabled')
+        } else {
+            $('#discount').val('')
+            $('#discount').attr('disabled', 'disabled')
+            $('#amount').removeAttr('disabled')
+        }
+        $('#voucher_type01').removeClass("border-danger-input_alert");
+        $('#voucher_type02').removeClass("border-danger-input_alert");
+        $('#voucher_type03').removeClass("border-danger-input_alert");
+        $('#voucher_type04').removeClass("border-danger-input_alert");
+        $('#voucher_type05').removeClass("border-danger-input_alert");
+        $('#voucher_type06').removeClass("border-danger-input_alert");
+    }
+
+    function get_exist_productcode() {
+        $('#selection_table_search3').DataTable().data().clear();
+        $.ajax({
+            type: 'post',
+            async: false,
+            url: '/prod/prod_create',
+            data: {action: 'get_productcode'},
+            success: function (return_data) {
+                this_row = `<tr onclick="use_this_productcode('*')">`;
+                this_row += `<td class="text-md-center"> * </td>`;
+                this_row += `<td class="text-md-center text-primary text-bold-700">ALL</td>`;
+                this_row += `</tr>`;
+                $('#selection_table_search3').DataTable().row.add($(this_row)).draw(false);
+                $.each(return_data, function (i) {
+                    this_row = `<tr onclick="use_this_productcode('` + return_data[i].ProductCode + `')">`;
+                    this_row += `<td class="text-md-left" style="width: 15%">` + return_data[i].ProductCode + `</td>`;
+                    this_row += `<td class="text-md-left" style="width: 85%">` + return_data[i].ProductName.replace(/(.{70})..+/, "$1…") + `</td>`;
+                    this_row += `</tr>`;
+                    $('#selection_table_search3').DataTable().row.add($(this_row)).draw(false);
+                });
+            }
+        });
+        $('#product_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#product_Modal').modal('show');
+    }
+
+    function use_this_productcode(code) {
+        $('#product_Modal').modal('hide');
+        $('#rule_productcode').val(code);
+    }
+
+    function get_exist_coursecode() {
+        $('#selection_table_search2').DataTable().data().clear();
+        $.ajax({
+            type: 'post',
+            async: false,
+            url: '/prod/prod_create',
+            data: {action: 'get_coursecode'},
+            success: function (return_data) {
+                this_row = `<tr onclick="use_this_ccode('*')">`;
+                this_row += `<td class="text-md-center"> * </td>`;
+                this_row += `<td class="text-md-center text-primary text-bold-700">ALL</td>`;
+                this_row += `</tr>`;
+                $('#selection_table_search2').DataTable().row.add($(this_row)).draw();
+                $.each(return_data, function (i) {
+                    this_row = `<tr onclick="use_this_ccode('` + return_data[i].CourseCode + `')">`;
+                    this_row += `<td class="text-md-left" style="width: 30%">` + return_data[i].CourseCode.replace(/(.{20})..+/, "$1…") + `</td>`;
+                    this_row += `<td class="text-md-left" style="width: 70%">` + return_data[i].CourseTitle.replace(/(.{70})..+/, "$1…") + `</td>`;
+                    this_row += `</tr>`;
+                    $('#selection_table_search2').DataTable().row.add($(this_row)).draw();
+                });
+            }
+        });
+        $('#coursecode_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#coursecode_Modal').modal('show');
+    }
+
+    function use_this_ccode(ccode) {
+        $('#rule_coursecode').val(ccode);
+        $('#coursecode_Modal').modal('hide');
+    }
+
+    function get_exist_mastercode() {
+        $('#selection_table_search').DataTable().data().clear();
+        $.ajax({
+            type: 'post',
+            async: false,
+            url: '/prod/prod_create',
+            data: {action: 'get_mastercode'},
+            success: function (return_data) {
+                this_row = `<tr onclick="use_this_mcode('*')">`;
+                this_row += `<td class="text-md-center"> * </td>`;
+                this_row += `<td class="text-md-center text-primary text-bold-700"> ALL </td>`;
+                this_row += `</tr>`;
+                $('#selection_table_search').DataTable().row.add($(this_row)).draw(false);
+                $.each(return_data, function (i) {
+                    this_row = `<tr onclick="use_this_mcode('` + return_data[i].MasterCode + `')">`;
+                    this_row += `<td class="text-md-left" style="width: 20%">` + return_data[i].MasterCode.replace(/(.{15})..+/, "$1…") + `</td>`;
+                    this_row += `<td class="text-md-left" style="width: 80%">` + return_data[i].CourseTitle.replace(/(.{70})..+/, "$1…") + `</td>`;
+                    this_row += `</tr>`;
+                    $('#selection_table_search').DataTable().row.add($(this_row)).draw(false);
+                });
+            }
+        });
+        $('#mastercode_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#mastercode_Modal').modal('show');
+    }
+
+    function use_this_mcode(e) {
+        $('#mastercode_Modal').modal('hide');
+        $('#rule_mastercode').val(e);
+    }
+
+    $(document).ready(function () {
+        $('#voucherdesc_Modal').on('hidden.bs.modal', function () {
+            $('#voucherdesc_form').trigger('reset');
+        })
+        $('#voucherrules_Modal').on('hidden.bs.modal', function () {
+            $('#rule_form').trigger('reset');
+            $('#voucherdesc_form').trigger('reset');
+        })
+    });
+
+    $('#start_date').datepicker({
+        autoclose: true,
+        todayHighlight: true,
+        format: "yyyy-mm-dd",
+        <% if(req.session.lang === 'zh-HK') { %>
+        language: "zh-TW",
+        <% } else if(req.session.lang === 'zh-CN') { %>
+        language: "zh-CN",
+        <% } else { %>
+        language: "en-CA",
+        <% } %>
+    });
+    $('#end_date').datepicker({
+        autoclose: true,
+        todayHighlight: true,
+        format: "yyyy-mm-dd",
+        <% if(req.session.lang === 'zh-HK') { %>
+        language: "zh-TW",
+        <% } else if(req.session.lang === 'zh-CN') { %>
+        language: "zh-CN",
+        <% } else { %>
+        language: "en-CA",
+        <% } %>
+    });
+</script>
+
+</body>
+
+</html>

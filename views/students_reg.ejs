@@ -1,0 +1,346 @@
+
+<%- include('./header.ejs') %>
+
+<body onload="get_badge()" xmlns="http://www.w3.org/1999/html">
+
+<!--wrapper-->
+<div class="wrapper">
+
+<%- include('./sidebar.ejs') %>
+<%- include('./topbar.ejs') %>
+
+<!--start page wrapper -->
+<div class="page-wrapper">
+	<div class="page-content">
+
+		<div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+			<div class="ps-3">
+				<span class="font-30"><i class="bx bx-happy-alt"></i></span>
+				<span class="font-24"><%= __("Students Registration") %></span>
+			</div>
+		</div>
+
+		<form id="StudentProfileData">
+
+			<!-- <div class="col-12 col-lg-9 mx-auto"> -->
+				<div class="card radius-10">
+					<div class="card-body">
+						<div class="row mb-3">
+							<div class="col-sm-3">
+								<h6 class="my-1"><%= __("Student Code") %></h6>
+							</div>
+							<div class="col-sm-9 text-secondary">
+								<input type='text'  class="form-control" id="student_code" placeholder="<%=__("** System Generate **")%>" disabled >
+							</div>
+						</div>
+
+						<div class="row mb-3">
+							<div class="col-sm-3">
+								<h6 class="mb-0"><%= __("Gender") %></h6>
+							</div>
+							<div class="col-sm-9 text-secondary">
+								<input type='radio' class="form-check-input" id="gender_M" name="gender" value="M"> <%=__("Male")%> </input>
+								<input type='radio' class="form-check-input" id="gender_F" name='gender' value="F"> <%=__("Female")%> </input>
+							</div>
+						</div>
+						<div class="row mb-3">
+							<div class="col-sm-3">
+								<h6 class="my-1"><%= __("Name (Eng)") %></h6>
+							</div>
+							<div class="col-sm-9 text-secondary">
+								<input type="text" class="form-control" id="name_eng" name="name_eng" autocomplete="off">
+							</div>
+						</div>
+						<div class="row mb-3">
+							<div class="col-sm-3">
+								<h6 class="my-1"><%= __("Name (Chi)") %></h6>
+							</div>
+							<div class="col-sm-9 text-secondary">
+								<input type="text" class="form-control" id="name_chi" name="name_chi" autocomplete="off">
+							</div>
+						</div>
+						<div class="row mb-3">
+							<div class="col-sm-3">
+								<h6 class="my-1"><%= __("Date of Birth") %></h6>
+							</div>
+							<div class="col-sm-9 text-secondary">
+								<input type="text" class="form-control" id="dob" name="dob" autocomplete="off">
+							</div>
+						</div>
+						<div class="row mb-3">
+							<div class="col-sm-3">
+								<h6 class="my-1"><%= __("Email") %></h6>
+							</div>
+							<div class="col-sm-9 text-secondary">
+								<input type="text" class="form-control" id="email" name="email" autocomplete="off">
+							</div>
+						</div>
+						<div class="row mb-3">
+							<div class="col-sm-3">
+								<h6 class="my-1"><%= __("Mobile") %></h6>
+							</div>
+							<div class="col-sm-9 text-secondary">
+								<input type="text" class="form-control" id="stu_mobile" name="stu_mobile" onkeyup="intCheck('stu_mobile')" autocomplete="off">
+							</div>
+						</div>
+						<div class="row mb-3">
+							<div class="col-sm-3">
+								<h6 class="my-1"><%= __("Branch Code") %></h6>
+							</div>
+							<div class="col-sm-9 text-secondary" onclick="get_branchcode()">
+								<input type="text" class="form-control" id="branchcode"
+									   name="branchcode" autocomplete="off">
+							</div>
+							</div>
+						<div class="row mb-3">
+							<div class="col-sm-3">
+								<h6 class="my-1"><%= __("Address") %></h6>
+							</div>
+							<div class="col-sm-9 text-secondary">
+								<textarea type="text" class="form-control" id="address" name="address" rows="4" autocomplete="off"></textarea>
+							</div>
+						</div>
+						<div class="row mb-3">
+							<div class="col-sm-3">
+								<h6 class="my-1"><%= __("Emergency Contact") %></h6>
+							</div>
+							<div class="col-sm-9 text-secondary">
+								<input type="text" class="form-control" id="em_contact" name="em_contact" autocomplete="off">
+							</div>
+						</div>
+						<div class="row mb-3">
+							<div class="col-sm-3">
+								<h6 class="my-1"><%= __("Emergency Contact Mobile") %></h6>
+							</div>
+							<div class="col-sm-9 text-secondary">
+								<input type="text" class="form-control" id="em_mobile" name="em_mobile" onkeyup="intCheck('em_mobile')" autocomplete="off">
+							</div>
+						</div>
+						<div class="row mb-3">
+							<div class="col-sm-3">
+								<h6 class="my-1"><%= __("School") %></h6>
+							</div>
+							<div class="col-sm-9 text-secondary">
+								<input type="text" class="form-control" id="school" name="school" autocomplete="off">
+							</div>
+						</div>
+						<div class="row mb-3">
+							<div class="col-sm-3">
+								<h6 class="my-1"><%= __("Current level") %></h6>
+							</div>
+							<div class="col-sm-9 text-secondary">
+								<input type="text" class="form-control" id="level" name="level" autocomplete="off">
+							</div>
+						</div>
+						<div class="row mb-3">
+							<div class="col-sm-3">
+								<h6 class="my-1"><%= __("Remarks") %></h6>
+							</div>
+							<div class="col-sm-9 text-secondary">
+								<textarea type="text" class="form-control" id="remarks" name="remarks" rows="2" required autocomplete="off"></textarea>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-sm-3"></div>
+							<div class="col-sm-9 text-secondary">
+								<span id="confirmation" class="text-center text-primary font-18"></span>
+								<div  id="save_button_container">
+									<input type="button" id="saveChange" class="btn btn-primary px-4" onclick="save_student()"
+									   value="<%= __("Save") %>"/></h6>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			<!-- </div> -->
+
+		</form>
+		<%- include('./copyright.ejs') %>
+	</div>
+</div>
+<!--end page wrapper -->
+
+<!-- Get branch code modal -->
+<div class="modal fade" id="branchcode_Modal" role="dialog">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-body">
+				<div class="modal-header">
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="card">
+					<div class="table-responsive">
+						<table class="table mb-0 table-striped table-bordered table-sm" id="product_list_sm"
+							   data-paging="false">
+							<thead class="table-light">
+							<tr>
+								<th class="text-md-center" style="width: 20%"></th>
+								<th class="text-md-center" style="width: 80%"><%= __("Branch Code") %></th>
+							</tr>
+							</thead>
+							<tbody>
+							</tbody>
+							<tfoot>
+							<tr>
+								<td class="text-left">
+									<a class="btn btn-primary btn-sm radius-30 px-4" data-bs-dismiss="modal"
+									   onclick="use_this_branchcode()"><%= __("Apply") %></a>
+								</td>
+								<td class="text-end">
+									<a class="btn btn-secondary btn-sm radius-30 px-4"
+									   data-bs-dismiss="modal"><%= __("Cancel") %></a>
+								</td>
+							</tr>
+							</tfoot>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>
+<!-- get branch code modal ended -->
+
+<%- include('./footer.ejs') %>
+
+</div>
+<!--wrapper ended-->
+
+<script type="text/javascript">
+	function save_student() {
+
+		let e = $('input[name="gender"]:checked').val();
+		if (e === undefined) {
+			$('#promptMSG').text('<%= __("Please select gender") %>');
+			$('#msgModal').modal('show');
+			$('#gender_M').addClass("border-danger-input_alert");
+			$('#gender_F').addClass("border-danger-input_alert");
+			return;
+		} else {
+			$('#gender_M').removeClass("border-danger-input_alert");
+			$('#gender_F').removeClass("border-danger-input_alert");
+		}
+		if ($('#name_chi').val()==='' && $('#name_eng').val()==='') {
+			$('#promptMSG').text('<%= __("Please enter name") %>');
+			$('#msgModal').modal('show');
+			$('#name_chi').addClass("border-danger-input_alert");
+			$('#name_eng').addClass("border-danger-input_alert");
+			return;
+		} else {
+			$('#name_chi').removeClass("border-danger-input_alert");
+			$('#name_eng').removeClass("border-danger-input_alert");
+		}
+		if ($('#email').val()==='' && $('#stu_mobile').val()==='') {
+			$('#promptMSG').text('<%= __("Please provide at least one contact method") %>');
+			$('#msgModal').modal('show');
+			$('#email').addClass("border-danger-input_alert");
+			$('#stu_mobile').addClass("border-danger-input_alert");
+			return;
+		} else {
+			$('#email').removeClass("border-danger-input_alert");
+			$('#stu_mobile').removeClass("border-danger-input_alert");
+		}
+
+		$('#saveChange').removeAttr('onclick');
+		$('#save_button_container').hide();
+
+		let form = $('#StudentProfileData');
+		$.ajax({
+			async: false,
+			type: 'post',
+			url: '/students/registration',
+			data: {action: 'save_student', form: form.serialize()},
+			success: function (return_data) {
+				if (return_data[0].StudentCode) {
+					$('#student_code').val(return_data[0].StudentCode)
+					$("#StudentProfileData").find(':input:not(:disabled)').prop('disabled',true)
+					$('#confirmation').text('Student Created');
+				}
+			}
+		});
+		setTimeout(resume_normal, 6000)
+	}
+	function resume_normal() {
+		$('#save_button_container').show();
+		$('#saveChange').attr('onclick', 'save_student()');
+		$('#confirmation').text('');
+		$("#StudentProfileData").find(':input:disabled').prop('disabled',false)
+		$("#StudentProfileData").trigger('reset');
+		$('#student_code').prop('disabled',true)
+	}
+	function intCheck(e) {
+		let dec = $('#' + e).val();
+		$('#' + e).val(dec.replace(/[^0-9]/g, ''));
+	}
+
+	// testing branch code modal
+
+	function get_branchcode() {
+        $('#product_list_sm').DataTable().data().clear();
+        $.ajax({
+            type: 'post',
+            async: false,
+            url: '/system/users',
+            data: {action: 'get_branchcode'},
+            success: function (return_data) {
+                $.each(return_data, function (i) {
+                    this_row = `<tr>`;
+                    this_row += `<td class="text-md-center" style="width: 20%"><input class="checkoption" onclick="confirm_branchcode()" type="checkbox" value="` + return_data[i].BranchCode + `"></td>`;
+                    this_row += `<td class="text-md-center" style="width: 80%">` + return_data[i].BranchCode + `</td>`;
+                    this_row += `</tr>`;
+
+                    $('#product_list_sm').DataTable().row.add($(this_row)).draw(false);
+                });
+            }
+        });
+		$('#branchcode_Modal').modal({backdrop: 'static', keyboard: false})
+        $('#branchcode_Modal').modal('show');
+    }
+
+	function use_this_branchcode() {
+        $('#branchcode_Modal').modal('hide');
+        let x = $('#product_list_sm').DataTable().$('input[type=checkbox]:checked');
+        console.log('------use_this_branchcode------');
+        console.log(x.length)
+        console.log(x)
+        $.each(x, function (i) {
+            if (i > 0) {
+                console.log('------if i>0 ------');
+                $('#branchcode').val($('#branchcode').val() + ',' + x[i].value);
+            } else {
+                console.log('------if i<0 ------');
+                console.log(x[i].value)
+                $('#branchcode').val(x[i].value);
+            }
+        });
+    }
+	
+	//Choose one branchcode only
+	// function confirm_branchcode(){
+	// 	console.log('--------check branch--------')
+	// 	console.log($('input[name="checkoption"]'))
+	// 	$('.checkoption').click(function() {
+    //      $('.checkoption').not(this).prop('checked', false);
+    //   });
+	// }
+
+	$(document).ready(function () {
+		$('#dob').datepicker({
+			autoclose: true,
+			todayHighlight: true,
+			format: "yyyy-mm-dd",
+			<% if(req.session.lang === 'zh-HK') { %>
+			language: "zh-TW",
+			<% } else if(req.session.lang === 'zh-CN') { %>
+			language: "zh-CN",
+			<% } else { %>
+			language: "en-CA",
+			<% } %>
+		});
+	});
+</script>
+
+</body>
+
+</html>
